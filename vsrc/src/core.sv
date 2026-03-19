@@ -223,7 +223,7 @@ module core import common::*;(
 	assign fetch_req_new_fire = fetch_can_consume && (!fetch_pending);
 	assign fetch_issue_fire = fetch_req_new_fire;
 	assign fetch_req_addr = fetch_pending ? fetch_req_pc : fetch_pc;
-	assign ireq.valid = !halted && !trap_commit && (fetch_pending || fetch_issue_fire);
+	assign ireq.valid = !halted && !trap_commit && (fetch_pending || fetch_issue_fire) && !stall_if_mem;
 	assign ireq.addr  = fetch_req_addr;
 
 	assign dreq.valid  = mem_r.valid && (mem_r.is_load || mem_r.is_store) && !trap_commit;

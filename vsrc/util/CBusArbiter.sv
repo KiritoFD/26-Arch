@@ -23,8 +23,9 @@ module CBusArbiter
     int index, select;
     cbus_req_t saved_req, selected_req;
 
-    // assign oreq = ireqs[index];
-    assign oreq = busy ? ireqs[index] : '0;  // prevent early issue
+    // Drive a latched request while busy so the downstream bus sees a stable
+    // transaction until completion.
+    assign oreq = busy ? saved_req : '0;
     assign selected_req = ireqs[select];
 
     // select a preferred request
@@ -55,19 +56,16 @@ module CBusArbiter
     if (~reset) begin
         if (busy) begin
             if (oresp.last) begin
-                if (selected_req.valid) begin
-                    busy <= 1'b1;
-                    index <= select;
-                    saved_req <= selected_req;
-                end else begin
-                    {busy, saved_req} <= '0;
-                end
+                // Finish current transaction first; pick next request in the
+                // following cycle so upstream has one cycle to update signals.
+                {busy, saved_req} <= '0;
             end
         end else begin
-            // if not valid, busy <= 0
             busy <= selected_req.valid;
-            index <= select;
-            saved_req <= selected_req;
+            if (selected_req.valid) begin
+                index <= select;
+                saved_req <= selected_req;
+            end
         end
     end else begin
         {busy, index, saved_req} <= '0;

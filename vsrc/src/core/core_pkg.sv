@@ -34,6 +34,11 @@ package core_pkg;
 	localparam logic [11:0] CSR_MCYCLE   = 12'hb00;
 	localparam logic [11:0] CSR_MHARTID  = 12'hf14;
 
+	localparam logic [63:0] MSTATUS_MASK = 64'h0000_0000_007e_79bb;
+	localparam logic [63:0] SSTATUS_MASK = 64'h8000_0003_0001_e000;
+	localparam logic [63:0] MIP_MASK     = 64'h0000_0000_0000_0333;
+	localparam logic [63:0] MTVEC_MASK   = ~64'h0000_0000_0000_0002;
+
 	typedef struct packed {
 		logic        valid;
 		logic [63:0] pc;
@@ -98,8 +103,9 @@ package core_pkg;
 		begin
 			sanitize_csr_write = data;
 			unique case (addr)
-				CSR_MTVEC: sanitize_csr_write = {data[63:2], 1'b0, data[0]};
-				CSR_MEPC : sanitize_csr_write = {data[63:1], 1'b0};
+				CSR_MSTATUS: sanitize_csr_write = data & MSTATUS_MASK;
+				CSR_MTVEC:   sanitize_csr_write = data & MTVEC_MASK;
+				CSR_MIP:     sanitize_csr_write = data & MIP_MASK;
 				default  : begin end
 			endcase
 		end

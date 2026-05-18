@@ -70,6 +70,8 @@ package core_pkg;
 		logic        csr_wen;
 		logic [11:0] csr_addr;
 		logic [63:0] csr_wdata;
+		logic        is_ecall;
+		logic        is_mret;
 	} ex_reg_t;
 
 	typedef struct packed {
@@ -90,6 +92,8 @@ package core_pkg;
 		logic        csr_wen;
 		logic [11:0] csr_addr;
 		logic [63:0] csr_wdata;
+		logic        is_ecall;
+		logic        is_mret;
 	} wb_like_reg_t;
 
 	function automatic logic is_mdu_cmd(input logic [3:0] cmd);

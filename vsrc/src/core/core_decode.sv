@@ -47,7 +47,9 @@ module core_decode
 	output logic          id_dec_wb_pc4,
 	output logic          id_dec_csr_wen,
 	output logic [11:0]   id_dec_csr_addr,
-	output logic [63:0]   id_dec_csr_wdata
+	output logic [63:0]   id_dec_csr_wdata,
+	output logic          id_dec_is_ecall,
+	output logic          id_dec_is_mret
 );
 	logic [63:0] id_rs1_val;
 	logic [63:0] id_rs2_val;
@@ -143,6 +145,8 @@ module core_decode
 		id_dec_csr_wen      = 1'b0;
 		id_dec_csr_addr     = id_csr_addr;
 		id_dec_csr_wdata    = 64'd0;
+		id_dec_is_ecall     = 1'b0;
+		id_dec_is_mret      = 1'b0;
 
 		if (id_r.instr == TRAP_INSN) begin
 			id_dec_trap = 1'b1;
@@ -287,40 +291,50 @@ module core_decode
 					end
 				end
 				7'b1110011: begin
-					id_dec_wen = (id_rd != 0);
-					id_dec_op1 = id_csr_rdata;
-					id_dec_op2 = 64'd0;
-					unique case (id_funct3)
-						3'b001: begin
-							id_dec_csr_wen = 1'b1;
-							id_dec_csr_wdata = id_rs1_val;
-						end
-						3'b010: begin
-							id_dec_csr_wen = (id_rs1 != 0);
-							id_dec_csr_wdata = id_csr_rdata | id_rs1_val;
-						end
-						3'b011: begin
-							id_dec_csr_wen = (id_rs1 != 0);
-							id_dec_csr_wdata = id_csr_rdata & ~id_rs1_val;
-						end
-						3'b101: begin
-							id_dec_csr_wen = 1'b1;
-							id_dec_csr_wdata = {59'd0, id_rs1};
-						end
-						3'b110: begin
-							id_dec_csr_wen = (id_rs1 != 0);
-							id_dec_csr_wdata = id_csr_rdata | {59'd0, id_rs1};
-						end
-						3'b111: begin
-							id_dec_csr_wen = (id_rs1 != 0);
-							id_dec_csr_wdata = id_csr_rdata & ~{59'd0, id_rs1};
-						end
-						default: begin
-							id_dec_valid = 1'b0;
-							id_dec_wen = 1'b0;
-						end
-					endcase
-					id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
+					if (id_r.instr == 32'h00000073) begin
+						// ECALL
+						id_dec_is_ecall = 1'b1;
+					end else if (id_r.instr == 32'h30200073) begin
+						// MRET
+						id_dec_is_mret = 1'b1;
+					end else if (id_r.instr == 32'h12000073) begin
+						// SFENCE.VMA - treat as NOP
+					end else begin
+						id_dec_wen = (id_rd != 0);
+						id_dec_op1 = id_csr_rdata;
+						id_dec_op2 = 64'd0;
+						unique case (id_funct3)
+							3'b001: begin
+								id_dec_csr_wen = 1'b1;
+								id_dec_csr_wdata = id_rs1_val;
+							end
+							3'b010: begin
+								id_dec_csr_wen = (id_rs1 != 0);
+								id_dec_csr_wdata = id_csr_rdata | id_rs1_val;
+							end
+							3'b011: begin
+								id_dec_csr_wen = (id_rs1 != 0);
+								id_dec_csr_wdata = id_csr_rdata & ~id_rs1_val;
+							end
+							3'b101: begin
+								id_dec_csr_wen = 1'b1;
+								id_dec_csr_wdata = {59'd0, id_rs1};
+							end
+							3'b110: begin
+								id_dec_csr_wen = (id_rs1 != 0);
+								id_dec_csr_wdata = id_csr_rdata | {59'd0, id_rs1};
+							end
+							3'b111: begin
+								id_dec_csr_wen = (id_rs1 != 0);
+								id_dec_csr_wdata = id_csr_rdata & ~{59'd0, id_rs1};
+							end
+							default: begin
+								id_dec_valid = 1'b0;
+								id_dec_wen = 1'b0;
+							end
+						endcase
+						id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
+					end
 				end
 				default: begin end
 			endcase

@@ -14,13 +14,19 @@
 
 module core
 	import common::*;
-	import core_pkg::*;(
+	import core_pkg::*;
+(
 	input  logic       clk, reset,
 	output ibus_req_t  ireq,
 	input  ibus_resp_t iresp,
 	output dbus_req_t  dreq,
 	input  dbus_resp_t dresp,
-	input  logic       trint, swint, exint
+	input  logic       trint, swint, exint,
+	output logic [63:0]  csr_satp_o,
+	output logic [1:0]   privilege_mode_o,
+	input  logic         walk_fault,
+	input  logic [63:0]  fault_vaddr,
+	input  logic         fault_is_insn
 );
 	// The top level keeps only long-lived pipeline state and control flow.
 	// Decode / execute / MDU details live in dedicated source files now.
@@ -76,6 +82,8 @@ module core
 	logic        id_dec_csr_wen;
 	logic [11:0] id_dec_csr_addr;
 	logic [63:0] id_dec_csr_wdata;
+	logic        id_dec_is_ecall;
+	logic        id_dec_is_mret;
 
 	logic [63:0] csr_mstatus;
 	logic [63:0] csr_mtvec;
@@ -96,6 +104,8 @@ module core
 	logic [63:0] csr_mtval_diff;
 	logic [63:0] csr_mepc_diff;
 	logic [63:0] csr_satp_diff;
+	logic [1:0]  privilege_mode;
+	logic [1:0]  privilege_mode_diff;
 
 	logic        halted;
 	logic        trap_commit;
@@ -106,6 +116,9 @@ module core
 	logic [63:0] trap_instr_latched;
 	logic [63:0] cycle_cnt;
 	logic [63:0] instr_cnt;
+
+	logic        mmu_trap;
+	logic [63:0] trap_vaddr;
 
 	logic        ex_is_mdu;
 	logic        ex_result_ready;
@@ -176,7 +189,9 @@ module core
 		.id_dec_wb_pc4(id_dec_wb_pc4),
 		.id_dec_csr_wen(id_dec_csr_wen),
 		.id_dec_csr_addr(id_dec_csr_addr),
-		.id_dec_csr_wdata(id_dec_csr_wdata)
+		.id_dec_csr_wdata(id_dec_csr_wdata),
+		.id_dec_is_ecall(id_dec_is_ecall),
+		.id_dec_is_mret(id_dec_is_mret)
 	);
 
 	core_execute u_execute(
@@ -223,6 +238,9 @@ module core
 		.trint(trint),
 		.swint(swint),
 		.exint(exint),
+		.mmu_trap(mmu_trap),
+		.trap_vaddr(trap_vaddr),
+		.fault_is_insn(fault_is_insn),
 		.trap_commit(trap_commit),
 		.halted(halted),
 		.trap_valid_latched(trap_valid_latched),
@@ -252,7 +270,9 @@ module core
 		.csr_mcause_diff(csr_mcause_diff),
 		.csr_mtval_diff(csr_mtval_diff),
 		.csr_mepc_diff(csr_mepc_diff),
-		.csr_satp_diff(csr_satp_diff)
+		.csr_satp_diff(csr_satp_diff),
+		.privilege_mode(privilege_mode),
+		.privilege_mode_diff(privilege_mode_diff)
 	);
 
 	assign raw_hazard_ex =
@@ -360,6 +380,8 @@ module core
 					wb_r.csr_wen <= mem_r.csr_wen;
 					wb_r.csr_addr <= mem_r.csr_addr;
 					wb_r.csr_wdata <= mem_r.csr_wdata;
+					wb_r.is_ecall <= mem_r.is_ecall;
+					wb_r.is_mret <= mem_r.is_mret;
 				end
 
 				if (stall_mem_busy) begin
@@ -385,9 +407,9 @@ module core
 					mem_r.csr_wen <= ex_r.csr_wen;
 					mem_r.csr_addr <= ex_r.csr_addr;
 					mem_r.csr_wdata <= ex_r.csr_wdata;
+					mem_r.is_ecall <= ex_r.is_ecall;
+					mem_r.is_mret <= ex_r.is_mret;
 
-					// Flush / bubble policy for the front half of the pipeline is also
-					// centralized here, because it depends on both control flow and hazards.
 					if (ex_flush_front) begin
 						ex_r <= '0;
 						id_r.valid <= 1'b0;
@@ -420,6 +442,8 @@ module core
 						ex_r.csr_wen <= id_dec_csr_wen;
 						ex_r.csr_addr <= id_dec_csr_addr;
 						ex_r.csr_wdata <= id_dec_csr_wdata;
+					ex_r.is_ecall <= id_dec_is_ecall;
+					ex_r.is_mret <= id_dec_is_mret;
 
 						if (fetch_pop_buf) begin
 							id_r.valid <= 1'b1;
@@ -446,6 +470,14 @@ module core
 	end
 
 `ifdef VERILATOR
+	// Output port assignments
+	assign csr_satp_o = csr_satp;
+	assign privilege_mode_o = privilege_mode;
+	// MMU fault signals are inputs from the mmu module
+	// mmu_trap is generated internally when walk_fault is asserted
+	assign trap_vaddr = fault_vaddr;
+	assign mmu_trap = walk_fault;
+
 	DifftestInstrCommit DifftestInstrCommit(
 		.clock              (clk),
 		.coreid             (csr_mhartid[7:0]),

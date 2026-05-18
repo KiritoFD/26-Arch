@@ -4,6 +4,7 @@
 `include "util/IBusToCBus.sv"
 `include "util/DBusToCBus.sv"
 `include "util/CBusArbiter.sv"
+`include "util/mmu.sv"
 
 module SimTop import common::*;(
   input         clock,
@@ -23,24 +24,66 @@ module SimTop import common::*;(
     cbus_resp_t oresp;
     logic trint, swint, exint;
 
-    ibus_req_t  ireq;
-    ibus_resp_t iresp;
-    dbus_req_t  dreq;
-    dbus_resp_t dresp;
+    // Core <-> MMU
+    ibus_req_t  ireq_core;
+    ibus_resp_t iresp_core;
+    dbus_req_t  dreq_core;
+    dbus_resp_t dresp_core;
+
+    // MMU <-> Bus converters
+    ibus_req_t  ireq_bus;
+    ibus_resp_t iresp_bus;
+    dbus_req_t  dreq_bus;
+    dbus_resp_t dresp_bus;
+
     cbus_req_t  icreq,  dcreq;
     cbus_resp_t icresp, dcresp;
 
+    logic [63:0] satp;
+    logic [1:0]  priv_mode;
+    logic        walk_fault;
+    logic [63:0] fault_vaddr;
+    logic        fault_is_insn;
+
     core core(
-      .clk(clock), .reset, .ireq, .iresp, .dreq, .dresp, .trint, .swint, .exint
+      .clk(clock), .reset,
+      .ireq(ireq_core), .iresp(iresp_core),
+      .dreq(dreq_core), .dresp(dresp_core),
+      .trint, .swint, .exint,
+      .csr_satp_o(satp),
+      .privilege_mode_o(priv_mode),
+      .walk_fault(walk_fault),
+      .fault_vaddr(fault_vaddr),
+      .fault_is_insn(fault_is_insn)
     );
 
-    IBusToCBus icvt(.*);
-    DBusToCBus dcvt(.*);
+    mmu u_mmu(
+      .clk(clock), .reset,
+      .satp(satp),
+      .privilege_mode(priv_mode),
+      .ireq_in(ireq_core),  .iresp_in(iresp_core),
+      .dreq_in(dreq_core),  .dresp_in(dresp_core),
+      .ireq_out(ireq_bus),  .iresp_out(iresp_bus),
+      .dreq_out(dreq_bus),  .dresp_out(dresp_bus),
+      .walk_fault(walk_fault),
+      .fault_vaddr(fault_vaddr),
+      .fault_is_insn(fault_is_insn)
+    );
+
+    IBusToCBus icvt(
+      .ireq(ireq_bus), .iresp(iresp_bus),
+      .icreq(icreq), .icresp(icresp)
+    );
+    DBusToCBus dcvt(
+      .dreq(dreq_bus), .dresp(dresp_bus),
+      .dcreq(dcreq), .dcresp(dcresp)
+    );
+
     CBusArbiter mux(
         .clk(clock), .reset,
         .ireqs({icreq, dcreq}),
         .iresps({icresp, dcresp}),
-        .*
+        .oreq(oreq), .oresp(oresp)
     );
 
     RAMHelper2 ram(

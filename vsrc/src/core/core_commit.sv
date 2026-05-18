@@ -10,6 +10,9 @@ module core_commit
 	input  logic         trint,
 	input  logic         swint,
 	input  logic         exint,
+	input  logic         mmu_trap,
+	input  logic [63:0]  trap_vaddr,
+	input  logic         fault_is_insn,
 	output logic         trap_commit,
 	output logic         halted,
 	output logic         trap_valid_latched,
@@ -39,11 +42,24 @@ module core_commit
 	output logic [63:0]  csr_mcause_diff,
 	output logic [63:0]  csr_mtval_diff,
 	output logic [63:0]  csr_mepc_diff,
-	output logic [63:0]  csr_satp_diff
+	output logic [63:0]  csr_satp_diff,
+	output logic [1:0]   privilege_mode,
+	output logic [1:0]   privilege_mode_diff
 );
 	integer i;
 
-	assign trap_commit = wb_r.valid && wb_r.trap;
+	logic wb_ecall;
+	logic wb_mret;
+	logic trap_detected;
+	assign wb_ecall = wb_r.valid && wb_r.is_ecall;
+	assign wb_mret  = wb_r.valid && wb_r.is_mret;
+
+	always_ff @(posedge clk) begin
+		if (reset) trap_detected <= 1'b0;
+		else trap_detected <= mmu_trap;
+	end
+
+	assign trap_commit = (wb_r.valid && wb_r.trap) || trap_detected;
 
 	core_csr u_csr(
 		.clk(clk),
@@ -52,6 +68,13 @@ module core_commit
 		.trint(trint),
 		.swint(swint),
 		.exint(exint),
+		.wb_ecall(wb_ecall),
+		.wb_mret(wb_mret),
+		.mmu_trap(mmu_trap),
+		.trap_vaddr(trap_vaddr),
+		.fault_is_insn(fault_is_insn),
+		.privilege_mode_i(privilege_mode),
+		.privilege_mode(privilege_mode),
 		.csr_mstatus(csr_mstatus),
 		.csr_mtvec(csr_mtvec),
 		.csr_mip(csr_mip),
@@ -70,7 +93,8 @@ module core_commit
 		.csr_mcause_diff(csr_mcause_diff),
 		.csr_mtval_diff(csr_mtval_diff),
 		.csr_mepc_diff(csr_mepc_diff),
-		.csr_satp_diff(csr_satp_diff)
+		.csr_satp_diff(csr_satp_diff),
+		.privilege_mode_diff(privilege_mode_diff)
 	);
 
 	always_ff @(posedge clk) begin
@@ -87,23 +111,21 @@ module core_commit
 				gpr[i] <= 64'd0;
 			end
 		end else begin
-			if (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MCYCLE)) cycle_cnt <= wb_r.csr_wdata;
+			if (wb_r.valid && !mmu_trap && wb_r.csr_wen && (wb_r.csr_addr == CSR_MCYCLE)) cycle_cnt <= wb_r.csr_wdata;
 			else cycle_cnt <= cycle_cnt + 64'd1;
 
-			if (wb_r.valid) instr_cnt <= instr_cnt + 64'd1;
+			if (wb_r.valid && !mmu_trap) instr_cnt <= instr_cnt + 64'd1;
 
-			if (wb_r.valid && wb_r.wen && (wb_r.rd != 0)) begin
+			if (wb_r.valid && !mmu_trap && wb_r.wen && (wb_r.rd != 0)) begin
 				gpr[wb_r.rd] <= wb_r.result;
 			end
 			gpr[0] <= 64'd0;
 
-			// Trap bookkeeping is latched exactly at commit so later control-path
-			// changes do not need to reach back into the pipeline timing block.
 			if (trap_commit) begin
 				halted <= 1'b1;
 				trap_valid_latched <= 1'b1;
-				trap_code_latched <= gpr[10][2:0];
-				trap_pc_latched <= wb_r.pc;
+				trap_code_latched <= mmu_trap ? 3'd0 : gpr[10][2:0];
+				trap_pc_latched <= mmu_trap ? trap_vaddr : wb_r.pc;
 				trap_cycle_latched <= cycle_cnt;
 				trap_instr_latched <= instr_cnt + 64'd1;
 			end
@@ -114,7 +136,7 @@ module core_commit
 		for (int j = 0; j < 32; j = j + 1) begin
 			gpr_diff[j] = gpr[j];
 		end
-		if (wb_r.valid && wb_r.wen && (wb_r.rd != 0)) begin
+		if (wb_r.valid && !mmu_trap && wb_r.wen && (wb_r.rd != 0)) begin
 			gpr_diff[wb_r.rd] = wb_r.result;
 		end
 		gpr_diff[0] = 64'd0;

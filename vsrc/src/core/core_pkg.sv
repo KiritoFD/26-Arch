@@ -73,6 +73,7 @@ package core_pkg;
 		logic        is_ecall;
 		logic        is_mret;
 		logic        is_misalign;
+		logic        is_instr_misalign;
 		logic        is_illegal;
 	} ex_reg_t;
 
@@ -97,6 +98,7 @@ package core_pkg;
 		logic        is_ecall;
 		logic        is_mret;
 		logic        is_misalign;
+		logic        is_instr_misalign;
 		logic        is_illegal;
 	} wb_like_reg_t;
 

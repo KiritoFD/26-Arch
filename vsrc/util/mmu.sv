@@ -11,6 +11,7 @@ module mmu
 	input  logic         reset,
 	input  logic [63:0]  satp,
 	input  logic [1:0]   privilege_mode,
+	input  logic         flush,
 
 	input  ibus_req_t    ireq_in,
 	output ibus_resp_t   iresp_in,
@@ -109,6 +110,9 @@ module mmu
 		end else if (state == WALK_DONE_INSN) begin
 			ireq_out.valid = 1'b1;
 			ireq_out.addr  = phys_addr;
+		end else if (flush) begin
+			ireq_out.valid = 1'b0;
+			ireq_out.addr  = 64'd0;
 		end else begin
 			ireq_out.valid = 1'b0;
 			ireq_out.addr  = 64'd0;
@@ -155,6 +159,19 @@ module mmu
 			fault_vaddr   <= 64'd0;
 			fault_is_insn <= 1'b0;
 			trap_pending  <= 1'b0;
+		end else if (flush) begin
+			state         <= WALK_IDLE;
+			saved_is_insn <= 1'b0;
+			saved_vaddr   <= 64'd0;
+			saved_wdata   <= 64'd0;
+			saved_wstrb   <= 8'd0;
+			saved_size    <= 3'd0;
+			pte_addr      <= 64'd0;
+			saved_pte     <= 64'd0;
+			saved_level   <= 2'd0;
+			fault_vaddr   <= 64'd0;
+			fault_is_insn <= 1'b0;
+			trap_pending  <= 1'b0;
 		end else begin
 			if (walk_fault_next) begin
 				fault_vaddr   <= saved_vaddr;
@@ -174,9 +191,6 @@ module mmu
 								saved_is_insn <= 1'b1;
 								saved_vaddr   <= ireq_in.addr;
 								pte_addr      <= {8'd0, satp_ppn, ireq_in.addr[38:30], 3'b000};
-								$display("[MMU-WALK] START insn vaddr=%h satp=%h ppn=%h vpn2=%h pte_addr=%h",
-									ireq_in.addr, satp, satp_ppn, ireq_in.addr[38:30],
-									{8'd0, satp_ppn, ireq_in.addr[38:30], 3'b000});
 							end else if (dreq_in.valid) begin
 								state         <= WALK_LEVEL2;
 								saved_is_insn <= 1'b0;
@@ -185,8 +199,6 @@ module mmu
 								saved_wstrb   <= dreq_in.strobe;
 								saved_size    <= dreq_in.size;
 								pte_addr      <= {8'd0, satp_ppn, dreq_in.addr[38:30], 3'b000};
-								$display("[MMU-WALK] START data vaddr=%h pte_addr=%h",
-									dreq_in.addr, {8'd0, satp_ppn, dreq_in.addr[38:30], 3'b000});
 							end
 						end
 					end
@@ -194,59 +206,44 @@ module mmu
 
 				WALK_LEVEL2: begin
 					if (dresp_out.data_ok) begin
-						$display("[MMU-WALK] L2 pte=%h V=%b R=%b W=%b X=%b pte_addr=%h",
-							dresp_out.data, dresp_out.data[0], dresp_out.data[1], dresp_out.data[2], dresp_out.data[3], pte_addr);
 						if (!dresp_out.data[0]) begin
 							state <= WALK_IDLE;
-							$display("[MMU-WALK] L2 FAULT: V=0");
 						end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
 							saved_pte   <= dresp_out.data;
 							saved_level <= 2'd2;
 							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
-							$display("[MMU-WALK] L2 LEAF");
 						end else begin
 							state    <= WALK_LEVEL1;
 							pte_addr <= {8'd0, dresp_out.data[53:10], vpn1, 3'b000};
-							$display("[MMU-WALK] L2 PTR -> L1 pte_addr=%h", {8'd0, dresp_out.data[53:10], vpn1, 3'b000});
 						end
 					end
 				end
 
 				WALK_LEVEL1: begin
 					if (dresp_out.data_ok) begin
-						$display("[MMU-WALK] L1 pte=%h V=%b R=%b W=%b X=%b pte_addr=%h",
-							dresp_out.data, dresp_out.data[0], dresp_out.data[1], dresp_out.data[2], dresp_out.data[3], pte_addr);
 						if (!dresp_out.data[0]) begin
 							state <= WALK_IDLE;
-							$display("[MMU-WALK] L1 FAULT: V=0");
 						end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
 							saved_pte   <= dresp_out.data;
 							saved_level <= 2'd1;
 							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
-							$display("[MMU-WALK] L1 LEAF");
 						end else begin
 							state    <= WALK_LEVEL0;
 							pte_addr <= {8'd0, dresp_out.data[53:10], vpn0, 3'b000};
-							$display("[MMU-WALK] L1 PTR -> L0 pte_addr=%h", {8'd0, dresp_out.data[53:10], vpn0, 3'b000});
 						end
 					end
 				end
 
 				WALK_LEVEL0: begin
 					if (dresp_out.data_ok) begin
-						$display("[MMU-WALK] L0 pte=%h V=%b R=%b W=%b X=%b pte_addr=%h",
-							dresp_out.data, dresp_out.data[0], dresp_out.data[1], dresp_out.data[2], dresp_out.data[3], pte_addr);
 						if (!dresp_out.data[0]) begin
 							state <= WALK_IDLE;
-							$display("[MMU-WALK] L0 FAULT: V=0");
 						end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
 							saved_pte   <= dresp_out.data;
 							saved_level <= 2'd0;
 							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
-							$display("[MMU-WALK] L0 LEAF -> DONE");
 						end else begin
 							state <= WALK_IDLE;
-							$display("[MMU-WALK] L0 FAULT: not leaf");
 						end
 					end
 				end

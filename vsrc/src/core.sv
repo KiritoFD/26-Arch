@@ -24,6 +24,7 @@ module core
 	input  logic       trint, swint, exint,
 	output logic [63:0]  csr_satp_o,
 	output logic [1:0]   privilege_mode_o,
+	output logic         flush_mmu_o,
 	input  logic         walk_fault,
 	input  logic [63:0]  fault_vaddr,
 	input  logic         fault_is_insn
@@ -55,6 +56,7 @@ module core
 	logic [63:0] fetch_req_addr;
 	logic        fetch_redirect_pending;
 	logic [63:0] fetch_redirect_pc;
+	logic [1:0]  fetch_redirect_bubble;
 
 	logic [4:0]  id_rs1;
 	logic [4:0]  id_rs2;
@@ -86,6 +88,7 @@ module core
 	logic        id_dec_is_mret;
 	logic        id_dec_is_illegal;
 	logic        ex_misalign;
+	logic        ex_instr_misalign;
 
 	logic [63:0] csr_mstatus;
 	logic [63:0] csr_mtvec;
@@ -224,7 +227,8 @@ module core
 		.mem_store_data_shifted(mem_store_data_shifted),
 		.mem_store_strobe(mem_store_strobe),
 		.difftest_skip(difftest_skip),
-		.ex_misalign(ex_misalign)
+		.ex_misalign(ex_misalign),
+		.ex_instr_misalign(ex_instr_misalign)
 	);
 
 	core_mdu u_mdu(
@@ -239,7 +243,10 @@ module core
 		.mdu_out_result(mdu_out_result)
 	);
 
-	assign intr_fetch_pc = fetch_pc;
+	assign intr_fetch_pc = mem_r.valid ? mem_r.pc :
+	                       ex_r.valid  ? ex_r.pc  :
+	                       id_r.valid  ? id_r.pc  :
+	                                     fetch_pc;
 
 	core_commit u_commit(
 		.clk(clk),
@@ -298,11 +305,11 @@ module core
 	assign stall_pipe  = stall_ex_busy || stall_mem_busy || raw_hazard_ex || raw_hazard_mem;
 	assign stall_front = stall_ex_busy || raw_hazard_ex || raw_hazard_mem || fetch_redirect_pending || stall_if_mem;
 
-	assign fetch_can_consume   = (!halted) && (!trap_commit) && (!stall_front) && !ex_flush_front;
+	assign fetch_can_consume   = (!halted) && (!trap_commit) && (fetch_redirect_bubble == 2'd0) && (!stall_front) && !ex_flush_front;
 	assign fetch_pop_buf       = fetch_can_consume && fetch_buf_valid;
 	assign fetch_resp_fire     = fetch_pending && iresp.data_ok;
 	assign fetch_resp_to_id    = fetch_can_consume && (!fetch_buf_valid) && fetch_resp_fire;
-	assign fetch_resp_to_buf   = fetch_resp_fire && !fetch_resp_to_id && !fetch_redirect_pending;
+	assign fetch_resp_to_buf   = fetch_resp_fire && !fetch_resp_to_id && !fetch_redirect_pending && !trap_redirect && !mret_redirect;
 	assign fetch_fire          = fetch_pop_buf || fetch_resp_to_id;
 	assign fetch_req_new_fire  = fetch_can_consume && (!fetch_pending);
 	assign fetch_issue_fire    = fetch_req_new_fire;
@@ -324,6 +331,7 @@ module core
 			fetch_req_pc <= 64'd0;
 			fetch_redirect_pending <= 1'b0;
 			fetch_redirect_pc <= 64'd0;
+			fetch_redirect_bubble <= 2'd0;
 			fetch_buf_valid <= 1'b0;
 			fetch_buf_pc <= 64'd0;
 			fetch_buf_instr <= 32'd0;
@@ -339,35 +347,31 @@ module core
 			end
 
 		if (!halted && !trap_commit) begin
+			if (fetch_redirect_bubble != 2'd0) begin
+				fetch_redirect_bubble <= fetch_redirect_bubble - 2'd1;
+			end
 			// Trap redirect (exception/interrupt) and MRET redirect have highest priority
 			if (trap_redirect || mret_redirect) begin
 				fetch_buf_valid <= 1'b0;
-				if (fetch_pending && !fetch_resp_fire) begin
-					fetch_redirect_pending <= 1'b1;
-					fetch_redirect_pc <= trap_redirect_pc;
-				end else begin
+				fetch_pending <= 1'b0;
+				fetch_req_pc <= 64'd0;
+				fetch_redirect_pending <= 1'b0;
+				fetch_pc <= trap_redirect_pc;
+				fetch_redirect_bubble <= 2'd2;
+			end else if (ex_flush_front) begin
+					fetch_buf_valid <= 1'b0;
 					fetch_pending <= 1'b0;
 					fetch_req_pc <= 64'd0;
 					fetch_redirect_pending <= 1'b0;
-					fetch_pc <= trap_redirect_pc;
-				end
-			end else if (ex_flush_front) begin
-					fetch_buf_valid <= 1'b0;
-					if (fetch_pending && !fetch_resp_fire) begin
-						fetch_redirect_pending <= 1'b1;
-						fetch_redirect_pc <= ex_redirect_pc;
-					end else begin
-						fetch_pending <= 1'b0;
-						fetch_req_pc <= 64'd0;
-						fetch_redirect_pending <= 1'b0;
-						fetch_pc <= ex_redirect_pc;
-					end
+					fetch_pc <= ex_redirect_pc;
+					fetch_redirect_bubble <= 2'd2;
 				end else if (fetch_resp_fire) begin
 					if (fetch_redirect_pending) begin
 						fetch_pending <= 1'b0;
 						fetch_req_pc <= 64'd0;
 						fetch_redirect_pending <= 1'b0;
 						fetch_pc <= fetch_redirect_pc;
+						fetch_redirect_bubble <= 2'd2;
 					end else begin
 						fetch_pending <= 1'b0;
 						fetch_req_pc <= 64'd0;
@@ -408,6 +412,7 @@ module core
 				wb_r.is_mret <= mem_r.is_mret;
 				wb_r.is_illegal <= mem_r.is_illegal;
 				wb_r.is_misalign <= mem_r.is_misalign;
+				wb_r.is_instr_misalign <= mem_r.is_instr_misalign;
 			end
 
 				if (stall_mem_busy) begin
@@ -415,6 +420,12 @@ module core
 					mem_r <= mem_r;
 			end else if (trap_redirect || mret_redirect || stall_ex_busy || raw_hazard_mem || fetch_redirect_pending) begin
 				mem_r <= '0;
+				if (trap_redirect || mret_redirect) begin
+					ex_r <= '0;
+					id_r.valid <= 1'b0;
+					id_r.pc    <= 64'd0;
+					id_r.instr <= 32'd0;
+				end
 				end else begin
 					mem_r.valid <= ex_r.valid;
 					mem_r.trap  <= ex_r.trap;
@@ -436,7 +447,8 @@ module core
 				mem_r.is_ecall <= ex_r.is_ecall;
 				mem_r.is_mret <= ex_r.is_mret;
 				mem_r.is_illegal <= ex_r.is_illegal;
-				mem_r.is_misalign <= ex_r.is_misalign;
+				mem_r.is_misalign <= ex_misalign;
+				mem_r.is_instr_misalign <= ex_instr_misalign;
 
 			if (trap_redirect || mret_redirect) begin
 					ex_r <= '0;
@@ -479,6 +491,7 @@ module core
 				ex_r.is_mret <= id_dec_is_mret;
 				ex_r.is_illegal <= id_dec_is_illegal;
 				ex_r.is_misalign <= ex_misalign;
+				ex_r.is_instr_misalign <= ex_instr_misalign;
 
 				if (fetch_pop_buf) begin
 							id_r.valid <= 1'b1;
@@ -508,10 +521,11 @@ module core
 	// Output port assignments
 	assign csr_satp_o = csr_satp;
 	assign privilege_mode_o = privilege_mode;
+	assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front;
 	// MMU fault signals are inputs from the mmu module
 	// mmu_trap is generated internally when walk_fault is asserted
 	assign trap_vaddr = fault_vaddr;
-	assign mmu_trap = walk_fault;
+	assign mmu_trap = walk_fault && (fetch_redirect_bubble == 2'd0);
 
 	DifftestInstrCommit DifftestInstrCommit(
 		.clock              (clk),
@@ -578,7 +592,7 @@ module core
 	DifftestCSRState DifftestCSRState(
 		.clock              (clk),
 		.coreid             (csr_mhartid[7:0]),
-		.priviledgeMode     (3),
+		.priviledgeMode     (privilege_mode_diff),
 		.mstatus            (csr_mstatus_diff),
 		.sstatus            (csr_mstatus_diff & SSTATUS_MASK),
 		.mepc               (csr_mepc_diff),

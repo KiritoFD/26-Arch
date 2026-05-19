@@ -26,7 +26,8 @@ module core_execute
 	output logic [63:0]   mem_store_data_shifted,
 	output logic [7:0]    mem_store_strobe,
 	output logic          difftest_skip,
-	output logic          ex_misalign
+	output logic          ex_misalign,
+	output logic          ex_instr_misalign
 );
 	logic [63:0] ex_result_word;
 	logic [63:0] ex_next_pc;
@@ -91,7 +92,8 @@ module core_execute
 	end
 
 	assign ex_next_pc = ex_r.is_jalr ? ((ex_r.op1 + ex_r.imm) & ~64'd1) : (ex_r.pc + ex_r.imm);
-	assign ex_flush_front = ex_r.valid && ex_branch_taken;
+	assign ex_instr_misalign = ex_r.valid && ex_branch_taken && |ex_next_pc[1:0];
+	assign ex_flush_front = ex_r.valid && ex_branch_taken && !ex_instr_misalign;
 	assign ex_redirect_pc = ex_next_pc;
 	assign ex_mem_addr    = ex_r.op1 + ex_r.imm;
 

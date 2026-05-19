@@ -14,6 +14,7 @@ module core_csr
 	input  logic         wb_mret,
 	input  logic         wb_illegal,
 	input  logic         wb_misalign_data,
+	input  logic         wb_misalign_instr,
 	input  logic         mmu_trap,
 	input  logic [63:0]  trap_vaddr,
 	input  logic         fault_is_insn,
@@ -52,10 +53,15 @@ module core_csr
 	logic intr_pending;
 	logic [63:0] intr_cause;
 	logic intr_meip, intr_msip, intr_mtip;
+	logic [63:0] intr_mstatus;
+	logic [63:0] intr_mie;
 
-	assign intr_meip = (privilege_mode_i != 2'd3 || csr_mstatus[3]) && csr_mip[11] && csr_mie[11];
-	assign intr_msip = (privilege_mode_i != 2'd3 || csr_mstatus[3]) && csr_mip[3]  && csr_mie[3];
-	assign intr_mtip = (privilege_mode_i != 2'd3 || csr_mstatus[3]) && csr_mip[7]  && csr_mie[7];
+	assign intr_mstatus = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MSTATUS)) ? wb_r.csr_wdata : csr_mstatus;
+	assign intr_mie     = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MIE))     ? wb_r.csr_wdata : csr_mie;
+
+	assign intr_meip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) && csr_mip[11] && intr_mie[11];
+	assign intr_msip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) && csr_mip[3]  && intr_mie[3];
+	assign intr_mtip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) && csr_mip[7]  && intr_mie[7];
 
 	assign intr_pending = intr_meip || intr_msip || intr_mtip;
 	assign intr_cause = intr_meip ? {1'b1, 63'd11} :  // MEIP  (11)
@@ -73,15 +79,26 @@ module core_csr
 	                      ({63'd0, swint} << 3);
 
 	// Trap cause selection for exceptions (interrupts handled separately)
+	function automatic logic [63:0] get_ecall_cause(input logic [1:0] mode);
+		unique case (mode)
+			2'd0: get_ecall_cause = 64'd8;   // ECALL from U-mode
+			2'd1: get_ecall_cause = 64'd9;   // ECALL from S-mode
+			2'd3: get_ecall_cause = 64'd11;  // ECALL from M-mode
+			default: get_ecall_cause = 64'd11;
+		endcase
+	endfunction
+
 	function automatic logic [63:0] get_excp_cause();
 		if (mmu_trap) begin
 			if (fault_is_insn) return 64'd12;
 			else if (wb_r.is_store) return 64'd15;
 			else return 64'd13;
 		end else if (wb_ecall) begin
-			return 64'd11;
+			return get_ecall_cause(privilege_mode_i);
 		end else if (wb_illegal) begin
 			return 64'd2;
+		end else if (wb_misalign_instr) begin
+			return 64'd0;
 		end else if (wb_misalign_data) begin
 			if (wb_r.is_store) return 64'd6;
 			else return 64'd4;
@@ -105,11 +122,19 @@ module core_csr
 			csr_mtval    <= 64'd0;
 			csr_mepc     <= 64'd0;
 			csr_satp     <= 64'd0;
-			privilege_mode <= 2'd0;
+			privilege_mode <= 2'd3;
 		end else begin
 			if (intr_eval && intr_pending) begin
 				csr_mepc   <= intr_fetch_pc;
 				csr_mcause <= intr_cause;
+				csr_mtval  <= 64'd0;
+				csr_mstatus[7] <= intr_mstatus[3];
+				csr_mstatus[3] <= 1'b0;
+				csr_mstatus[12:11] <= privilege_mode_i;
+				privilege_mode <= 2'd3;
+			end else if (wb_ecall) begin
+				csr_mepc   <= wb_r.pc;
+				csr_mcause <= get_ecall_cause(privilege_mode_i);
 				csr_mtval  <= 64'd0;
 				csr_mstatus[7] <= csr_mstatus[3];
 				csr_mstatus[3] <= 1'b0;
@@ -128,18 +153,18 @@ module core_csr
 				csr_mstatus[3] <= 1'b0;
 				csr_mstatus[12:11] <= privilege_mode_i;
 				privilege_mode <= 2'd3;
-			end else if (wb_ecall) begin
-				csr_mepc   <= wb_r.pc;
-				csr_mcause <= 64'd11;
-				csr_mtval  <= 64'd0;
-				csr_mstatus[7] <= csr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
 			end else if (wb_illegal) begin
 				csr_mepc   <= wb_r.pc;
 				csr_mcause <= 64'd2;
 				csr_mtval  <= {32'd0, wb_r.instr};
+				csr_mstatus[7] <= csr_mstatus[3];
+				csr_mstatus[3] <= 1'b0;
+				csr_mstatus[12:11] <= privilege_mode_i;
+				privilege_mode <= 2'd3;
+			end else if (wb_misalign_instr) begin
+				csr_mepc   <= wb_r.pc;
+				csr_mcause <= 64'd0;
+				csr_mtval  <= wb_r.result;
 				csr_mstatus[7] <= csr_mstatus[3];
 				csr_mstatus[3] <= 1'b0;
 				csr_mstatus[12:11] <= privilege_mode_i;
@@ -197,6 +222,18 @@ module core_csr
 			next_mepc = intr_fetch_pc;
 			next_mcause = intr_cause;
 			next_mtval = 64'd0;
+			next_mstatus = intr_mstatus;
+			next_mstatus[7] = intr_mstatus[3];
+			next_mstatus[3] = 1'b0;
+			next_mstatus[12:11] = privilege_mode_i;
+			next_privilege_mode = 2'd3;
+			trap_redirect = 1'b1;
+			trap_redirect_pc = csr_mtvec;
+		end else if (wb_ecall || wb_illegal || wb_misalign_instr || wb_misalign_data) begin
+			next_mepc = wb_r.pc;
+			next_mcause = get_excp_cause();
+			next_mtval = wb_illegal ? {32'd0, wb_r.instr} :
+			             (wb_misalign_instr ? wb_r.result : (wb_misalign_data ? wb_r.mem_addr : 64'd0));
 			next_mstatus = csr_mstatus;
 			next_mstatus[7] = csr_mstatus[3];
 			next_mstatus[3] = 1'b0;
@@ -208,17 +245,6 @@ module core_csr
 			next_mepc = trap_vaddr;
 			next_mcause = get_excp_cause();
 			next_mtval = trap_vaddr;
-			next_mstatus = csr_mstatus;
-			next_mstatus[7] = csr_mstatus[3];
-			next_mstatus[3] = 1'b0;
-			next_mstatus[12:11] = privilege_mode_i;
-			next_privilege_mode = 2'd3;
-			trap_redirect = 1'b1;
-			trap_redirect_pc = csr_mtvec;
-		end else if (wb_ecall || wb_illegal || wb_misalign_data) begin
-			next_mepc = wb_r.pc;
-			next_mcause = get_excp_cause();
-			next_mtval = wb_illegal ? {32'd0, wb_r.instr} : (wb_misalign_data ? wb_r.mem_addr : 64'd0);
 			next_mstatus = csr_mstatus;
 			next_mstatus[7] = csr_mstatus[3];
 			next_mstatus[3] = 1'b0;
@@ -259,7 +285,7 @@ module core_csr
 	assign csr_mtval_diff    = next_mtval;
 	assign csr_mepc_diff     = next_mepc;
 	assign csr_satp_diff     = next_satp;
-	assign privilege_mode_diff = privilege_mode;
+	assign privilege_mode_diff = next_privilege_mode;
 endmodule
 
 `endif

@@ -41,6 +41,7 @@ module SimTop import common::*;(
 
     logic [63:0] satp;
     logic [1:0]  priv_mode;
+    logic        flush_mmu;
     logic        walk_fault;
     logic [63:0] fault_vaddr;
     logic        fault_is_insn;
@@ -52,6 +53,7 @@ module SimTop import common::*;(
       .trint, .swint, .exint,
       .csr_satp_o(satp),
       .privilege_mode_o(priv_mode),
+      .flush_mmu_o(flush_mmu),
       .walk_fault(walk_fault),
       .fault_vaddr(fault_vaddr),
       .fault_is_insn(fault_is_insn)
@@ -61,6 +63,7 @@ module SimTop import common::*;(
       .clk(clock), .reset,
       .satp(satp),
       .privilege_mode(priv_mode),
+      .flush(flush_mmu),
       .ireq_in(ireq_core),  .iresp_in(iresp_core),
       .dreq_in(dreq_core),  .dresp_in(dresp_core),
       .ireq_out(ireq_bus),  .iresp_out(iresp_bus),

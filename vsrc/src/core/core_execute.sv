@@ -25,7 +25,8 @@ module core_execute
 	output logic [63:0]   mem_stage_result,
 	output logic [63:0]   mem_store_data_shifted,
 	output logic [7:0]    mem_store_strobe,
-	output logic          difftest_skip
+	output logic          difftest_skip,
+	output logic          ex_misalign
 );
 	logic [63:0] ex_result_word;
 	logic [63:0] ex_next_pc;
@@ -108,6 +109,19 @@ module core_execute
 	assign mem_store_data_shifted = ex_r.rs2_store << ({ex_mem_addr[2:0], 3'b000});
 	assign mem_byte_shift = {3'd0, mem_r.mem_addr[2:0]};
 	assign mem_aligned_data = dresp.data >> (mem_byte_shift * 6'd8);
+
+	// Data address misalignment detection
+	always_comb begin
+		ex_misalign = 1'b0;
+		if (ex_r.valid && (ex_r.is_load || ex_r.is_store)) begin
+			unique case (ex_r.mem_size)
+				MSIZE2: ex_misalign = |ex_mem_addr[0];
+				MSIZE4: ex_misalign = |ex_mem_addr[1:0];
+				MSIZE8: ex_misalign = |ex_mem_addr[2:0];
+				default: ex_misalign = 1'b0;
+			endcase
+		end
+	end
 
 	always_comb begin
 		mem_load_data = 64'd0;

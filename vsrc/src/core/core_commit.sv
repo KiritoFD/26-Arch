@@ -44,22 +44,30 @@ module core_commit
 	output logic [63:0]  csr_mepc_diff,
 	output logic [63:0]  csr_satp_diff,
 	output logic [1:0]   privilege_mode,
-	output logic [1:0]   privilege_mode_diff
+	output logic [1:0]   privilege_mode_diff,
+	input  logic [63:0]  intr_fetch_pc,
+	output logic         trap_redirect,
+	output logic         mret_redirect,
+	output logic [63:0]  trap_redirect_pc
 );
 	integer i;
 
 	logic wb_ecall;
 	logic wb_mret;
-	logic trap_detected;
-	assign wb_ecall = wb_r.valid && wb_r.is_ecall;
-	assign wb_mret  = wb_r.valid && wb_r.is_mret;
+	logic wb_illegal;
+	logic wb_misalign_data;
+	logic intr_eval;
 
-	always_ff @(posedge clk) begin
-		if (reset) trap_detected <= 1'b0;
-		else trap_detected <= mmu_trap;
-	end
+	assign wb_ecall        = wb_r.valid && wb_r.is_ecall && !mmu_trap;
+	assign wb_mret         = wb_r.valid && wb_r.is_mret && !mmu_trap;
+	assign wb_illegal      = wb_r.valid && wb_r.is_illegal && !mmu_trap;
+	assign wb_misalign_data = wb_r.valid && wb_r.is_misalign && !mmu_trap;
 
-	assign trap_commit = (wb_r.valid && wb_r.trap) || trap_detected;
+	// Only halt on the terminating TRAP_INSN, not on recoverable traps
+	assign trap_commit = wb_r.valid && wb_r.trap;
+
+	// Interrupt evaluation: check when pipeline can consume a new instruction
+	assign intr_eval = 1'b1;
 
 	core_csr u_csr(
 		.clk(clk),
@@ -70,11 +78,15 @@ module core_commit
 		.exint(exint),
 		.wb_ecall(wb_ecall),
 		.wb_mret(wb_mret),
+		.wb_illegal(wb_illegal),
+		.wb_misalign_data(wb_misalign_data),
 		.mmu_trap(mmu_trap),
 		.trap_vaddr(trap_vaddr),
 		.fault_is_insn(fault_is_insn),
 		.privilege_mode_i(privilege_mode),
 		.privilege_mode(privilege_mode),
+		.intr_eval(intr_eval),
+		.intr_fetch_pc(intr_fetch_pc),
 		.csr_mstatus(csr_mstatus),
 		.csr_mtvec(csr_mtvec),
 		.csr_mip(csr_mip),
@@ -94,8 +106,13 @@ module core_commit
 		.csr_mtval_diff(csr_mtval_diff),
 		.csr_mepc_diff(csr_mepc_diff),
 		.csr_satp_diff(csr_satp_diff),
-		.privilege_mode_diff(privilege_mode_diff)
+		.privilege_mode_diff(privilege_mode_diff),
+		.trap_redirect(trap_redirect),
+		.mret_redirect(mret_redirect),
+		.trap_redirect_pc(trap_redirect_pc)
 	);
+
+	// intr_fetch_pc is set by core.sv from fetch_pc
 
 	always_ff @(posedge clk) begin
 		if (reset) begin

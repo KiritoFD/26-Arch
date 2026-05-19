@@ -49,7 +49,8 @@ module core_decode
 	output logic [11:0]   id_dec_csr_addr,
 	output logic [63:0]   id_dec_csr_wdata,
 	output logic          id_dec_is_ecall,
-	output logic          id_dec_is_mret
+	output logic          id_dec_is_mret,
+	output logic          id_dec_is_illegal
 );
 	logic [63:0] id_rs1_val;
 	logic [63:0] id_rs2_val;
@@ -147,6 +148,7 @@ module core_decode
 		id_dec_csr_wdata    = 64'd0;
 		id_dec_is_ecall     = 1'b0;
 		id_dec_is_mret      = 1'b0;
+		id_dec_is_illegal   = 1'b0;
 
 		if (id_r.instr == TRAP_INSN) begin
 			id_dec_trap = 1'b1;
@@ -328,16 +330,19 @@ module core_decode
 								id_dec_csr_wen = (id_rs1 != 0);
 								id_dec_csr_wdata = id_csr_rdata & ~{59'd0, id_rs1};
 							end
-							default: begin
-								id_dec_valid = 1'b0;
-								id_dec_wen = 1'b0;
-							end
-						endcase
-						id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
-					end
-				end
-				default: begin end
-			endcase
+						default: begin
+							id_dec_valid = 1'b0;
+							id_dec_wen = 1'b0;
+							id_dec_is_illegal = 1'b1;
+						end
+					endcase
+				id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
+			end
+		end
+		default: begin
+			id_dec_is_illegal = 1'b1;
+		end
+		endcase
 		end
 	end
 endmodule

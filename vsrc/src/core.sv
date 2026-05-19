@@ -84,6 +84,8 @@ module core
 	logic [63:0] id_dec_csr_wdata;
 	logic        id_dec_is_ecall;
 	logic        id_dec_is_mret;
+	logic        id_dec_is_illegal;
+	logic        ex_misalign;
 
 	logic [63:0] csr_mstatus;
 	logic [63:0] csr_mtvec;
@@ -119,6 +121,10 @@ module core
 
 	logic        mmu_trap;
 	logic [63:0] trap_vaddr;
+	logic        trap_redirect;
+	logic        mret_redirect;
+	logic [63:0] trap_redirect_pc;
+	logic [63:0] intr_fetch_pc;
 
 	logic        ex_is_mdu;
 	logic        ex_result_ready;
@@ -191,7 +197,8 @@ module core
 		.id_dec_csr_addr(id_dec_csr_addr),
 		.id_dec_csr_wdata(id_dec_csr_wdata),
 		.id_dec_is_ecall(id_dec_is_ecall),
-		.id_dec_is_mret(id_dec_is_mret)
+		.id_dec_is_mret(id_dec_is_mret),
+		.id_dec_is_illegal(id_dec_is_illegal)
 	);
 
 	core_execute u_execute(
@@ -216,7 +223,8 @@ module core
 		.mem_stage_result(mem_stage_result),
 		.mem_store_data_shifted(mem_store_data_shifted),
 		.mem_store_strobe(mem_store_strobe),
-		.difftest_skip(difftest_skip)
+		.difftest_skip(difftest_skip),
+		.ex_misalign(ex_misalign)
 	);
 
 	core_mdu u_mdu(
@@ -230,6 +238,8 @@ module core
 		.mdu_out_valid(mdu_out_valid),
 		.mdu_out_result(mdu_out_result)
 	);
+
+	assign intr_fetch_pc = fetch_pc;
 
 	core_commit u_commit(
 		.clk(clk),
@@ -272,7 +282,11 @@ module core
 		.csr_mepc_diff(csr_mepc_diff),
 		.csr_satp_diff(csr_satp_diff),
 		.privilege_mode(privilege_mode),
-		.privilege_mode_diff(privilege_mode_diff)
+		.privilege_mode_diff(privilege_mode_diff),
+		.intr_fetch_pc(intr_fetch_pc),
+		.trap_redirect(trap_redirect),
+		.mret_redirect(mret_redirect),
+		.trap_redirect_pc(trap_redirect_pc)
 	);
 
 	assign raw_hazard_ex =
@@ -324,10 +338,20 @@ module core
 				fetch_buf_valid <= 1'b0;
 			end
 
-			if (!halted && !trap_commit) begin
-				// Front-end state is isolated here so redirects and request buffering
-				// stay easy to audit when tracking instruction flow bugs.
-				if (ex_flush_front) begin
+		if (!halted && !trap_commit) begin
+			// Trap redirect (exception/interrupt) and MRET redirect have highest priority
+			if (trap_redirect || mret_redirect) begin
+				fetch_buf_valid <= 1'b0;
+				if (fetch_pending && !fetch_resp_fire) begin
+					fetch_redirect_pending <= 1'b1;
+					fetch_redirect_pc <= trap_redirect_pc;
+				end else begin
+					fetch_pending <= 1'b0;
+					fetch_req_pc <= 64'd0;
+					fetch_redirect_pending <= 1'b0;
+					fetch_pc <= trap_redirect_pc;
+				end
+			end else if (ex_flush_front) begin
 					fetch_buf_valid <= 1'b0;
 					if (fetch_pending && !fetch_resp_fire) begin
 						fetch_redirect_pending <= 1'b1;
@@ -364,7 +388,7 @@ module core
 					end
 				end
 
-				if (stall_mem_busy) begin
+				if (trap_redirect || mret_redirect || stall_mem_busy) begin
 					wb_r.valid <= 1'b0;
 				end else begin
 					wb_r.valid <= mem_r.valid;
@@ -380,15 +404,17 @@ module core
 					wb_r.csr_wen <= mem_r.csr_wen;
 					wb_r.csr_addr <= mem_r.csr_addr;
 					wb_r.csr_wdata <= mem_r.csr_wdata;
-					wb_r.is_ecall <= mem_r.is_ecall;
-					wb_r.is_mret <= mem_r.is_mret;
-				end
+				wb_r.is_ecall <= mem_r.is_ecall;
+				wb_r.is_mret <= mem_r.is_mret;
+				wb_r.is_illegal <= mem_r.is_illegal;
+				wb_r.is_misalign <= mem_r.is_misalign;
+			end
 
 				if (stall_mem_busy) begin
 					// Hold MEM steady until the external bus returns valid data.
 					mem_r <= mem_r;
-				end else if (stall_ex_busy || raw_hazard_mem || fetch_redirect_pending) begin
-					mem_r <= '0;
+			end else if (trap_redirect || mret_redirect || stall_ex_busy || raw_hazard_mem || fetch_redirect_pending) begin
+				mem_r <= '0;
 				end else begin
 					mem_r.valid <= ex_r.valid;
 					mem_r.trap  <= ex_r.trap;
@@ -407,15 +433,22 @@ module core
 					mem_r.csr_wen <= ex_r.csr_wen;
 					mem_r.csr_addr <= ex_r.csr_addr;
 					mem_r.csr_wdata <= ex_r.csr_wdata;
-					mem_r.is_ecall <= ex_r.is_ecall;
-					mem_r.is_mret <= ex_r.is_mret;
+				mem_r.is_ecall <= ex_r.is_ecall;
+				mem_r.is_mret <= ex_r.is_mret;
+				mem_r.is_illegal <= ex_r.is_illegal;
+				mem_r.is_misalign <= ex_r.is_misalign;
 
-					if (ex_flush_front) begin
-						ex_r <= '0;
-						id_r.valid <= 1'b0;
-						id_r.pc    <= 64'd0;
-						id_r.instr <= 32'd0;
-					end else if (raw_hazard_ex) begin
+			if (trap_redirect || mret_redirect) begin
+					ex_r <= '0;
+					id_r.valid <= 1'b0;
+					id_r.pc    <= 64'd0;
+					id_r.instr <= 32'd0;
+				end else if (ex_flush_front) begin
+					ex_r <= '0;
+					id_r.valid <= 1'b0;
+					id_r.pc    <= 64'd0;
+					id_r.instr <= 32'd0;
+				end else if (raw_hazard_ex) begin
 						ex_r <= '0;
 					end else begin
 						ex_r.valid   <= id_dec_valid;
@@ -442,10 +475,12 @@ module core
 						ex_r.csr_wen <= id_dec_csr_wen;
 						ex_r.csr_addr <= id_dec_csr_addr;
 						ex_r.csr_wdata <= id_dec_csr_wdata;
-					ex_r.is_ecall <= id_dec_is_ecall;
-					ex_r.is_mret <= id_dec_is_mret;
+				ex_r.is_ecall <= id_dec_is_ecall;
+				ex_r.is_mret <= id_dec_is_mret;
+				ex_r.is_illegal <= id_dec_is_illegal;
+				ex_r.is_misalign <= ex_misalign;
 
-						if (fetch_pop_buf) begin
+				if (fetch_pop_buf) begin
 							id_r.valid <= 1'b1;
 							id_r.pc    <= fetch_buf_pc;
 							id_r.instr <= fetch_buf_instr;

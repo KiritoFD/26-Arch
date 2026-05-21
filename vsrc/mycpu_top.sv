@@ -22,11 +22,20 @@ module mycpu_top
 
   cbus_req_t  oreq;
   cbus_resp_t oresp;
+  logic trint, swint, exint;
+
+  assign trint = 1'b0;
+  assign swint = 1'b0;
+  assign exint = 1'b0;
+
   VTop VTop_inst (
-      .clk,
-      .reset,
-      .oreq,
-      .oresp
+      .clk(clk),
+      .reset(reset),
+      .oreq(oreq),
+      .oresp(oresp),
+      .trint(trint),
+      .swint(swint),
+      .exint(exint)
   );
 
   assign valid = oreq.valid;

@@ -12,6 +12,8 @@
 
 module DBusToCBus
     import common::*;(
+    input  logic       clk,
+    input  logic       reset,
     input  dbus_req_t  dreq,
     output dbus_resp_t dresp,
     output cbus_req_t  dcreq,
@@ -27,10 +29,37 @@ module DBusToCBus
 	assign dcreq.burst = AXI_BURST_INCR;
 
     logic okay;
-    assign okay = dcresp.ready && dcresp.last;
+    logic req_inflight;
+    logic resp_seen;
+    logic issue_now;
+    logic resp_fire;
 
-    assign dresp.addr_ok = okay;
-    assign dresp.data_ok = okay;
+    assign okay = dcresp.ready && dcresp.last;
+    assign issue_now = dreq.valid && !req_inflight && !resp_seen;
+    assign resp_fire = okay && (req_inflight || issue_now) && !resp_seen;
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            req_inflight <= 1'b0;
+            resp_seen    <= 1'b0;
+        end else begin
+            if (!okay) begin
+                resp_seen <= 1'b0;
+            end
+
+            if (resp_fire) begin
+                req_inflight <= 1'b0;
+                resp_seen    <= 1'b1;
+            end else if (issue_now) begin
+                req_inflight <= 1'b1;
+            end else if (!dreq.valid) begin
+                req_inflight <= 1'b0;
+            end
+        end
+    end
+
+    assign dresp.addr_ok = resp_fire;
+    assign dresp.data_ok = resp_fire;
     assign dresp.data    = dcresp.data;
 endmodule
 

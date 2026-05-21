@@ -32,14 +32,32 @@ module soc_top #(
 	logic [63:0] device_addr;
 	logic [63:0] device_wdata;
 	logic device_wvalid;
+	logic [7:0] device_wstrobe;
 	logic [63:0] device_rdata;
 	logic device_ready;
 	logic device_last;
 
 	logic cpu_clk;
+	logic clk_locked;
+	logic sys_reset;
+
+	assign sys_reset = SIMULATION ? reset : (reset | ~clk_locked);
 
 	/* mycpu */
-	mycpu_top mycpu_top_inst(.clk(cpu_clk), .*);
+	mycpu_top mycpu_top_inst(
+		.clk(cpu_clk),
+		.reset(sys_reset),
+		.valid,
+		.addr,
+		.wdata,
+		.burst,
+		.len,
+		.wstrobe,
+		.rdata,
+		.ready,
+		.last,
+		.size
+	);
 
 
 	/* CBus Crossbar */
@@ -47,7 +65,7 @@ module soc_top #(
 
 	/* RAM */
 	bram_wrapper #(SIMULATION) bram_wrapper_inst(
-		.clk(cpu_clk), .reset,
+		.clk(cpu_clk), .reset(sys_reset),
 		.valid(ram_valid),
 		.addr(ram_addr),
 		.wdata(ram_wdata),
@@ -66,15 +84,27 @@ module soc_top #(
 		.wdata(device_wdata),
 		.rdata(device_rdata),
 		.wvalid(device_wvalid),
+		.wstrobe(device_wstrobe),
 		.ready(device_ready),
 		.last(device_last),
-		.*
+		.clk,
+		.reset(sys_reset),
+		.cpu_clk(cpu_clk),
+		.led,
+		.sw,
+		.tx,
+		.size
 	);
 
 	if (SIMULATION)
 		assign cpu_clk = clk;
 	else
-		clk_wiz_0 clk_wiz_0(.sys_clk(clk), .cpu_clk(cpu_clk));
+		clk_wiz_0 clk_wiz_0(
+			.sys_clk(clk),
+			.reset(reset),
+			.locked(clk_locked),
+			.cpu_clk(cpu_clk)
+		);
 	
 
 endmodule

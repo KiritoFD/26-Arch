@@ -54,7 +54,6 @@ module mmu
 	logic [11:0] page_offset;
 	logic [63:0] phys_addr;
 	logic        trap_pending;
-
 	logic        satp_mode;
 	logic [43:0] satp_ppn;
 

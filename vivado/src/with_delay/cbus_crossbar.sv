@@ -28,6 +28,7 @@ module cbus_crossbar (
 	output logic [63:0] device_addr,
 	output logic [63:0] device_wdata,
 	output logic device_wvalid,
+	output logic [7:0] device_wstrobe,
 	input logic [63:0] device_rdata,
 	input logic device_ready,
 	input logic device_last
@@ -47,5 +48,6 @@ module cbus_crossbar (
 	assign device_addr = addr;
 	assign device_wdata = wdata;
 	assign device_wvalid = |wstrobe;
+	assign device_wstrobe = wstrobe;
 	
 endmodule

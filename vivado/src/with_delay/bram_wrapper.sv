@@ -15,24 +15,54 @@ module bram_wrapper #(
 	output logic last
 
 );
-	localparam BRAM_DELAY = SIMULATION ? 2 : 32;
+	localparam BRAM_DELAY = 32;
 	logic [15:0] counter;
+	logic txn_active;
+	logic [63:0] latched_addr;
+	logic [63:0] latched_wdata;
+	logic [7:0]  latched_wstrobe;
+	logic [1:0]  latched_burst;
+	logic [7:0]  latched_len;
 
 	logic real_valid;
 	always_ff @(posedge clk) begin
-		if (reset || ~valid || last) counter <= '0;
-		else if (counter != BRAM_DELAY) counter <= counter + 1;
+		if (reset) begin
+			counter <= '0;
+			txn_active <= 1'b0;
+			latched_addr <= '0;
+			latched_wdata <= '0;
+			latched_wstrobe <= '0;
+			latched_burst <= '0;
+			latched_len <= '0;
+		end else begin
+			if (!txn_active) begin
+				counter <= '0;
+				if (valid) begin
+					txn_active <= 1'b1;
+					latched_addr <= addr;
+					latched_wdata <= wdata;
+					latched_wstrobe <= wstrobe;
+					latched_burst <= burst;
+					latched_len <= len;
+				end
+			end else if (last) begin
+				counter <= '0;
+				txn_active <= 1'b0;
+			end else if (counter != BRAM_DELAY) begin
+				counter <= counter + 1;
+			end
+		end
 	end
 	
 	always_ff @(posedge clk) begin
-		if (reset || counter != BRAM_DELAY || ~valid || last) real_valid <= '0;
+		if (reset || !txn_active || counter != BRAM_DELAY || last) real_valid <= '0;
 		else real_valid <= '1;
 	end
 
-	wire [17:0] base_addr = addr[20:3];
+	wire [17:0] base_addr = latched_addr[20:3];
 	logic [17:0] burst_addr;
 
-	wire is_incr = burst == 2'b1;
+	wire is_incr = latched_burst == 2'b1;
 	
 	logic [17:0] burst_counter;
 	always_ff @(posedge clk) begin
@@ -47,9 +77,9 @@ module bram_wrapper #(
 	bram_0 bram_0_inst (
 		.clka(clk),
 		.ena(real_valid),
-		.wea(wstrobe),
+		.wea(latched_wstrobe),
 		.addra(is_incr ? burst_addr : base_addr),
-		.dina(wdata),
+		.dina(latched_wdata),
 		.douta(rdata)
 	);
 
@@ -62,8 +92,8 @@ module bram_wrapper #(
 	end
 
 	assign ready_write = real_valid;
-	assign last_write = ~is_incr ? real_valid : real_valid && burst_counter == len;
+	assign last_write = ~is_incr ? real_valid : real_valid && burst_counter == latched_len;
 	
-	assign ready = |wstrobe ? ready_write : ready_read;
-	assign last = |wstrobe ? last_write : last_read;
+	assign ready = |latched_wstrobe ? ready_write : ready_read;
+	assign last = |latched_wstrobe ? last_write : last_read;
 endmodule

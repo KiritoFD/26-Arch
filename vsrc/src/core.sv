@@ -57,6 +57,7 @@ module core
 	logic        fetch_redirect_pending;
 	logic [63:0] fetch_redirect_pc;
 	logic [1:0]  fetch_redirect_bubble;
+	logic        fetch_drop_resp_pending;
 
 	logic [4:0]  id_rs1;
 	logic [4:0]  id_rs2;
@@ -307,7 +308,7 @@ module core
 
 	assign fetch_can_consume   = (!halted) && (!trap_commit) && (fetch_redirect_bubble == 2'd0) && (!stall_front) && !ex_flush_front;
 	assign fetch_pop_buf       = fetch_can_consume && fetch_buf_valid;
-	assign fetch_resp_fire     = fetch_pending && iresp.data_ok;
+	assign fetch_resp_fire     = fetch_pending && iresp.data_ok && !fetch_drop_resp_pending;
 	assign fetch_resp_to_id    = fetch_can_consume && (!fetch_buf_valid) && fetch_resp_fire;
 	assign fetch_resp_to_buf   = fetch_resp_fire && !fetch_resp_to_id && !fetch_redirect_pending && !trap_redirect && !mret_redirect;
 	assign fetch_fire          = fetch_pop_buf || fetch_resp_to_id;
@@ -332,6 +333,7 @@ module core
 			fetch_redirect_pending <= 1'b0;
 			fetch_redirect_pc <= 64'd0;
 			fetch_redirect_bubble <= 2'd0;
+			fetch_drop_resp_pending <= 1'b0;
 			fetch_buf_valid <= 1'b0;
 			fetch_buf_pc <= 64'd0;
 			fetch_buf_instr <= 32'd0;
@@ -347,11 +349,17 @@ module core
 			end
 
 		if (!halted && !trap_commit) begin
+			if (fetch_drop_resp_pending && iresp.data_ok) begin
+				fetch_drop_resp_pending <= 1'b0;
+			end
 			if (fetch_redirect_bubble != 2'd0) begin
 				fetch_redirect_bubble <= fetch_redirect_bubble - 2'd1;
 			end
 			// Trap redirect (exception/interrupt) and MRET redirect have highest priority
 			if (trap_redirect || mret_redirect) begin
+				if (fetch_pending) begin
+					fetch_drop_resp_pending <= 1'b1;
+				end
 				fetch_buf_valid <= 1'b0;
 				fetch_pending <= 1'b0;
 				fetch_req_pc <= 64'd0;
@@ -359,6 +367,9 @@ module core
 				fetch_pc <= trap_redirect_pc;
 				fetch_redirect_bubble <= 2'd2;
 			end else if (ex_flush_front) begin
+					if (fetch_pending) begin
+						fetch_drop_resp_pending <= 1'b1;
+					end
 					fetch_buf_valid <= 1'b0;
 					fetch_pending <= 1'b0;
 					fetch_req_pc <= 64'd0;
@@ -517,16 +528,14 @@ module core
 		end
 	end
 
-`ifdef VERILATOR
 	// Output port assignments
 	assign csr_satp_o = csr_satp;
 	assign privilege_mode_o = privilege_mode;
 	assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front;
-	// MMU fault signals are inputs from the mmu module
-	// mmu_trap is generated internally when walk_fault is asserted
 	assign trap_vaddr = fault_vaddr;
 	assign mmu_trap = walk_fault && (fetch_redirect_bubble == 2'd0);
 
+`ifdef VERILATOR
 	DifftestInstrCommit DifftestInstrCommit(
 		.clock              (clk),
 		.coreid             (csr_mhartid[7:0]),

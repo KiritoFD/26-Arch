@@ -141,7 +141,7 @@ module core_csr
 				csr_mstatus[12:11] <= privilege_mode_i;
 				privilege_mode <= 2'd3;
 			end else if (mmu_trap) begin
-				csr_mepc   <= trap_vaddr;
+				csr_mepc   <= fault_is_insn ? trap_vaddr : wb_r.pc;
 				if (fault_is_insn)
 					csr_mcause <= 64'd12;
 				else if (wb_r.is_store)
@@ -242,7 +242,7 @@ module core_csr
 			trap_redirect = 1'b1;
 			trap_redirect_pc = csr_mtvec;
 		end else if (mmu_trap) begin
-			next_mepc = trap_vaddr;
+			next_mepc = fault_is_insn ? trap_vaddr : wb_r.pc;
 			next_mcause = get_excp_cause();
 			next_mtval = trap_vaddr;
 			next_mstatus = csr_mstatus;

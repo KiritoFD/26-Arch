@@ -34,7 +34,7 @@ handin:
 	echo "Please enter lab number (e.g., 1)"; \
 	read lab_n; \
 	zip -q -r "docs/$$filename-lab$$lab_n.zip" \
-	  include vsrc docs -x "docs/*.zip"
+	  include vsrc vivado docs -x "docs/*.zip"
 
 sim-verilog:
 	@echo "I don't know why, just make difftest happy..."

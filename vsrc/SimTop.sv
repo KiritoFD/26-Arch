@@ -74,10 +74,15 @@ module SimTop import common::*;(
     );
 
     IBusToCBus icvt(
+      .clk(clock),
+      .reset(reset),
+      .flush(flush_mmu),
       .ireq(ireq_bus), .iresp(iresp_bus),
       .icreq(icreq), .icresp(icresp)
     );
     DBusToCBus dcvt(
+      .clk(clock),
+      .reset(reset || flush_mmu),
       .dreq(dreq_bus), .dresp(dresp_bus),
       .dcreq(dcreq), .dcresp(dcresp)
     );

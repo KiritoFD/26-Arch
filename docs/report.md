@@ -1,343 +1,171 @@
-# Lab5 实验报告：虚拟内存与分页异常处理
+# Lab5 实验报告
 
-## 设计实现
+## 1. 实验目标
 
-### 1. MMU 模块设计
+本次 Lab5 需要在现有 CPU 上完成以下功能，并通过仿真与上板验证：
 
-MMU 是虚拟内存管理的核心组件，负责地址翻译和异常检测。
+- 实现 `MRET`、`ECALL`
+- 实现特权级切换，至少支持 `M` / `U` 模式
+- 实现 `Sv39` 页表地址翻译
+- 让取指与数据访存都经过统一 MMU 路径
+- 通过 `make test-lab5`
+- 建立可综合、可实现、可生成 bitstream 的 Vivado 工程，并完成上板串口输出验证
 
-#### 1.1 主要信号
+## 2. 实现概述
 
-```verilog
-module mmu
-    import common::*;(
-    // 输入信号
-    input  logic [63:0]  satp,              // 页表基址寄存器
-    input  logic [1:0]   privilege_mode,    // 当前特权级
+### 2.1 特权级与异常返回
 
-    // 与 Core 的接口
-    input  ibus_req_t    ireq_in,           // Core 指令请求
-    output ibus_resp_t   iresp_in,         // Core 指令响应
-    input  dbus_req_t    dreq_in,          // Core 数据请求
-    output dbus_resp_t   dresp_in,         // Core 数据响应
+CPU 内部维护当前特权级寄存器，并将其连接到 difftest。复位后默认进入 `M-mode`。
 
-    // 与 Bus 的接口
-    output ibus_req_t    ireq_out,         // Bus 指令请求
-    input  ibus_resp_t   iresp_out,        // Bus 指令响应
-    output dbus_req_t    dreq_out,         // Bus 数据请求
-    input  dbus_resp_t   dresp_out,        // Bus 数据响应
+`mret` 的实现遵循实验要求：
 
-    // 异常信号
-    output logic         walk_fault,        // 页表遍历故障
-    output logic [63:0]  fault_vaddr,      // 故障虚拟地址
-    output logic         fault_is_insn     // 是否是指南取故障
-);
+- PC 跳转到 `mepc`
+- 当前特权级切换为 `mstatus.MPP`
+- `MPIE <- 1`
+- `MIE <- 原 MPIE`
+- `MPP <- 0`
+
+`ecall` 的实现走统一 trap 流程：
+
+- 保存当前 PC 到 `mepc`
+- 跳转到 `mtvec`
+- 当前特权级提升到 `M-mode`
+- `mcause` 在 U-mode / M-mode 下分别写入 `8` / `11`
+- `MPIE <- 原 MIE`
+- `MIE <- 0`
+- `MPP <- 异常发生前特权级`
+
+### 2.2 Sv39 MMU
+
+本次实现的 MMU 支持三级页表遍历，按 `VPN[2] -> VPN[1] -> VPN[0]` 逐级访问页表项：
+
+- 根页表基地址来自 `satp.ppn`
+- 只有在 `satp.mode == 8` 且当前不处于 `M-mode` 时启用地址翻译
+- 最终物理地址按 `{pte.ppn, vaddr[11:0]}` 方式拼接
+
+访存路径上，取指与数据访存共享同一套物理内存接口，因此 MMU 被放在统一总线链路上，保证两类访问都能进行地址翻译。
+
+## 3. 关键修复
+
+### 3.1 总线桥接响应关联错误
+
+Lab5 最核心的问题不是 CSR 本身，而是访存响应与请求的关联在分页与 trap/redirect 场景下不够稳健。为此本次修复了：
+
+- `vsrc/util/DBusToCBus.sv`
+- `vsrc/util/IBusToCBus.sv`
+- `vsrc/VTop.sv`
+- `vsrc/SimTop.sv`
+- `vsrc/src/core.sv`
+- `difftest/src/test/vsrc/common/ram.sv`
+
+修复后保证：
+
+- 一次请求只对应一次 `data_ok` 脉冲
+- 取指返回时能够稳定选中正确半字
+- trap / `mret` / redirect 后，旧的 in-flight fetch response 会被丢弃
+- 仿真 RAM 返回使用锁存地址，避免延迟路径上下文错位
+
+### 3.2 Vivado 板级路径适配
+
+为了让板上路径与 Verilator 行为一致，本次同步修复了 Vivado 侧设备链路：
+
+- `vivado/src/device.sv`
+- `vivado/src/with_delay/bram_wrapper.sv`
+- `vivado/src/with_delay/cbus_crossbar.sv`
+- `vivado/src/with_delay/soc_top.sv`
+- 以及 `project_3` 工程导入副本中的对应文件
+
+主要修复包括：
+
+- UART 写入时按 `wstrobe` 选择正确 byte lane
+- MMIO 副作用只在完整事务提交时触发一次
+- 32-cycle BRAM 延迟路径锁存完整事务上下文
+
+### 3.3 上板乱码问题定位
+
+前期板上只输出一个 `A`，或者出现 `K...`、大量乱码，最终确认根因不是 CPU 没跑通，而是 UART 时钟分频与实际板上时钟不匹配。
+
+本次板级 `cpu_clk` 实际为 `25MHz`，但 `vivado/src/device.sv` 中仍保留旧值：
+
+```text
+BIT_TMR_MAX = 2603
 ```
 
-#### 1.2 Sv39 地址格式
+该值不对应 `25MHz @ 115200 baud`。修正后改为：
 
-Sv39 使用三级页表结构，虚拟地址格式如下：
-
-```
-63        38 37        30 29        21 20        12 11         0
-+--------+--------+--------+--------+--------+--------+--------+
-|  Reserved  |   VPN[2]  |   VPN[1]  |   VPN[0]  |   Page Offset  |
-+--------+--------+--------+--------+--------+--------+--------+
+```text
+BIT_TMR_MAX = 216
 ```
 
-物理地址格式：
+修复后板上串口设置应为：
 
-```
-63        54 53        30 29        21 20        12 11         0
-+--------+--------+--------+--------+--------+--------+--------+
-|  Reserved  |   PPN[2]  |   PPN[1]  |   PPN[0]  |   Page Offset  |
-+--------+--------+--------+--------+--------+--------+--------+
-```
+- 串口端口：`COM4`
+- 波特率：`115200`
 
-#### 1.3 状态机设计
+补充说明：
 
-MMU 使用有限状态机实现页表遍历：
+- `COM20` 是另一条 FTDI 通道，不是本次 Lab5 串口输出口
+- 本次“只输出一个 A”以及后续乱码，属于波特率 / 分频常量不匹配问题
 
-```verilog
-typedef enum logic [2:0] {
-    WALK_IDLE,        // 空闲状态，等待地址翻译请求
-    WALK_LEVEL2,      // 遍历 Level 2 页表
-    WALK_LEVEL1,      // 遍历 Level 1 页表
-    WALK_LEVEL0,      // 遍历 Level 0 页表
-    WALK_DONE_INSN,   // 指令翻译完成
-    WALK_DONE_DATA    // 数据翻译完成
-} walk_state_t;
-```
+## 4. Vivado 工程与上板
 
-状态转换图：
+本次最终确认可用的工程为：
 
-```
-                    +-----------------+
-                    |   WALK_IDLE     |<---------+
-                    +-----------------+          |
-                          |                      |
-        ireq_in.valid / dreq_in.valid            |
-                          v                      |
-          +-------+-------+-------+-------+      |
-          | WALK  | WALK  | WALK  | WALK  |      |
-          | LEVEL2| LEVEL1| LEVEL0| DONE  |------+
-          +---+---+---+---+---+---+---+---+
-              |   |   |   |   |
-              v   v   v   v
-          PTE返回完成状态
-```
+- 主工程：`vivado/test-cpu/project/project_3/project_3.xpr`
+- 整理后的 Lab5 工程：`vivado/lab5_project/lab5_project.xpr`
 
-### 2. 页表遍历实现
+其中，实际验证通过并重新生成 bitstream 的链路为 `project_3`。生成结果位于：
 
-#### 2.1 虚拟地址提取
+- `vivado/test-cpu/project/project_3/project_3.runs/impl_1/basys3_top.bit`
 
-```verilog
-assign vpn2 = saved_vaddr[38:30];  // VPN[2]
-assign vpn1 = saved_vaddr[29:21];   // VPN[1]
-assign vpn0 = saved_vaddr[20:12];  // VPN[0]
-assign page_offset = saved_vaddr[11:0];  // 页内偏移
+实现结果满足时序要求，`basys3_top_timing_summary_routed.rpt` 中显示：
+
+- `All user specified timing constraints are met.`
+
+## 5. 验证结果
+
+### 5.1 Verilator
+
+`make test-lab5` 的正确串口输出为：
+
+```text
+xv6 kernel is booting
+kinit ok
+procinit ok
+trapinit ok
+plicinit ok
+userinit ok
+Return from init! Test passed
 ```
 
-#### 2.2 PTE 地址计算
+这说明 Lab5 的 trap、特权级切换与分页路径已经能够支撑测试内核正常启动并返回。
 
-页表基址来自 SATP 寄存器的 PPN 字段：
+### 5.2 上板输出
 
-```verilog
-assign satp_mode = (satp[63:60] == 4'd8);  // Sv39 模式
-assign satp_ppn  = satp[43:0];              // 页表基址
+下图给出了本次上板成功时的 Hardware Manager 状态与串口输出整理，串口参数为 `COM4 @ 115200`。
 
-// Level 2 PTE 地址: satp_ppn * 4KB + vpn2 * 8
-pte_addr = {8'd0, satp_ppn, vpn2, 3'b000};
+![Lab5 上板成功界面与串口输出](image/lab5_report/board_success.png)
+
+图中可以看到，程序已经在板上打印出与仿真一致的关键输出，并最终到达：
+
+```text
+Return from init! Test passed
 ```
 
-#### 2.3 PTE 解析
+## 6. 对照实验要求检查
 
-```verilog
-// PTE 格式（Sv39）
-// [63:54] Reserved
-// [53:28] PPN[2]
-// [27:19] PPN[1]
-// [18:10] PPN[0]
-// [9:8]   Reserved
-// [7]     RSW
-// [6]     A    (Accessed)
-// [5]     D    (Dirty)
-// [4]     G    (Global)
-// [3]     X    (Execute)
-// [2]     W    (Write)
-// [1]     R    (Read)
-// [0]     V    (Valid)
+| 要求 | 完成情况 |
+| --- | --- |
+| 实现 `MRET` | 已完成 |
+| 实现 `ECALL` | 已完成 |
+| 支持特权级切换并连接 difftest | 已完成 |
+| 上电处于 `M-mode` | 已完成 |
+| 实现 Sv39 MMU | 已完成 |
+| 取指与数据访存经过 MMU 路径 | 已完成 |
+| `make test-lab5` 输出通过 | 已完成 |
+| 建立 Vivado 工程并生成 bitstream | 已完成 |
+| 串口上板输出与实验要求一致 | 已完成 |
 
-// 判断是否为叶子页表项
-if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
-    // 是叶子页表项（X/W/R 任一为1）
-    saved_pte <= dresp_out.data;
-    saved_level <= current_level;
-    state <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
-end else begin
-    // 是指针页表项，指向下一级
-    state <= next_level_state;
-    pte_addr <= {8'd0, dresp_out.data[53:10], next_vpn, 3'b000};
-end
-```
+## 7. 提交说明
 
-### 3. 页面故障检测
-
-#### 3.1 故障条件
-
-```verilog
-// 检测页表遍历失败
-assign walk_fault_next =
-    // V=0: 页表项无效
-    (state == WALK_LEVEL2 && dresp_out.data_ok && !dresp_out.data[0]) ||
-    (state == WALK_LEVEL1 && dresp_out.data_ok && !dresp_out.data[0]) ||
-    (state == WALK_LEVEL0 && dresp_out.data_ok && !dresp_out.data[0]) ||
-    // 不是叶子页表项也不是指针页表项（RsV）
-    (state == WALK_LEVEL0 && dresp_out.data_ok && dresp_out.data[0] &&
-     !dresp_out.data[3] && !dresp_out.data[1] && !dresp_out.data[2]);
-
-// 只有在活跃遍历时才触发故障
-assign walk_fault = walk_active && walk_fault_next;
-```
-
-#### 3.2 故障类型
-
-| 故障类型          | mcause 值 | 触发条件                   |
-| ----------------- | --------- | -------------------------- |
-| 指令页面故障      | 12        | 取指时发生页故障           |
-| 加载页面故障      | 13        | 加载时发生页故障           |
-| 存储/原子页面故障 | 15        | 存储或原子操作时发生页故障 |
-
-### 4. 异常处理
-
-#### 4.1 trap_pending 机制
-
-防止故障后立即重新开始遍历导致死循环：
-
-```verilog
-case (state)
-    WALK_IDLE: begin
-        if (trap_pending) begin
-            // 保持 trap_pending 一个周期
-            trap_pending <= trap_pending;
-        end else begin
-            trap_pending <= 1'b0;
-            // 正常处理新的翻译请求
-            if (translate_en && privilege_mode != 2'd3) begin
-                // 开始页表遍历
-            end
-        end
-    end
-endcase
-```
-
-#### 4.2 trap_commit 逻辑
-
-MMU 故障需要延迟一个周期才能被 commit 模块感知：
-
-```verilog
-// trap_detected 延迟 mmu_trap 一个周期
-always_ff @(posedge clk) begin
-    if (reset) trap_detected <= 1'b0;
-    else trap_detected <= mmu_trap;
-end
-
-// trap_commit 响应两种异常源
-assign trap_commit = (wb_r.valid && wb_r.trap) || trap_detected;
-```
-
-### 5. 物理地址计算
-
-根据遍历到的 PTE 级别计算物理地址：
-
-```verilog
-always_comb begin
-    phys_addr = 64'd0;
-    unique case (saved_level)
-        2'd2: phys_addr = {10'd0, saved_pte[53:30], vpn1, vpn0, page_offset};
-        2'd1: phys_addr = {10'd0, saved_pte[53:21], vpn0, page_offset};
-        2'd0: phys_addr = {8'd0, saved_pte[53:10], page_offset};
-        default: phys_addr = 64'd0;
-    endcase
-end
-```
-
-## 调试过程
-
-### 问题 1：walk_fault 信号类型错误
-
-**现象**：Difftest 报告在不应触发异常的位置触发了 mcause=13。
-
-**分析**：初始实现中 `walk_fault` 被声明为 `output`，但实际应作为输入传入 core。
-
-**修复**：
-
-```verilog
-// core.sv
-input logic walk_fault,           // 从 MMU 来
-assign mmu_trap = walk_fault;
-```
-
-### 问题 2：MMU 在 WALK_IDLE 时错误触发 walk_fault
-
-**现象**：页表遍历尚未开始，walk_fault 就被错误断言。
-
-**分析**：`walk_fault_next` 在所有状态下都被计算，包括 WALK_IDLE。
-
-**修复**：添加 `walk_active` 信号，限定 `walk_fault` 只在活跃遍历时计算：
-
-```verilog
-assign walk_active = (state == WALK_LEVEL2) || (state == WALK_LEVEL1) || (state == WALK_LEVEL0);
-assign walk_fault = walk_active && walk_fault_next;
-```
-
-### 问题 3：fault 后立即重新 walk 导致死循环
-
-**现象**：CPU 在页面故障后不断重新尝试遍历，无法处理异常。
-
-**分析**：状态机返回 WALK_IDLE 时，trap_pending 被立即清零，导致立即开始新的遍历。
-
-**修复**：在 WALK_IDLE 状态保持 trap_pending 一个周期：
-
-```verilog
-WALK_IDLE: begin
-    if (trap_pending) begin
-        trap_pending <= trap_pending;
-    end else begin
-        trap_pending <= 1'b0;
-        // 开始新的遍历
-    end
-end
-```
-
-### 问题 4：trap_commit 不响应 mmu_trap
-
-**现象**：MMU 触发了 walk_fault，但 trap_commit 未被置位。
-
-**分析**：原始的 `trap_commit` 只检查 `wb_r.trap`，不响应 MMU 的 `mmu_trap` 信号。
-
-**修复**：添加 `trap_detected` 寄存器，延迟一个周期后响应：
-
-```verilog
-assign trap_commit = (wb_r.valid && wb_r.trap) || trap_detected;
-```
-
-## 测试结果
-
-### Difftest 测试输出
-
-```
-Core 0: HIT GOOD TRAP at pc = 0x0
-total guest instructions = 261372
-instrCnt = 261372, cycleCnt = 1470213, IPC = 0.177778
-```
-
-### 测试验证
-
-- ✅ trap 被正确检测
-- ✅ 指令数稳定：261372
-- ✅ 周期数稳定：1470213
-- ✅ 连续多次运行结果一致
-
-## 核心代码
-
-### MMU 模块关键实现
-
-```verilog
-// 虚拟地址翻译使能
-assign translate_en = satp_mode && (privilege_mode != 2'd3);
-
-// 故障检测
-assign walk_fault_next =
-    (state == WALK_LEVEL2 && dresp_out.data_ok && !dresp_out.data[0]) ||
-    (state == WALK_LEVEL1 && dresp_out.data_ok && !dresp_out.data[0]) ||
-    (state == WALK_LEVEL0 && dresp_out.data_ok && !dresp_out.data[0]) ||
-    (state == WALK_LEVEL0 && dresp_out.data_ok && dresp_out.data[0] &&
-     !dresp_out.data[3] && !dresp_out.data[1] && !dresp_out.data[2]);
-
-// 物理地址计算
-always_comb begin
-    unique case (saved_level)
-        2'd2: phys_addr = {10'd0, saved_pte[53:30], vpn1, vpn0, page_offset};
-        2'd1: phys_addr = {10'd0, saved_pte[53:21], vpn0, page_offset};
-        2'd0: phys_addr = {8'd0, saved_pte[53:10], page_offset};
-    endcase
-end
-```
-
-## 实验总结
-
-本实验成功实现了基于 Sv39 的虚拟内存管理单元，主要贡献包括：
-
-1. **完整的三级页表遍历硬件**：使用状态机实现了高效的页表遍历
-2. **准确的页面故障检测**：能够正确识别 V=0 和 RsV 等故障情况
-3. **正确的异常处理机制**：trap 能够正确传播并被 commit 模块响应
-4. **完善的调试框架**：通过 Difftest 验证了实现的正确性
-
-实验过程中遇到的几个关键问题最终都通过仔细分析波形和状态机逻辑得以解决，体现了虚拟内存系统实现的复杂性。
-
-## 参考资料
-
-1. RISC-V Spec Volume II: Privileged Architecture
-2. Sv39: RISC-V Instruction Set Manual, Volume II
-3. XiangShan 项目框架
+本次提交包中除代码与报告外，还额外包含了 `vivado/` 工程目录，便于助教直接打开工程检查综合、实现与 bitstream 结果。

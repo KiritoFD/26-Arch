@@ -55,6 +55,7 @@ module core_csr
 	logic intr_meip, intr_msip, intr_mtip;
 	logic [63:0] intr_mstatus;
 	logic [63:0] intr_mie;
+	logic sync_trap_or_mret;
 
 	assign intr_mstatus = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MSTATUS)) ? wb_r.csr_wdata : csr_mstatus;
 	assign intr_mie     = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MIE))     ? wb_r.csr_wdata : csr_mie;
@@ -67,6 +68,8 @@ module core_csr
 	assign intr_cause = intr_meip ? {1'b1, 63'd11} :  // MEIP  (11)
 	                    intr_msip ? {1'b1, 63'd3}  :  // MSIP  (3)
 	                    {1'b1, 63'd7};                  // MTIP  (7)
+	assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_misalign_instr ||
+	                           wb_misalign_data || mmu_trap || wb_mret;
 
 	assign csr_mhartid = 64'd0;
 	assign csr_mip = (csr_mip_raw & ~64'h0000_0000_0000_0888) |
@@ -124,7 +127,7 @@ module core_csr
 			csr_satp     <= 64'd0;
 			privilege_mode <= 2'd3;
 		end else begin
-			if (intr_eval && intr_pending) begin
+			if (intr_eval && intr_pending && !sync_trap_or_mret) begin
 				csr_mepc   <= intr_fetch_pc;
 				csr_mcause <= intr_cause;
 				csr_mtval  <= 64'd0;
@@ -218,7 +221,7 @@ module core_csr
 		mret_redirect = 1'b0;
 		trap_redirect_pc = 64'd0;
 
-		if (intr_eval && intr_pending) begin
+		if (intr_eval && intr_pending && !sync_trap_or_mret) begin
 			next_mepc = intr_fetch_pc;
 			next_mcause = intr_cause;
 			next_mtval = 64'd0;

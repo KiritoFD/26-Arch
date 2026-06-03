@@ -1,106 +1,163 @@
 # Lab6 实验报告：中断与异常支持
 
-## 1. 实验目标
+## 1. 实验要求对照
 
-Lab6 要求 CPU 支持基本的 RISC-V 特权级中断与异常处理。本地 `wiki/Lab-6.md` 的内容较简略，只说明需要支持：
+Lab6 要求 CPU 支持 RISC-V 机器态 trap 相关机制。根据 Wiki，本次实验必须先理解特权架构，并完成以下内容：
 
-- 时钟中断
-- 外部中断
-- ECALL
-- 非法指令
-- 页错误等异常
+- 实现异常：指令地址不对齐、数据地址不对齐、非法指令、ECALL
+- 实现中断：时钟中断、外部中断、软件中断
+- 实现 `mret`
+- 发生 trap 时正确更新 `mepc`、`mcause`、`mstatus` 和当前 mode
+- trap 后跳转到 `mtvec`
+- trap/mret 后清除流水线，避免旧指令或旧访存响应污染新控制流
+- 运行 `make test-lab6`
+- 本次 Lab 不要求上板
 
-该 Wiki 页面没有单独写出测试命令。实际测试入口来自 `Makefile` 中的 `test-lab6`：
+Wiki 中还提到 MMU 缺页异常属于 bonus。本实现已在 Lab5 Sv39 MMU 基础上接入页错误 trap，因此公开要求和 bonus 方向都覆盖到了。
 
-```makefile
-test-lab6: sim
-	TEST=sys ./build/emu --no-diff -i ./ready-to-run/lab6/lab6-test.bin $(VOPT) || true
+## 2. Trap 总体设计
+
+本实现把中断和异常统一成 trap 流程处理。同步异常来自正在提交的指令，异步中断来自 `trint`、`exint`、`swint` 三根输入线。trap 发生后，CSR 模块完成架构状态更新，前端和 MMU 负责丢弃旧控制流下的状态。
+
+一次 trap 的核心动作如下：
+
+```text
+mepc          <- trap 对应 PC
+mcause[63]    <- 0 表示异常，1 表示中断
+mcause[62:0]  <- trap 类型
+mstatus.MPIE <- mstatus.MIE
+mstatus.MIE  <- 0
+mstatus.MPP  <- trap 前 mode
+mode          <- M-mode
+next_pc       <- mtvec
 ```
 
-因此本实验使用 WSL 中的 `make test-lab6` 验证。由于 Makefile 在测试命令末尾加了 `|| true`，且 Lab5/Lab6 仿真在打印通过信息后不一定自然退出，最终判断以输出中的 `Test ... [OK]`、`Single test passed.` 等关键通过信息为准，而不是只看 shell 退出码。
+对应的返回由 `mret` 完成：
 
-## 2. 相关模块
+```text
+mstatus.MIE  <- mstatus.MPIE
+mstatus.MPIE <- 1
+mode          <- mstatus.MPP
+mstatus.MPP  <- 0
+next_pc       <- mepc
+```
 
-本次修改集中在以下文件：
+代码上，trap 的核心状态更新集中在 `vsrc/src/core/core_csr.sv`，trap 信号从 `vsrc/src/core/core_commit.sv` 接入，前端 flush 和 difftest 接口在 `vsrc/src/core.sv` 中完成。
 
-- `vsrc/src/core.sv`
-- `vsrc/src/core/core_commit.sv`
-- `vsrc/src/core/core_csr.sv`
-- `vsrc/src/core/core_execute.sv`
-- `vsrc/src/core/core_pkg.sv`
-- `vsrc/SimTop.sv`
-- `vsrc/util/mmu.sv`
+## 3. 异常实现
 
-核心思路是把异常与中断统一接入 commit/CSR 路径，由 CSR 模块维护 `mepc`、`mcause`、`mtval`、`mstatus`、`mie`、`mip`、`satp` 等状态，并在 trap/mret 时对前端和 MMU 状态做 flush，避免旧请求污染新特权级下的执行。
+### 3.1 ECALL
 
-## 3. 异常处理实现
+ECALL 的 `mcause` 由当前特权级决定：
 
-### 3.1 ECALL cause
+| 来源特权级 | mcause |
+| --- | --- |
+| U-mode | 8 |
+| S-mode | 9 |
+| M-mode | 11 |
 
-ECALL 的 `mcause` 需要根据当前特权级区分：
+CSR 模块中使用 `get_ecall_cause()` 生成对应 cause。ECALL trap 时：
 
-- U-mode ECALL：`mcause = 8`
-- S-mode ECALL：`mcause = 9`
-- M-mode ECALL：`mcause = 11`
-
-CSR 模块中新增 `get_ecall_cause()`，根据 `privilege_mode_i` 生成对应 cause。这样 Lab6 中的 `ecall_u` 和后续 M-mode trap 测试都能得到正确的异常原因。
+```text
+mepc   <- wb_r.pc
+mcause <- get_ecall_cause(mode)
+mtval  <- 0
+mode   <- M-mode
+pc     <- mtvec
+```
 
 ### 3.2 非法指令
 
-非法指令进入 trap 时：
+非法指令 trap 时写入：
 
-- `mepc = wb_r.pc`
-- `mcause = 2`
-- `mtval = {32'd0, wb_r.instr}`
+```text
+mepc   <- wb_r.pc
+mcause <- 2
+mtval  <- 原始非法指令编码
+```
 
-这样 trap handler 可以从 `mtval` 中看到触发异常的原始指令编码。
+这样 handler 可以通过 `mtval` 判断触发异常的指令内容。
 
-### 3.3 地址不对齐异常
+### 3.3 地址不对齐
 
-Lab6 测试覆盖了取指、load、store 三类 misalign：
+本实现覆盖三类地址不对齐：
 
-- 取指地址不对齐：`mcause = 0`
-- load 地址不对齐：`mcause = 4`
-- store 地址不对齐：`mcause = 6`
+| 类型 | mcause | mtval |
+| --- | --- | --- |
+| 指令地址不对齐 | 0 | 跳转目标地址 |
+| load 地址不对齐 | 4 | load 地址 |
+| store 地址不对齐 | 6 | store 地址 |
 
-执行模块在跳转目标地址低两位非零时生成 `ex_instr_misalign`，并禁止错误跳转继续 flush 前端。访存地址不对齐沿用 `ex_misalign`，在 CSR trap 中根据 load/store 类型写入不同 cause。对应的 `mtval` 写入出错地址。
+执行级计算跳转目标后检测 `ex_next_pc[1:0]`。若目标不对齐，生成 `ex_instr_misalign`，同时禁止错误跳转继续刷新前端。数据地址不对齐使用访存地址检测，并在 commit/CSR 路径中生成对应 trap。
 
-## 4. 中断处理实现
+### 3.4 页错误
+
+MMU 页表遍历发现无效 PTE 或非叶子错误时产生 page fault，并通过 `fault_vaddr` 和 `fault_is_insn` 送入 core：
+
+| 类型 | mcause | mtval |
+| --- | --- | --- |
+| instruction page fault | 12 | fault_vaddr |
+| load page fault | 13 | fault_vaddr |
+| store page fault | 15 | fault_vaddr |
+
+这部分属于 Wiki 中的 bonus，但对 Lab5/Lab6 的特权级和分页组合测试也有实际作用。
+
+### 3.5 优先级处理
+
+同步异常已经到达 WB/commit 时，不能被同一拍的异步中断覆盖。因此 CSR 中加入 `sync_trap_or_mret`：
+
+```verilog
+assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_misalign_instr ||
+                           wb_misalign_data || mmu_trap || wb_mret;
+```
+
+中断只有在没有同步 trap/mret 抢占时才进入 trap。这使异常优先级更符合“当前提交指令先产生确定架构行为”的原则。
+
+## 4. 中断实现
 
 ### 4.1 中断 pending 与 enable
 
-CSR 模块根据 `mip`、`mie` 和 `mstatus.MIE` 判断机器级中断：
+三类中断信号映射到 `mip`：
 
-- MTIP：timer interrupt，`mcause = 0x8000000000000007`
-- MSIP：software interrupt，`mcause = 0x8000000000000003`
-- MEIP：external interrupt，`mcause = 0x800000000000000b`
+| 输入 | mip 位 | mie 位 | mcause |
+| --- | --- | --- | --- |
+| `swint` | 3 | 3 | `0x8000000000000003` |
+| `trint` | 7 | 7 | `0x8000000000000007` |
+| `exint` | 11 | 11 | `0x800000000000000b` |
 
-当 CPU 已在 M-mode 时，只有 `mstatus.MIE = 1` 才响应中断；当 CPU 处于低特权级时，机器级中断可以进入 M-mode trap。
+中断进入 M-mode 的条件按 Wiki 实现：
 
-### 4.2 本拍 CSR 写回后的中断判定
-
-Lab6 的 `m_trap` 测试中有如下关键序列：
-
-```asm
-csrsi mstatus, 8
-csrci mstatus, 8
+```text
+(当前 mode 不是 M-mode，或 mstatus.MIE = 1)
+并且
+mip[i] = 1 且 mie[i] = 1
 ```
 
-测试期望 timer interrupt 精确落在 `csrci mstatus, 8` 这条指令处，并在这条指令清掉 MIE 后不再重复进入中断。原先如果直接用旧的 `csr_mstatus` 判断 pending，中断可能在 `csrci` 写回同一拍仍按旧 MIE 触发，导致重复 trap。
+实现中没有检测中断信号边沿，而是把外部中断输入组合到 `mip` 对应位，这符合 Wiki 中“不要检测 posedge/negedge”的要求。
 
-修复方式是为中断判定引入本拍有效值：
+### 4.2 CSR 写回后的即时判定
 
-- 如果 WB 正在写 `mstatus`，中断判定使用 `wb_r.csr_wdata`
-- 如果 WB 正在写 `mie`，中断判定使用 `wb_r.csr_wdata`
-- 否则使用寄存器中的 `csr_mstatus` / `csr_mie`
+Wiki 指出中断条件依赖 `mip`、`mie`、`mstatus`，并且这些 CSR 被写入后需要重新 evaluate。当前实现对 `mstatus` 和 `mie` 使用本拍有效值：
 
-这样 CSR 写回和中断响应的优先关系与测试预期一致。
+```verilog
+assign intr_mstatus =
+  (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MSTATUS))
+  ? wb_r.csr_wdata
+  : csr_mstatus;
 
-### 4.3 精确中断 mepc
+assign intr_mie =
+  (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MIE))
+  ? wb_r.csr_wdata
+  : csr_mie;
+```
 
-中断进入 trap 时，`mepc` 应保存流水线中最老的未提交指令 PC，而不是简单使用当前 fetch PC。否则当前端已经预取到后续指令时，`mepc` 会偏后。
+这样 `csrsi mstatus, 8` 打开 MIE 后能及时响应中断，而 `csrci mstatus, 8` 清除 MIE 后不会因为旧值重复进中断。
 
-当前实现按流水线阶段优先选择：
+### 4.3 精确中断 PC
+
+中断是异步事件，前端 PC 可能已经取到后续指令。若直接把 `fetch_pc` 写入 `mepc`，中断返回后可能跳过尚未提交的指令。
+
+因此 `mepc` 选择流水线中最老的未提交指令 PC：
 
 ```verilog
 assign intr_fetch_pc = mem_r.valid ? mem_r.pc :
@@ -109,48 +166,52 @@ assign intr_fetch_pc = mem_r.valid ? mem_r.pc :
                                      fetch_pc;
 ```
 
-这保证 `m_trap` 中 timer interrupt 的 `mepc` 能落在测试期望的 `0x80008048`。
+这个设计保证中断前已经提交的指令不会重复执行，尚未提交的指令不会丢失。公开测试中的 `m_trap` 对这个点很敏感。
 
-## 5. trap/mret 与前端 flush
+## 5. mret 与特权级恢复
 
-trap 或 mret 发生后，前端必须立即切换到新 PC：
+`mret` 在 CSR 模块中恢复中断使能和特权级：
 
-- trap 跳转到 `mtvec`
-- mret 跳转到 `mepc`
-- 执行级跳转跳转到 `ex_redirect_pc`
+```text
+MIE  <- MPIE
+MPIE <- 1
+MPP  <- 0
+mode <- 原 MPP
+PC   <- mepc
+```
 
-实现中在 `trap_redirect || mret_redirect || ex_flush_front` 时清理：
+`mret_redirect` 会通知前端跳转到 `mepc`，同时清除流水线中旧路径的指令，避免 trap handler 后续指令继续进入执行级。
+
+## 6. 流水线与 MMU flush
+
+trap、mret、执行级跳转都会改变控制流。实现中在这些事件发生时清理前端状态：
 
 - `fetch_pending`
 - `fetch_req_pc`
 - `fetch_redirect_pending`
 - `fetch_buf_valid`
 
-并加入短暂的 `fetch_redirect_bubble`，避免 redirect 后旧响应立刻被当成新指令消费。这样可以防止旧 U-mode 虚拟地址请求在切回 M-mode 后继续流入流水线。
+同时加入 `fetch_redirect_bubble`，屏蔽 redirect 后短时间内返回的旧取指响应。
 
-## 6. MMU flush 与页错误处理
+MMU 也接入 `flush_mmu_o`：
 
-`SimTop.sv` 将 core 的 `flush_mmu_o` 接入 MMU。MMU 在 flush 时清理：
+```verilog
+assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front;
+```
 
-- page walk 状态机
-- 保存的虚拟地址和 PTE 信息
-- fault 地址
-- fault 类型
-- `trap_pending`
+MMU 收到 flush 后清理 page walk 状态、保存的虚拟地址、PTE、fault 地址、fault 类型和 `trap_pending`。这可以避免旧 U-mode 请求或旧 page fault 在切到 M-mode trap handler 后污染新状态。
 
-这样在 trap/mret/前端 flush 后，旧的 page walk 或旧 fault 不会污染新的异常处理路径。此前调试中曾出现过 ECALL 被旧的 page fault 抢优先级的问题，这一处 flush 可以避免该类问题。
+## 7. Difftest 状态
 
-## 7. Difftest 特权级状态
-
-`DifftestCSRState.priviledgeMode` 原先固定上报 M-mode。Lab5/Lab6 中涉及 U-mode 与 M-mode 之间的 mret/trap 切换，因此需要上报真实的下一拍特权级：
+Lab6 官方测试暂时不使用 Difftest，但 Lab5 和后续测试需要 CSR 状态一致。本实现将 `DifftestCSRState.priviledgeMode` 接到真实 privilege mode：
 
 ```verilog
 .priviledgeMode(privilege_mode_diff)
 ```
 
-同时 `core_csr.sv` 中 `privilege_mode_diff` 使用 `next_privilege_mode`，避免 difftest 看到滞后一拍的 privilege mode。
+并让 `privilege_mode_diff` 使用 `next_privilege_mode`，避免 trap/mret 提交点上报滞后一拍的特权级。
 
-## 8. 验证结果
+## 8. 测试结果
 
 ### 8.1 Lab6
 
@@ -160,7 +221,7 @@ trap 或 mret 发生后，前端必须立即切换到新 PC：
 make test-lab6
 ```
 
-关键输出：
+关键输出如下：
 
 ```text
 Single test passed.
@@ -173,16 +234,19 @@ trap here, epc 80006040, cause 4
 Test load_misalign [OK]
 trap here, epc 80006050, cause 6
 Test store_misalign [OK]
-trap here, epc 800060b0, cause 8000000000000007
+trap here, epc 800060a8, cause 8000000000000007
 Test timer_intr [OK]
 trap here, epc 80006090, cause 8000000000000003
 Test software_intr [OK]
 Test m_trap [OK]
+Privileged test finished.
 ```
+
+Wiki 中说明后续循环输出 `m_trap_test [X]` / `---TEST FAILED---` 属于正常现象，可以手动退出。当前实现已经能输出 `Test m_trap [OK]` 和 `Privileged test finished.`，因此公开 Lab6 测试通过。
 
 ### 8.2 前五个 Lab 回归
 
-为确认没有破坏前五个测试，分别运行已有仿真镜像，结果如下：
+为确认没有破坏前五个实验，回归结果如下：
 
 ```text
 Lab1: HIT GOOD TRAP at pc = 0x80010004
@@ -192,16 +256,28 @@ Lab4: HIT GOOD TRAP at pc = 0x8001fff8
 Lab5: Return from init! Test passed
 ```
 
-Lab5 和 Lab6 在打印通过信息后不会在 timeout 前自然退出，因此验证时使用 timeout 截断仿真进程。测试是否通过以输出中的通过信息为准。
+Lab5 和 Lab6 在打印通过信息后不会立即自然退出，因此验证时使用 `timeout` 截断仿真进程。判断通过与否以输出中的通过信息为准。
 
-## 9. 小结
+## 9. 提交说明
 
-本次 Lab6 完成了机器级中断和常见同步异常的基本支持，并修复了几个和流水线精确性相关的问题：
+本次 Lab6 不要求上板。提交包通过：
 
-- 异常 cause 和 `mtval` 按类型正确写入
-- 中断 `mepc` 取流水线最老未提交指令 PC
+```bash
+make handin
+```
+
+生成，报告同时提供 `docs/report.md` 和 `docs/report.pdf`，并保留 `docs/lab6_report.md` 作为同内容的 Lab6 专项报告。
+
+## 10. 小结
+
+本实现覆盖了 Wiki 中列出的异常、中断和 `mret` 行为，并额外接入了 MMU 缺页异常。关键设计点包括：
+
+- WB/commit 收口同步异常
+- CSR 统一维护 trap 架构状态
+- 中断按 `mip`、`mie`、`mstatus.MIE` 判定
 - CSR 写回后的 `mstatus`/`mie` 参与同拍中断判定
-- trap/mret 后清理前端与 MMU 旧状态
-- Difftest 上报真实 privilege mode
+- 中断 `mepc` 保存流水线中最老的未提交指令 PC
+- trap/mret 后清理前端和 MMU 旧状态
+- 同步异常和 mret 不被同拍异步中断覆盖
 
-最终 `make test-lab6` 的功能项全部输出 `[OK]`，同时 Lab1-Lab5 回归保持通过。
+公开测试 `make test-lab6` 已通过，且 Lab1-Lab5 回归保持通过。

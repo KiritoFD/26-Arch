@@ -115,7 +115,7 @@ module core_execute
 	// Data address misalignment detection
 	always_comb begin
 		ex_misalign = 1'b0;
-		if (ex_r.valid && (ex_r.is_load || ex_r.is_store)) begin
+		if (ex_r.valid && (ex_r.is_load || ex_r.is_store || ex_r.is_amo)) begin
 			unique case (ex_r.mem_size)
 				MSIZE2: ex_misalign = |ex_mem_addr[0];
 				MSIZE4: ex_misalign = |ex_mem_addr[1:0];

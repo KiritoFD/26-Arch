@@ -10,16 +10,28 @@ module core_decode
 	input  wb_like_reg_t  wb_r,
 	input  logic [63:0]   gpr [31:0],
 	input  logic [63:0]   csr_mstatus,
+	input  logic [63:0]   csr_sstatus,
 	input  logic [63:0]   csr_mtvec,
+	input  logic [63:0]   csr_stvec,
 	input  logic [63:0]   csr_mip,
+	input  logic [63:0]   csr_sip,
 	input  logic [63:0]   csr_mie,
+	input  logic [63:0]   csr_sie,
 	input  logic [63:0]   csr_mscratch,
+	input  logic [63:0]   csr_sscratch,
 	input  logic [63:0]   csr_mcause,
+	input  logic [63:0]   csr_scause,
 	input  logic [63:0]   csr_mtval,
+	input  logic [63:0]   csr_stval,
 	input  logic [63:0]   csr_mepc,
+	input  logic [63:0]   csr_sepc,
 	input  logic [63:0]   csr_mcycle,
 	input  logic [63:0]   csr_mhartid,
 	input  logic [63:0]   csr_satp,
+	input  logic [63:0]   csr_medeleg,
+	input  logic [63:0]   csr_mideleg,
+	input  logic [63:0]   csr_mcounteren,
+	input  logic [63:0]   csr_menvcfg,
 	input  logic          ex_forwardable,
 	input  logic [63:0]   ex_result,
 	output logic [4:0]    id_rs1,
@@ -50,6 +62,9 @@ module core_decode
 	output logic [63:0]   id_dec_csr_wdata,
 	output logic          id_dec_is_ecall,
 	output logic          id_dec_is_mret,
+	output logic          id_dec_is_sret,
+	output logic          id_dec_is_amo,
+	output logic [4:0]    id_dec_amo_cmd,
 	output logic          id_dec_is_illegal
 );
 	logic [63:0] id_rs1_val;
@@ -85,9 +100,11 @@ module core_decode
 	                    (id_opcode == 7'b0011011) || (id_opcode == 7'b0111011) ||
 	                    (id_opcode == 7'b0000011) || (id_opcode == 7'b0100011) ||
 	                    (id_opcode == 7'b1100011) || (id_opcode == 7'b1100111) ||
+	                    (id_opcode == 7'b0101111) ||
 	                    ((id_opcode == 7'b1110011) && (id_funct3 == 3'b001 || id_funct3 == 3'b010 || id_funct3 == 3'b011));
 	assign id_use_rs2 = (id_opcode == 7'b0110011) || (id_opcode == 7'b0111011) ||
-	                    (id_opcode == 7'b0100011) || (id_opcode == 7'b1100011);
+	                    (id_opcode == 7'b0100011) || (id_opcode == 7'b1100011) ||
+	                    ((id_opcode == 7'b0101111) && ((id_funct7 != 7'b0001000) && (id_funct7 != 7'b0001010)));
 
 	always_comb begin
 		id_rs1_val = (id_rs1 == 0) ? 64'd0 : gpr[id_rs1];
@@ -105,16 +122,28 @@ module core_decode
 	always_comb begin
 		unique case (id_csr_addr)
 			CSR_MSTATUS:  id_csr_rdata = csr_mstatus;
+			CSR_SSTATUS:  id_csr_rdata = csr_sstatus;
 			CSR_MTVEC:    id_csr_rdata = csr_mtvec;
+			CSR_STVEC:    id_csr_rdata = csr_stvec;
 			CSR_MIP:      id_csr_rdata = csr_mip;
+			CSR_SIP:      id_csr_rdata = csr_sip;
 			CSR_MIE:      id_csr_rdata = csr_mie;
+			CSR_SIE:      id_csr_rdata = csr_sie;
 			CSR_MSCRATCH: id_csr_rdata = csr_mscratch;
+			CSR_SSCRATCH: id_csr_rdata = csr_sscratch;
 			CSR_MCAUSE:   id_csr_rdata = csr_mcause;
+			CSR_SCAUSE:   id_csr_rdata = csr_scause;
 			CSR_MTVAL:    id_csr_rdata = csr_mtval;
+			CSR_STVAL:    id_csr_rdata = csr_stval;
 			CSR_MEPC:     id_csr_rdata = csr_mepc;
+			CSR_SEPC:     id_csr_rdata = csr_sepc;
 			CSR_MCYCLE:   id_csr_rdata = csr_mcycle;
 			CSR_MHARTID:  id_csr_rdata = csr_mhartid;
 			CSR_SATP:     id_csr_rdata = csr_satp;
+			CSR_MEDELEG:  id_csr_rdata = csr_medeleg;
+			CSR_MIDELEG:  id_csr_rdata = csr_mideleg;
+			CSR_MCOUNTEREN: id_csr_rdata = csr_mcounteren;
+			CSR_MENVCFG:  id_csr_rdata = csr_menvcfg;
 			default:      id_csr_rdata = 64'd0;
 		endcase
 
@@ -148,6 +177,9 @@ module core_decode
 		id_dec_csr_wdata    = 64'd0;
 		id_dec_is_ecall     = 1'b0;
 		id_dec_is_mret      = 1'b0;
+		id_dec_is_sret      = 1'b0;
+		id_dec_is_amo       = 1'b0;
+		id_dec_amo_cmd      = 5'd0;
 		id_dec_is_illegal   = 1'b0;
 
 		if (id_r.instr == TRAP_INSN) begin
@@ -183,6 +215,9 @@ module core_decode
 					id_dec_br_funct3 = id_funct3;
 					id_dec_imm = id_imm_b;
 				end
+				7'b0001111: begin
+					// FENCE / FENCE.I - treat as NOP on this in-order single-core CPU
+				end
 				7'b0000011: begin
 					id_dec_wen = 1'b1;
 					id_dec_is_load = 1'b1;
@@ -208,6 +243,26 @@ module core_decode
 						3'b011: id_dec_mem_size = MSIZE8;
 						default: begin id_dec_valid = 1'b0; end
 					endcase
+				end
+				7'b0101111: begin
+					if (id_funct3 == 3'b010) begin
+						id_dec_wen = (id_rd != 0);
+						id_dec_is_amo = 1'b1;
+						id_dec_mem_size = MSIZE4;
+						unique case (id_funct7[6:2])
+							5'b00001: id_dec_amo_cmd = AMO_CMD_SWAP; // amoswap.w
+							5'b00000: id_dec_amo_cmd = AMO_CMD_ADD;  // amoadd.w
+							5'b00010: id_dec_amo_cmd = AMO_CMD_LR;   // lr.w
+							5'b00011: id_dec_amo_cmd = AMO_CMD_SC;   // sc.w
+							default: begin
+								id_dec_is_amo = 1'b0;
+								id_dec_wen = 1'b0;
+								id_dec_is_illegal = 1'b1;
+							end
+						endcase
+					end else begin
+						id_dec_is_illegal = 1'b1;
+					end
 				end
 				7'b0010011: begin
 					unique case (id_funct3)
@@ -299,6 +354,11 @@ module core_decode
 					end else if (id_r.instr == 32'h30200073) begin
 						// MRET
 						id_dec_is_mret = 1'b1;
+					end else if (id_r.instr == 32'h10200073) begin
+						// SRET
+						id_dec_is_sret = 1'b1;
+					end else if (id_r.instr == 32'h10500073) begin
+						// WFI - treat as NOP
 					end else if (id_r.instr == 32'h12000073) begin
 						// SFENCE.VMA - treat as NOP
 					end else begin

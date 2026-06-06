@@ -25,15 +25,27 @@ module core_commit
 	output logic [63:0]  gpr [31:0],
 	output logic [63:0]  gpr_diff [31:0],
 	output logic [63:0]  csr_mstatus,
+	output logic [63:0]  csr_sstatus,
 	output logic [63:0]  csr_mtvec,
+	output logic [63:0]  csr_stvec,
 	output logic [63:0]  csr_mip,
+	output logic [63:0]  csr_sip,
 	output logic [63:0]  csr_mie,
+	output logic [63:0]  csr_sie,
 	output logic [63:0]  csr_mscratch,
+	output logic [63:0]  csr_sscratch,
 	output logic [63:0]  csr_mcause,
+	output logic [63:0]  csr_scause,
 	output logic [63:0]  csr_mtval,
+	output logic [63:0]  csr_stval,
 	output logic [63:0]  csr_mepc,
+	output logic [63:0]  csr_sepc,
 	output logic [63:0]  csr_mhartid,
 	output logic [63:0]  csr_satp,
+	output logic [63:0]  csr_medeleg,
+	output logic [63:0]  csr_mideleg,
+	output logic [63:0]  csr_mcounteren,
+	output logic [63:0]  csr_menvcfg,
 	output logic [63:0]  csr_mstatus_diff,
 	output logic [63:0]  csr_mtvec_diff,
 	output logic [63:0]  csr_mip_diff,
@@ -54,6 +66,7 @@ module core_commit
 
 	logic wb_ecall;
 	logic wb_mret;
+	logic wb_sret;
 	logic wb_illegal;
 	logic wb_misalign_data;
 	logic wb_misalign_instr;
@@ -61,6 +74,7 @@ module core_commit
 
 	assign wb_ecall        = wb_r.valid && wb_r.is_ecall;
 	assign wb_mret         = wb_r.valid && wb_r.is_mret;
+	assign wb_sret         = wb_r.valid && wb_r.is_sret;
 	assign wb_illegal      = wb_r.valid && wb_r.is_illegal;
 	assign wb_misalign_data = wb_r.valid && wb_r.is_misalign;
 	assign wb_misalign_instr = wb_r.valid && wb_r.is_instr_misalign;
@@ -80,6 +94,7 @@ module core_commit
 		.exint(exint),
 		.wb_ecall(wb_ecall),
 		.wb_mret(wb_mret),
+		.wb_sret(wb_sret),
 		.wb_illegal(wb_illegal),
 		.wb_misalign_data(wb_misalign_data),
 		.wb_misalign_instr(wb_misalign_instr),
@@ -91,15 +106,27 @@ module core_commit
 		.intr_eval(intr_eval),
 		.intr_fetch_pc(intr_fetch_pc),
 		.csr_mstatus(csr_mstatus),
+		.csr_sstatus(csr_sstatus),
 		.csr_mtvec(csr_mtvec),
+		.csr_stvec(csr_stvec),
 		.csr_mip(csr_mip),
+		.csr_sip(csr_sip),
 		.csr_mie(csr_mie),
+		.csr_sie(csr_sie),
 		.csr_mscratch(csr_mscratch),
+		.csr_sscratch(csr_sscratch),
 		.csr_mcause(csr_mcause),
+		.csr_scause(csr_scause),
 		.csr_mtval(csr_mtval),
+		.csr_stval(csr_stval),
 		.csr_mepc(csr_mepc),
+		.csr_sepc(csr_sepc),
 		.csr_mhartid(csr_mhartid),
 		.csr_satp(csr_satp),
+		.csr_medeleg(csr_medeleg),
+		.csr_mideleg(csr_mideleg),
+		.csr_mcounteren(csr_mcounteren),
+		.csr_menvcfg(csr_menvcfg),
 		.csr_mstatus_diff(csr_mstatus_diff),
 		.csr_mtvec_diff(csr_mtvec_diff),
 		.csr_mip_diff(csr_mip_diff),

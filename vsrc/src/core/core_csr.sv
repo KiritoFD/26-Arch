@@ -12,6 +12,7 @@ module core_csr
 	input  logic         exint,
 	input  logic         wb_ecall,
 	input  logic         wb_mret,
+	input  logic         wb_sret,
 	input  logic         wb_illegal,
 	input  logic         wb_misalign_data,
 	input  logic         wb_misalign_instr,
@@ -23,15 +24,27 @@ module core_csr
 	input  logic [63:0]  intr_fetch_pc,  // current fetch PC for interrupt mepc
 	output logic [1:0]   privilege_mode,
 	output logic [63:0]  csr_mstatus,
+	output logic [63:0]  csr_sstatus,
 	output logic [63:0]  csr_mtvec,
+	output logic [63:0]  csr_stvec,
 	output logic [63:0]  csr_mip,
+	output logic [63:0]  csr_sip,
 	output logic [63:0]  csr_mie,
+	output logic [63:0]  csr_sie,
 	output logic [63:0]  csr_mscratch,
+	output logic [63:0]  csr_sscratch,
 	output logic [63:0]  csr_mcause,
+	output logic [63:0]  csr_scause,
 	output logic [63:0]  csr_mtval,
+	output logic [63:0]  csr_stval,
 	output logic [63:0]  csr_mepc,
+	output logic [63:0]  csr_sepc,
 	output logic [63:0]  csr_mhartid,
 	output logic [63:0]  csr_satp,
+	output logic [63:0]  csr_medeleg,
+	output logic [63:0]  csr_mideleg,
+	output logic [63:0]  csr_mcounteren,
+	output logic [63:0]  csr_menvcfg,
 	output logic [63:0]  csr_mstatus_diff,
 	output logic [63:0]  csr_mtvec_diff,
 	output logic [63:0]  csr_mip_diff,
@@ -48,38 +61,78 @@ module core_csr
 );
 	logic [63:0] csr_mip_raw;
 	logic [63:0] csr_mip_raw_diff;
+	logic [63:0] csr_stvec_r;
+	logic [63:0] csr_sscratch_r;
+	logic [63:0] csr_sepc_r;
+	logic [63:0] csr_scause_r;
+	logic [63:0] csr_stval_r;
+	logic [63:0] csr_medeleg_r;
+	logic [63:0] csr_mideleg_r;
+	logic [63:0] csr_mcounteren_r;
+	logic [63:0] csr_menvcfg_r;
 
 	// Interrupt evaluation
 	logic intr_pending;
 	logic [63:0] intr_cause;
 	logic intr_meip, intr_msip, intr_mtip;
+	logic intr_seip, intr_ssip, intr_stip;
 	logic [63:0] intr_mstatus;
 	logic [63:0] intr_mie;
+	logic [63:0] intr_sie;
 	logic sync_trap_or_mret;
 
-	assign intr_mstatus = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MSTATUS)) ? wb_r.csr_wdata : csr_mstatus;
+	assign intr_mstatus =
+		(wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MSTATUS)) ? wb_r.csr_wdata :
+		(wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_SSTATUS)) ? ((csr_mstatus & ~SSTATUS_MASK) | (wb_r.csr_wdata & SSTATUS_MASK)) :
+		csr_mstatus;
 	assign intr_mie     = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MIE))     ? wb_r.csr_wdata : csr_mie;
+	assign intr_sie     = (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_SIE))     ?
+	                     ((csr_mie & ~SIE_MASK) | (wb_r.csr_wdata & SIE_MASK)) : csr_sie;
 
-	assign intr_meip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) && csr_mip[11] && intr_mie[11];
-	assign intr_msip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) && csr_mip[3]  && intr_mie[3];
-	assign intr_mtip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) && csr_mip[7]  && intr_mie[7];
+	assign intr_meip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) &&
+	                   !csr_mideleg_r[11] && csr_mip[11] && intr_mie[11];
+	assign intr_msip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) &&
+	                   !csr_mideleg_r[3]  && csr_mip[3]  && intr_mie[3];
+	assign intr_mtip = (privilege_mode_i != 2'd3 || intr_mstatus[3]) &&
+	                   !csr_mideleg_r[7]  && csr_mip[7]  && intr_mie[7];
+	assign intr_seip = ((privilege_mode_i == 2'd1 && intr_mstatus[1]) || privilege_mode_i == 2'd0) &&
+	                   csr_mideleg_r[11] && csr_sip[11] && intr_sie[11];
+	assign intr_ssip = ((privilege_mode_i == 2'd1 && intr_mstatus[1]) || privilege_mode_i == 2'd0) &&
+	                   csr_mideleg_r[3] && csr_sip[3] && intr_sie[3];
+	assign intr_stip = ((privilege_mode_i == 2'd1 && intr_mstatus[1]) || privilege_mode_i == 2'd0) &&
+	                   csr_mideleg_r[7] && csr_sip[7] && intr_sie[7];
 
-	assign intr_pending = intr_meip || intr_msip || intr_mtip;
-	assign intr_cause = intr_meip ? {1'b1, 63'd11} :  // MEIP  (11)
+	assign intr_pending = intr_seip || intr_ssip || intr_stip || intr_meip || intr_msip || intr_mtip;
+	assign intr_cause = intr_seip ? {1'b1, 63'd9} :
+	                    intr_ssip ? {1'b1, 63'd1} :
+	                    intr_stip ? {1'b1, 63'd5} :
+	                    intr_meip ? {1'b1, 63'd11} :  // MEIP  (11)
 	                    intr_msip ? {1'b1, 63'd3}  :  // MSIP  (3)
 	                    {1'b1, 63'd7};                  // MTIP  (7)
 	assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_misalign_instr ||
-	                           wb_misalign_data || mmu_trap || wb_mret;
+	                           wb_misalign_data || mmu_trap || wb_mret || wb_sret;
 
 	assign csr_mhartid = 64'd0;
+	assign csr_sstatus = csr_mstatus & SSTATUS_MASK;
 	assign csr_mip = (csr_mip_raw & ~64'h0000_0000_0000_0888) |
 	                 ({63'd0, exint} << 11) |
 	                 ({63'd0, trint} << 7) |
 	                 ({63'd0, swint} << 3);
+	assign csr_sip = csr_mip & SIP_MASK;
 	assign csr_mip_diff = (csr_mip_raw_diff & ~64'h0000_0000_0000_0888) |
 	                      ({63'd0, exint} << 11) |
 	                      ({63'd0, trint} << 7) |
 	                      ({63'd0, swint} << 3);
+	assign csr_stvec = csr_stvec_r;
+	assign csr_sie = csr_mie & SIE_MASK;
+	assign csr_sscratch = csr_sscratch_r;
+	assign csr_scause = csr_scause_r;
+	assign csr_stval = csr_stval_r;
+	assign csr_sepc = csr_sepc_r;
+	assign csr_medeleg = csr_medeleg_r;
+	assign csr_mideleg = csr_mideleg_r;
+	assign csr_mcounteren = csr_mcounteren_r;
+	assign csr_menvcfg = csr_menvcfg_r;
 
 	// Trap cause selection for exceptions (interrupts handled separately)
 	function automatic logic [63:0] get_ecall_cause(input logic [1:0] mode);
@@ -109,9 +162,23 @@ module core_csr
 		return 64'd0;
 	endfunction
 
+	function automatic logic delegate_to_s(input logic is_interrupt, input logic [63:0] cause);
+		begin
+			if (privilege_mode_i == 2'd3) begin
+				delegate_to_s = 1'b0;
+			end else if (is_interrupt) begin
+				delegate_to_s = csr_mideleg_r[cause[5:0]];
+			end else begin
+				delegate_to_s = csr_medeleg_r[cause[5:0]];
+			end
+		end
+	endfunction
+
 	// Compute "next" values for diffs combinationally
 	logic [63:0] next_mstatus, next_mepc, next_mcause, next_mtval, next_mtvec;
 	logic [63:0] next_mip_raw, next_mie, next_mscratch, next_satp;
+	logic [63:0] next_stvec, next_sscratch, next_sepc, next_scause, next_stval;
+	logic [63:0] next_medeleg, next_mideleg, next_mcounteren, next_menvcfg;
 	logic [1:0]  next_privilege_mode;
 
 	always_ff @(posedge clk) begin
@@ -125,80 +192,166 @@ module core_csr
 			csr_mtval    <= 64'd0;
 			csr_mepc     <= 64'd0;
 			csr_satp     <= 64'd0;
+			csr_stvec_r     <= 64'd0;
+			csr_sscratch_r  <= 64'd0;
+			csr_sepc_r      <= 64'd0;
+			csr_scause_r    <= 64'd0;
+			csr_stval_r     <= 64'd0;
+			csr_medeleg_r   <= 64'd0;
+			csr_mideleg_r   <= 64'd0;
+			csr_mcounteren_r<= 64'd0;
+			csr_menvcfg_r   <= 64'd0;
 			privilege_mode <= 2'd3;
 		end else begin
 			if (intr_eval && intr_pending && !sync_trap_or_mret) begin
-				csr_mepc   <= intr_fetch_pc;
-				csr_mcause <= intr_cause;
-				csr_mtval  <= 64'd0;
-				csr_mstatus[7] <= intr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
+				if (delegate_to_s(1'b1, intr_cause[63:0])) begin
+					csr_sepc_r   <= intr_fetch_pc;
+					csr_scause_r <= intr_cause;
+					csr_stval_r  <= 64'd0;
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= intr_fetch_pc;
+					csr_mcause <= intr_cause;
+					csr_mtval  <= 64'd0;
+					csr_mstatus[7] <= intr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
 			end else if (wb_ecall) begin
-				csr_mepc   <= wb_r.pc;
-				csr_mcause <= get_ecall_cause(privilege_mode_i);
-				csr_mtval  <= 64'd0;
-				csr_mstatus[7] <= csr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
+				if (delegate_to_s(1'b0, get_ecall_cause(privilege_mode_i))) begin
+					csr_sepc_r   <= wb_r.pc;
+					csr_scause_r <= get_ecall_cause(privilege_mode_i);
+					csr_stval_r  <= 64'd0;
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= wb_r.pc;
+					csr_mcause <= get_ecall_cause(privilege_mode_i);
+					csr_mtval  <= 64'd0;
+					csr_mstatus[7] <= csr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
 			end else if (mmu_trap) begin
-				csr_mepc   <= fault_is_insn ? trap_vaddr : wb_r.pc;
-				if (fault_is_insn)
-					csr_mcause <= 64'd12;
-				else if (wb_r.is_store)
-					csr_mcause <= 64'd15;
-				else
-					csr_mcause <= 64'd13;
-				csr_mtval  <= trap_vaddr;
-				csr_mstatus[7] <= csr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
+				if (delegate_to_s(1'b0, get_excp_cause())) begin
+					csr_sepc_r   <= fault_is_insn ? trap_vaddr : wb_r.pc;
+					csr_scause_r <= get_excp_cause();
+					csr_stval_r  <= trap_vaddr;
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= fault_is_insn ? trap_vaddr : wb_r.pc;
+					if (fault_is_insn)
+						csr_mcause <= 64'd12;
+					else if (wb_r.is_store)
+						csr_mcause <= 64'd15;
+					else
+						csr_mcause <= 64'd13;
+					csr_mtval  <= trap_vaddr;
+					csr_mstatus[7] <= csr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
 			end else if (wb_illegal) begin
-				csr_mepc   <= wb_r.pc;
-				csr_mcause <= 64'd2;
-				csr_mtval  <= {32'd0, wb_r.instr};
-				csr_mstatus[7] <= csr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
+				if (delegate_to_s(1'b0, 64'd2)) begin
+					csr_sepc_r   <= wb_r.pc;
+					csr_scause_r <= 64'd2;
+					csr_stval_r  <= {32'd0, wb_r.instr};
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= wb_r.pc;
+					csr_mcause <= 64'd2;
+					csr_mtval  <= {32'd0, wb_r.instr};
+					csr_mstatus[7] <= csr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
 			end else if (wb_misalign_instr) begin
-				csr_mepc   <= wb_r.pc;
-				csr_mcause <= 64'd0;
-				csr_mtval  <= wb_r.result;
-				csr_mstatus[7] <= csr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
+				if (delegate_to_s(1'b0, 64'd0)) begin
+					csr_sepc_r   <= wb_r.pc;
+					csr_scause_r <= 64'd0;
+					csr_stval_r  <= wb_r.result;
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= wb_r.pc;
+					csr_mcause <= 64'd0;
+					csr_mtval  <= wb_r.result;
+					csr_mstatus[7] <= csr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
 			end else if (wb_misalign_data) begin
-				csr_mepc   <= wb_r.pc;
-				if (wb_r.is_store)
-					csr_mcause <= 64'd6;
-				else
-					csr_mcause <= 64'd4;
-				csr_mtval  <= wb_r.mem_addr;
-				csr_mstatus[7] <= csr_mstatus[3];
-				csr_mstatus[3] <= 1'b0;
-				csr_mstatus[12:11] <= privilege_mode_i;
-				privilege_mode <= 2'd3;
+				if (delegate_to_s(1'b0, wb_r.is_store ? 64'd6 : 64'd4)) begin
+					csr_sepc_r   <= wb_r.pc;
+					csr_scause_r <= wb_r.is_store ? 64'd6 : 64'd4;
+					csr_stval_r  <= wb_r.mem_addr;
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= wb_r.pc;
+					if (wb_r.is_store)
+						csr_mcause <= 64'd6;
+					else
+						csr_mcause <= 64'd4;
+					csr_mtval  <= wb_r.mem_addr;
+					csr_mstatus[7] <= csr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
 			end else if (wb_mret) begin
 				csr_mstatus[3] <= csr_mstatus[7];
 				csr_mstatus[7] <= 1'b1;
 				csr_mstatus[12:11] <= 2'b00;
 				privilege_mode <= csr_mstatus[12:11];
+			end else if (wb_sret) begin
+				csr_mstatus[1] <= csr_mstatus[5];
+				csr_mstatus[5] <= 1'b1;
+				csr_mstatus[8] <= 1'b0;
+				privilege_mode <= {1'b0, csr_mstatus[8]};
 			end else if (wb_r.valid && wb_r.csr_wen) begin
 				unique case (wb_r.csr_addr)
 					CSR_MSTATUS:  csr_mstatus  <= wb_r.csr_wdata;
+					CSR_SSTATUS:  csr_mstatus  <= (csr_mstatus & ~SSTATUS_MASK) | (wb_r.csr_wdata & SSTATUS_MASK);
 					CSR_MTVEC:    csr_mtvec    <= wb_r.csr_wdata;
+					CSR_STVEC:    csr_stvec_r  <= wb_r.csr_wdata;
 					CSR_MIP:      csr_mip_raw  <= wb_r.csr_wdata;
+					CSR_SIP:      csr_mip_raw  <= (csr_mip_raw & ~SIP_MASK) | (wb_r.csr_wdata & SIP_MASK);
 					CSR_MIE:      csr_mie      <= wb_r.csr_wdata;
+					CSR_SIE:      csr_mie      <= (csr_mie & ~SIE_MASK) | (wb_r.csr_wdata & SIE_MASK);
 					CSR_MSCRATCH: csr_mscratch <= wb_r.csr_wdata;
+					CSR_SSCRATCH: csr_sscratch_r <= wb_r.csr_wdata;
 					CSR_MCAUSE:   csr_mcause   <= wb_r.csr_wdata;
+					CSR_SCAUSE:   csr_scause_r <= wb_r.csr_wdata;
 					CSR_MTVAL:    csr_mtval    <= wb_r.csr_wdata;
+					CSR_STVAL:    csr_stval_r  <= wb_r.csr_wdata;
 					CSR_MEPC:     csr_mepc     <= wb_r.csr_wdata;
+					CSR_SEPC:     csr_sepc_r   <= wb_r.csr_wdata;
 					CSR_SATP:     csr_satp     <= wb_r.csr_wdata;
+					CSR_MEDELEG:  csr_medeleg_r <= wb_r.csr_wdata;
+					CSR_MIDELEG:  csr_mideleg_r <= wb_r.csr_wdata;
+					CSR_MCOUNTEREN: csr_mcounteren_r <= wb_r.csr_wdata;
+					CSR_MENVCFG:  csr_menvcfg_r <= wb_r.csr_wdata;
 					default: begin end
 				endcase
 			end
@@ -215,6 +368,15 @@ module core_csr
 		next_mie       = csr_mie;
 		next_mscratch  = csr_mscratch;
 		next_satp      = csr_satp;
+		next_stvec     = csr_stvec_r;
+		next_sscratch  = csr_sscratch_r;
+		next_sepc      = csr_sepc_r;
+		next_scause    = csr_scause_r;
+		next_stval     = csr_stval_r;
+		next_medeleg   = csr_medeleg_r;
+		next_mideleg   = csr_mideleg_r;
+		next_mcounteren= csr_mcounteren_r;
+		next_menvcfg   = csr_menvcfg_r;
 		next_privilege_mode = privilege_mode;
 
 		trap_redirect = 1'b0;
@@ -222,39 +384,79 @@ module core_csr
 		trap_redirect_pc = 64'd0;
 
 		if (intr_eval && intr_pending && !sync_trap_or_mret) begin
-			next_mepc = intr_fetch_pc;
-			next_mcause = intr_cause;
-			next_mtval = 64'd0;
-			next_mstatus = intr_mstatus;
-			next_mstatus[7] = intr_mstatus[3];
-			next_mstatus[3] = 1'b0;
-			next_mstatus[12:11] = privilege_mode_i;
-			next_privilege_mode = 2'd3;
-			trap_redirect = 1'b1;
-			trap_redirect_pc = csr_mtvec;
+			if (delegate_to_s(1'b1, intr_cause)) begin
+				next_sepc = intr_fetch_pc;
+				next_scause = intr_cause;
+				next_stval = 64'd0;
+				next_mstatus = csr_mstatus;
+				next_mstatus[5] = csr_mstatus[1];
+				next_mstatus[1] = 1'b0;
+				next_mstatus[8] = privilege_mode_i[0];
+				next_privilege_mode = 2'd1;
+				trap_redirect = 1'b1;
+				trap_redirect_pc = csr_stvec_r;
+			end else begin
+				next_mepc = intr_fetch_pc;
+				next_mcause = intr_cause;
+				next_mtval = 64'd0;
+				next_mstatus = intr_mstatus;
+				next_mstatus[7] = intr_mstatus[3];
+				next_mstatus[3] = 1'b0;
+				next_mstatus[12:11] = privilege_mode_i;
+				next_privilege_mode = 2'd3;
+				trap_redirect = 1'b1;
+				trap_redirect_pc = csr_mtvec;
+			end
 		end else if (wb_ecall || wb_illegal || wb_misalign_instr || wb_misalign_data) begin
-			next_mepc = wb_r.pc;
-			next_mcause = get_excp_cause();
-			next_mtval = wb_illegal ? {32'd0, wb_r.instr} :
-			             (wb_misalign_instr ? wb_r.result : (wb_misalign_data ? wb_r.mem_addr : 64'd0));
-			next_mstatus = csr_mstatus;
-			next_mstatus[7] = csr_mstatus[3];
-			next_mstatus[3] = 1'b0;
-			next_mstatus[12:11] = privilege_mode_i;
-			next_privilege_mode = 2'd3;
-			trap_redirect = 1'b1;
-			trap_redirect_pc = csr_mtvec;
+			if (delegate_to_s(1'b0, get_excp_cause())) begin
+				next_sepc = wb_r.pc;
+				next_scause = get_excp_cause();
+				next_stval = wb_illegal ? {32'd0, wb_r.instr} :
+				             (wb_misalign_instr ? wb_r.result : (wb_misalign_data ? wb_r.mem_addr : 64'd0));
+				next_mstatus = csr_mstatus;
+				next_mstatus[5] = csr_mstatus[1];
+				next_mstatus[1] = 1'b0;
+				next_mstatus[8] = privilege_mode_i[0];
+				next_privilege_mode = 2'd1;
+				trap_redirect = 1'b1;
+				trap_redirect_pc = csr_stvec_r;
+			end else begin
+				next_mepc = wb_r.pc;
+				next_mcause = get_excp_cause();
+				next_mtval = wb_illegal ? {32'd0, wb_r.instr} :
+				             (wb_misalign_instr ? wb_r.result : (wb_misalign_data ? wb_r.mem_addr : 64'd0));
+				next_mstatus = csr_mstatus;
+				next_mstatus[7] = csr_mstatus[3];
+				next_mstatus[3] = 1'b0;
+				next_mstatus[12:11] = privilege_mode_i;
+				next_privilege_mode = 2'd3;
+				trap_redirect = 1'b1;
+				trap_redirect_pc = csr_mtvec;
+			end
 		end else if (mmu_trap) begin
-			next_mepc = fault_is_insn ? trap_vaddr : wb_r.pc;
-			next_mcause = get_excp_cause();
-			next_mtval = trap_vaddr;
-			next_mstatus = csr_mstatus;
-			next_mstatus[7] = csr_mstatus[3];
-			next_mstatus[3] = 1'b0;
-			next_mstatus[12:11] = privilege_mode_i;
-			next_privilege_mode = 2'd3;
-			trap_redirect = 1'b1;
-			trap_redirect_pc = csr_mtvec;
+			if (delegate_to_s(1'b0, get_excp_cause())) begin
+				next_sepc = fault_is_insn ? trap_vaddr : wb_r.pc;
+				next_scause = get_excp_cause();
+				next_stval = trap_vaddr;
+				next_mstatus = csr_mstatus;
+				next_mstatus[5] = csr_mstatus[1];
+				next_mstatus[1] = 1'b0;
+				next_mstatus[8] = privilege_mode_i[0];
+				next_privilege_mode = 2'd1;
+				trap_redirect = 1'b1;
+				trap_redirect_pc = csr_stvec_r;
+			end else begin
+				next_mepc = fault_is_insn ? trap_vaddr : wb_r.pc;
+				next_mcause = get_excp_cause();
+				next_mtval = trap_vaddr;
+				next_mstatus = csr_mstatus;
+				next_mstatus[7] = csr_mstatus[3];
+				next_mstatus[3] = 1'b0;
+				next_mstatus[12:11] = privilege_mode_i;
+				next_privilege_mode = 2'd3;
+				trap_redirect = 1'b1;
+				trap_redirect_pc = csr_mtvec;
+			end
 		end else if (wb_mret) begin
 			next_mstatus = csr_mstatus;
 			next_mstatus[3] = csr_mstatus[7];
@@ -263,17 +465,37 @@ module core_csr
 			next_privilege_mode = csr_mstatus[12:11];
 			mret_redirect = 1'b1;
 			trap_redirect_pc = csr_mepc;
+		end else if (wb_sret) begin
+			next_mstatus = csr_mstatus;
+			next_mstatus[1] = csr_mstatus[5];
+			next_mstatus[5] = 1'b1;
+			next_mstatus[8] = 1'b0;
+			next_privilege_mode = {1'b0, csr_mstatus[8]};
+			mret_redirect = 1'b1;
+			trap_redirect_pc = csr_sepc_r;
 		end else if (wb_r.valid && wb_r.csr_wen) begin
 			unique case (wb_r.csr_addr)
 				CSR_MSTATUS:  next_mstatus  = wb_r.csr_wdata;
+				CSR_SSTATUS:  next_mstatus  = (csr_mstatus & ~SSTATUS_MASK) | (wb_r.csr_wdata & SSTATUS_MASK);
 				CSR_MTVEC:    next_mtvec    = wb_r.csr_wdata;
+				CSR_STVEC:    next_stvec    = wb_r.csr_wdata;
 				CSR_MIP:      next_mip_raw  = wb_r.csr_wdata;
+				CSR_SIP:      next_mip_raw  = (csr_mip_raw & ~SIP_MASK) | (wb_r.csr_wdata & SIP_MASK);
 				CSR_MIE:      next_mie      = wb_r.csr_wdata;
+				CSR_SIE:      next_mie      = (csr_mie & ~SIE_MASK) | (wb_r.csr_wdata & SIE_MASK);
 				CSR_MSCRATCH: next_mscratch = wb_r.csr_wdata;
+				CSR_SSCRATCH: next_sscratch = wb_r.csr_wdata;
 				CSR_MCAUSE:   next_mcause   = wb_r.csr_wdata;
+				CSR_SCAUSE:   next_scause   = wb_r.csr_wdata;
 				CSR_MTVAL:    next_mtval    = wb_r.csr_wdata;
+				CSR_STVAL:    next_stval    = wb_r.csr_wdata;
 				CSR_MEPC:     next_mepc     = wb_r.csr_wdata;
+				CSR_SEPC:     next_sepc     = wb_r.csr_wdata;
 				CSR_SATP:     next_satp     = wb_r.csr_wdata;
+				CSR_MEDELEG:  next_medeleg  = wb_r.csr_wdata;
+				CSR_MIDELEG:  next_mideleg  = wb_r.csr_wdata;
+				CSR_MCOUNTEREN: next_mcounteren = wb_r.csr_wdata;
+				CSR_MENVCFG:  next_menvcfg  = wb_r.csr_wdata;
 				default: begin end
 			endcase
 		end

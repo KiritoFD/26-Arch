@@ -22,15 +22,32 @@ package core_pkg;
 	localparam logic [3:0] ALU_REM  = 4'd13;
 	localparam logic [3:0] ALU_REMU = 4'd14;
 
+	localparam logic [4:0] AMO_CMD_SWAP = 5'd4;
+	localparam logic [4:0] AMO_CMD_LR   = 5'd6;
+	localparam logic [4:0] AMO_CMD_SC   = 5'd7;
+	localparam logic [4:0] AMO_CMD_ADD  = 5'd8;
+
 	localparam logic [11:0] CSR_SATP     = 12'h180;
+	localparam logic [11:0] CSR_SSTATUS  = 12'h100;
+	localparam logic [11:0] CSR_SIE      = 12'h104;
+	localparam logic [11:0] CSR_STVEC    = 12'h105;
 	localparam logic [11:0] CSR_MSTATUS  = 12'h300;
+	localparam logic [11:0] CSR_MEDELEG  = 12'h302;
+	localparam logic [11:0] CSR_MIDELEG  = 12'h303;
 	localparam logic [11:0] CSR_MIE      = 12'h304;
 	localparam logic [11:0] CSR_MTVEC    = 12'h305;
+	localparam logic [11:0] CSR_MCOUNTEREN = 12'h306;
+	localparam logic [11:0] CSR_MENVCFG  = 12'h30a;
 	localparam logic [11:0] CSR_MSCRATCH = 12'h340;
+	localparam logic [11:0] CSR_SSCRATCH = 12'h140;
 	localparam logic [11:0] CSR_MEPC     = 12'h341;
+	localparam logic [11:0] CSR_SEPC     = 12'h141;
 	localparam logic [11:0] CSR_MCAUSE   = 12'h342;
+	localparam logic [11:0] CSR_SCAUSE   = 12'h142;
 	localparam logic [11:0] CSR_MTVAL    = 12'h343;
+	localparam logic [11:0] CSR_STVAL    = 12'h143;
 	localparam logic [11:0] CSR_MIP      = 12'h344;
+	localparam logic [11:0] CSR_SIP      = 12'h144;
 	localparam logic [11:0] CSR_MCYCLE   = 12'hb00;
 	localparam logic [11:0] CSR_MHARTID  = 12'hf14;
 
@@ -38,6 +55,11 @@ package core_pkg;
 	localparam logic [63:0] SSTATUS_MASK = 64'h8000_0003_0001_e000;
 	localparam logic [63:0] MIP_MASK     = 64'h0000_0000_0000_0333;
 	localparam logic [63:0] MTVEC_MASK   = ~64'h0000_0000_0000_0002;
+	localparam logic [63:0] STVEC_MASK   = ~64'h0000_0000_0000_0002;
+	localparam logic [63:0] SIE_MASK     = 64'h0000_0000_0000_0222;
+	localparam logic [63:0] SIP_MASK     = 64'h0000_0000_0000_0222;
+	localparam logic [63:0] MEDELEG_MASK = 64'h0000_0000_0000_b3ff;
+	localparam logic [63:0] MIDELEG_MASK = 64'h0000_0000_0000_0222;
 
 	typedef struct packed {
 		logic        valid;
@@ -72,6 +94,9 @@ package core_pkg;
 		logic [63:0] csr_wdata;
 		logic        is_ecall;
 		logic        is_mret;
+		logic        is_sret;
+		logic        is_amo;
+		logic [4:0]  amo_cmd;
 		logic        is_misalign;
 		logic        is_instr_misalign;
 		logic        is_illegal;
@@ -97,6 +122,9 @@ package core_pkg;
 		logic [63:0] csr_wdata;
 		logic        is_ecall;
 		logic        is_mret;
+		logic        is_sret;
+		logic        is_amo;
+		logic [4:0]  amo_cmd;
 		logic        is_misalign;
 		logic        is_instr_misalign;
 		logic        is_illegal;
@@ -114,7 +142,13 @@ package core_pkg;
 			sanitize_csr_write = data;
 			unique case (addr)
 				CSR_MSTATUS: sanitize_csr_write = data & MSTATUS_MASK;
+				CSR_SSTATUS: sanitize_csr_write = data & SSTATUS_MASK;
+				CSR_SIE:     sanitize_csr_write = data & SIE_MASK;
+				CSR_SIP:     sanitize_csr_write = data & SIP_MASK;
+				CSR_MEDELEG: sanitize_csr_write = data & MEDELEG_MASK;
+				CSR_MIDELEG: sanitize_csr_write = data & MIDELEG_MASK;
 				CSR_MTVEC:   sanitize_csr_write = data & MTVEC_MASK;
+				CSR_STVEC:   sanitize_csr_write = data & STVEC_MASK;
 				CSR_MIP:     sanitize_csr_write = data & MIP_MASK;
 				default  : begin end
 			endcase

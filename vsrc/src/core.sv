@@ -87,20 +87,35 @@ module core
 	logic [63:0] id_dec_csr_wdata;
 	logic        id_dec_is_ecall;
 	logic        id_dec_is_mret;
+	logic        id_dec_is_sret;
+	logic        id_dec_is_amo;
+	logic [4:0]  id_dec_amo_cmd;
 	logic        id_dec_is_illegal;
 	logic        ex_misalign;
 	logic        ex_instr_misalign;
 
 	logic [63:0] csr_mstatus;
+	logic [63:0] csr_sstatus;
 	logic [63:0] csr_mtvec;
+	logic [63:0] csr_stvec;
 	logic [63:0] csr_mip;
+	logic [63:0] csr_sip;
 	logic [63:0] csr_mie;
+	logic [63:0] csr_sie;
 	logic [63:0] csr_mscratch;
+	logic [63:0] csr_sscratch;
 	logic [63:0] csr_mcause;
+	logic [63:0] csr_scause;
 	logic [63:0] csr_mtval;
+	logic [63:0] csr_stval;
 	logic [63:0] csr_mepc;
+	logic [63:0] csr_sepc;
 	logic [63:0] csr_mhartid;
 	logic [63:0] csr_satp;
+	logic [63:0] csr_medeleg;
+	logic [63:0] csr_mideleg;
+	logic [63:0] csr_mcounteren;
+	logic [63:0] csr_menvcfg;
 	logic [63:0] csr_mstatus_diff;
 	logic [63:0] csr_mtvec_diff;
 	logic [63:0] csr_mip_diff;
@@ -131,6 +146,7 @@ module core
 	logic [63:0] intr_fetch_pc;
 
 	logic        ex_is_mdu;
+	logic        mdu_req;
 	logic        ex_result_ready;
 	logic        ex_forwardable;
 	logic        stall_ex_busy;
@@ -152,8 +168,20 @@ module core
 	logic [7:0]  mem_store_strobe;
 	logic        mdu_out_valid;
 	logic [63:0] mdu_out_result;
+	logic        mdu_core_out_valid;
+	logic [63:0] mdu_core_out_result;
+	logic [63:0] amo_result;
+	logic [7:0]  amo_mask;
+	logic        amo_issue;
+	logic        amo_issued_q;
+	logic        amo_done_q;
+	logic [63:0] amo_helper_result;
 
-	assign ex_is_mdu = is_mdu_cmd(ex_r.alu_cmd);
+	assign mdu_req = is_mdu_cmd(ex_r.alu_cmd);
+	assign ex_is_mdu = mdu_req || ex_r.is_amo;
+	assign amo_mask = (8'h0f << ex_mem_addr[2:0]);
+	assign amo_issue = ex_r.valid && ex_r.is_amo && !amo_issued_q && !amo_done_q;
+	assign amo_result = amo_helper_result;
 
 	core_decode u_decode(
 		.id_r(id_r),
@@ -162,16 +190,28 @@ module core
 		.wb_r(wb_r),
 		.gpr(gpr),
 		.csr_mstatus(csr_mstatus),
+		.csr_sstatus(csr_sstatus),
 		.csr_mtvec(csr_mtvec),
+		.csr_stvec(csr_stvec),
 		.csr_mip(csr_mip),
+		.csr_sip(csr_sip),
 		.csr_mie(csr_mie),
+		.csr_sie(csr_sie),
 		.csr_mscratch(csr_mscratch),
+		.csr_sscratch(csr_sscratch),
 		.csr_mcause(csr_mcause),
+		.csr_scause(csr_scause),
 		.csr_mtval(csr_mtval),
+		.csr_stval(csr_stval),
 		.csr_mepc(csr_mepc),
+		.csr_sepc(csr_sepc),
 		.csr_mcycle(cycle_cnt),
 		.csr_mhartid(csr_mhartid),
 		.csr_satp(csr_satp),
+		.csr_medeleg(csr_medeleg),
+		.csr_mideleg(csr_mideleg),
+		.csr_mcounteren(csr_mcounteren),
+		.csr_menvcfg(csr_menvcfg),
 		.ex_forwardable(ex_forwardable),
 		.ex_result(ex_result),
 		.id_rs1(id_rs1),
@@ -202,6 +242,9 @@ module core
 		.id_dec_csr_wdata(id_dec_csr_wdata),
 		.id_dec_is_ecall(id_dec_is_ecall),
 		.id_dec_is_mret(id_dec_is_mret),
+		.id_dec_is_sret(id_dec_is_sret),
+		.id_dec_is_amo(id_dec_is_amo),
+		.id_dec_amo_cmd(id_dec_amo_cmd),
 		.id_dec_is_illegal(id_dec_is_illegal)
 	);
 
@@ -239,10 +282,27 @@ module core
 		.trap_commit(trap_commit),
 		.stall_pipe(stall_pipe),
 		.ex_r(ex_r),
-		.ex_is_mdu(ex_is_mdu),
-		.mdu_out_valid(mdu_out_valid),
-		.mdu_out_result(mdu_out_result)
+		.ex_is_mdu(mdu_req),
+		.mdu_out_valid(mdu_core_out_valid),
+		.mdu_out_result(mdu_core_out_result)
 	);
+
+`ifdef VERILATOR
+	AMOHelper u_amo_helper(
+		.clock(clk),
+		.enable(amo_issue),
+		.cmd({3'd0, ex_r.amo_cmd}),
+		.addr(ex_mem_addr),
+		.wdata(ex_r.rs2_store),
+		.mask(amo_mask),
+		.rdata(amo_helper_result)
+	);
+`else
+	assign amo_helper_result = 64'd0;
+`endif
+
+	assign mdu_out_valid = ex_r.is_amo ? amo_done_q : mdu_core_out_valid;
+	assign mdu_out_result = ex_r.is_amo ? amo_result : mdu_core_out_result;
 
 	assign intr_fetch_pc = mem_r.valid ? mem_r.pc :
 	                       ex_r.valid  ? ex_r.pc  :
@@ -271,15 +331,27 @@ module core
 		.gpr(gpr),
 		.gpr_diff(gpr_diff),
 		.csr_mstatus(csr_mstatus),
+		.csr_sstatus(csr_sstatus),
 		.csr_mtvec(csr_mtvec),
+		.csr_stvec(csr_stvec),
 		.csr_mip(csr_mip),
+		.csr_sip(csr_sip),
 		.csr_mie(csr_mie),
+		.csr_sie(csr_sie),
 		.csr_mscratch(csr_mscratch),
+		.csr_sscratch(csr_sscratch),
 		.csr_mcause(csr_mcause),
+		.csr_scause(csr_scause),
 		.csr_mtval(csr_mtval),
+		.csr_stval(csr_stval),
 		.csr_mepc(csr_mepc),
+		.csr_sepc(csr_sepc),
 		.csr_mhartid(csr_mhartid),
 		.csr_satp(csr_satp),
+		.csr_medeleg(csr_medeleg),
+		.csr_mideleg(csr_mideleg),
+		.csr_mcounteren(csr_mcounteren),
+		.csr_menvcfg(csr_menvcfg),
 		.csr_mstatus_diff(csr_mstatus_diff),
 		.csr_mtvec_diff(csr_mtvec_diff),
 		.csr_mip_diff(csr_mip_diff),
@@ -319,7 +391,7 @@ module core
 	assign ireq.valid = !halted && !trap_commit && (fetch_pending || fetch_issue_fire) && !stall_if_mem;
 	assign ireq.addr  = fetch_req_addr;
 
-	assign dreq.valid  = mem_r.valid && (mem_r.is_load || mem_r.is_store) && !trap_commit;
+	assign dreq.valid  = mem_r.valid && (mem_r.is_load || mem_r.is_store) && !mem_r.is_amo && !trap_commit;
 	assign dreq.addr   = mem_r.mem_addr;
 	assign dreq.size   = msize_t'(mem_r.mem_size);
 	assign dreq.strobe = mem_r.mem_wstrb;
@@ -341,7 +413,22 @@ module core
 			ex_r <= '0;
 			mem_r <= '0;
 			wb_r <= '0;
+			amo_issued_q <= 1'b0;
+			amo_done_q <= 1'b0;
 		end else begin
+			if (!ex_r.valid || !ex_r.is_amo) begin
+				amo_issued_q <= 1'b0;
+				amo_done_q <= 1'b0;
+			end else if (amo_issue) begin
+				amo_issued_q <= 1'b1;
+				amo_done_q <= 1'b0;
+			end else if (amo_issued_q) begin
+				amo_issued_q <= 1'b0;
+				amo_done_q <= 1'b1;
+			end else if (amo_done_q && !stall_ex_busy) begin
+				amo_done_q <= 1'b0;
+			end
+
 			if (trap_commit) begin
 				fetch_pending <= 1'b0;
 				fetch_redirect_pending <= 1'b0;
@@ -421,6 +508,7 @@ module core
 					wb_r.csr_wdata <= mem_r.csr_wdata;
 				wb_r.is_ecall <= mem_r.is_ecall;
 				wb_r.is_mret <= mem_r.is_mret;
+				wb_r.is_sret <= mem_r.is_sret;
 				wb_r.is_illegal <= mem_r.is_illegal;
 				wb_r.is_misalign <= mem_r.is_misalign;
 				wb_r.is_instr_misalign <= mem_r.is_instr_misalign;
@@ -444,7 +532,7 @@ module core
 					mem_r.rd    <= ex_r.rd;
 					mem_r.pc    <= ex_r.pc;
 					mem_r.instr <= ex_r.instr;
-					mem_r.result<= ex_r.wb_pc4 ? (ex_r.pc + 64'd4) : ex_result;
+					mem_r.result<= ex_r.is_amo ? amo_result : (ex_r.wb_pc4 ? (ex_r.pc + 64'd4) : ex_result);
 					mem_r.is_load <= ex_r.is_load;
 					mem_r.is_store <= ex_r.is_store;
 					mem_r.mem_size <= ex_r.mem_size;
@@ -452,11 +540,14 @@ module core
 					mem_r.mem_addr <= ex_mem_addr;
 					mem_r.mem_wdata <= mem_store_data_shifted;
 					mem_r.mem_wstrb <= ex_r.is_store ? mem_store_strobe : 8'd0;
-					mem_r.csr_wen <= ex_r.csr_wen;
-					mem_r.csr_addr <= ex_r.csr_addr;
-					mem_r.csr_wdata <= ex_r.csr_wdata;
+				mem_r.csr_wen <= ex_r.csr_wen;
+				mem_r.csr_addr <= ex_r.csr_addr;
+				mem_r.csr_wdata <= ex_r.csr_wdata;
 				mem_r.is_ecall <= ex_r.is_ecall;
 				mem_r.is_mret <= ex_r.is_mret;
+				mem_r.is_sret <= ex_r.is_sret;
+				mem_r.is_amo <= ex_r.is_amo;
+				mem_r.amo_cmd <= ex_r.amo_cmd;
 				mem_r.is_illegal <= ex_r.is_illegal;
 				mem_r.is_misalign <= ex_misalign;
 				mem_r.is_instr_misalign <= ex_instr_misalign;
@@ -495,11 +586,14 @@ module core
 						ex_r.is_jal <= id_dec_is_jal;
 						ex_r.is_jalr <= id_dec_is_jalr;
 						ex_r.wb_pc4 <= id_dec_wb_pc4;
-						ex_r.csr_wen <= id_dec_csr_wen;
-						ex_r.csr_addr <= id_dec_csr_addr;
-						ex_r.csr_wdata <= id_dec_csr_wdata;
+				ex_r.csr_wen <= id_dec_csr_wen;
+				ex_r.csr_addr <= id_dec_csr_addr;
+				ex_r.csr_wdata <= id_dec_csr_wdata;
 				ex_r.is_ecall <= id_dec_is_ecall;
 				ex_r.is_mret <= id_dec_is_mret;
+				ex_r.is_sret <= id_dec_is_sret;
+				ex_r.is_amo <= id_dec_is_amo;
+				ex_r.amo_cmd <= id_dec_amo_cmd;
 				ex_r.is_illegal <= id_dec_is_illegal;
 				ex_r.is_misalign <= ex_misalign;
 				ex_r.is_instr_misalign <= ex_instr_misalign;

@@ -5,9 +5,16 @@ no_arguments:
 	@echo "  - init: Initialize submodules"
 	@echo "  - handin: Create a zip file for handin"
 	@echo "  - test-lab1: Run lab1 test"
+	@echo "  - build-xv6: Build local xv6 kernel/fs image"
+	@echo "  - test-xv6: Run local xv6 with difftest memory/mmio support"
 
 init:
 	git submodule update --init --recursive
+
+XV6_DIR ?= ./third_party/xv6-riscv
+XV6_KERNEL_ELF ?= $(XV6_DIR)/kernel/kernel
+XV6_KERNEL_BIN ?= $(XV6_DIR)/kernel/kernel.bin
+XV6_FS_IMG ?= $(XV6_DIR)/fs.img
 
 handin:
 	@report_found=""; \
@@ -52,11 +59,19 @@ ifeq ($(shell uname -s),Darwin)
 REF_NEMU := riscv64-nemu-interpreter-so-apple
 endif
 REF_SO := $(NEMU_HOME)/$(REF_NEMU)
+SIM_JOBS ?= 1
 
 sim:
 	rm -rf build
 	mkdir -p build
-	make EMU_TRACE=1 emu -j12 NOOP_HOME=$(NOOP_HOME) NEMU_HOME=$(NEMU_HOME)
+	$(MAKE) EMU_TRACE=1 emu -j$(SIM_JOBS) NOOP_HOME=$(NOOP_HOME) NEMU_HOME=$(NEMU_HOME)
+
+build-xv6:
+	cd $(XV6_DIR) && make clean && make CPUS=1 kernel/kernel fs.img
+	riscv64-unknown-elf-objcopy -O binary $(XV6_KERNEL_ELF) $(XV6_KERNEL_BIN)
+
+test-xv6: sim build-xv6
+	SDCARD_IMAGE=$(XV6_FS_IMG) TEST=sys ./build/emu --no-diff -i $(XV6_KERNEL_BIN) $(VOPT) || true
 
 test-lab1: sim
 	TEST=$(TEST) ./build/emu --diff $(REF_SO) -i ./ready-to-run/lab1/lab1-test.bin $(VOPT) || true

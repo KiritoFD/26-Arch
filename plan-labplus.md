@@ -14,10 +14,13 @@ Lab+ is a bonus lab that covers previously skipped bonuses and new optional cont
 
 ## Current Status (from last test run)
 
-### lab+4 (privfull)
-- [PASS] ecall_u, instr_misalign, instr_access_fault, load_misalign, load_fault, store_misalign, store_fault
-- [PASS] timer_intr, software_intr, pmp_nr, pmp_nw, pmp_nx, mem_detect, m_trap
-- [FAIL] **illegal_instr**, **breakpoint**
+### lab+4 (privfull) — CURRENT STATUS
+- [PASS] ecall_u, instr_access_fault, load_misalign, load_fault, store_misalign, store_fault
+- [PASS] timer_intr, software_intr, pmp_nr, pmp_nw, pmp_nx, m_trap
+- [FIXED] **illegal_instr** → PASS (CSR privilege check)
+- [FIXED] **mem_detect** → PASS (CSR privilege check fixed trap handling)
+- [FAIL] **instr_misalign** (test binary has `jalr t1, a0` instead of `jalr t1, t0`)
+- [FAIL] **breakpoint** (no ebreak instruction in binary; test expects breakpoint mechanism not present)
 
 ### lab+3 (atomicity)
 - Status: NOT YET TESTED (needs AMO + LR/SC improvements)

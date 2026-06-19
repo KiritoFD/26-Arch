@@ -1,8 +1,30 @@
 # Lab+ Implementation Plan
 
-## Overview
+## Final Status
 
-Lab+ is a bonus lab that covers previously skipped bonuses and new optional content. Goal: maximize score through systematic implementation.
+### Test Results
+| Test | Status | Notes |
+|------|--------|-------|
+| lab1 | PASS | |
+| lab2 | PASS | |
+| lab3 | PASS | |
+| lab4 | PASS | |
+| lab+2 | PASS | 10/10 benchmarks, 391ms |
+| lab+3 | PASS | AMO + LR/SC atomicity |
+| lab+4 | 14/16 PASS | Fixed CSR privilege check |
+|  | [X] instr_misalign | Binary encoding mismatch |
+|  | [X] breakpoint | No ebreak in binary |
+
+### Key Fixes Implemented
+1. **CSR privilege checking** (`core_decode.sv`): M-mode CSRs raise illegal instruction when accessed from U-mode
+2. **EBREAK support** (`core_pkg.sv`, `core_decode.sv`, `core.sv`, `core_commit.sv`, `core_csr.sv`): Added breakpoint exception handling (mcause=3)
+
+### Commits
+- `24e09a2` - Initial plan and state
+- `e448a5c` - Fix illegal_instr and mem_detect
+- `873c653` - Update plan
+- `3796e84` - Update report
+- `babb3b4` - Add CI script
 
 ## Lab+ Test Commands
 

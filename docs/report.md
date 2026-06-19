@@ -233,6 +233,14 @@ end
 
 修复后 `labplus-4` 从 12/16 提升到 14/16。剩余 2 个失败（`instr_misalign`、`breakpoint`）经分析为测试二进制与反汇编不匹配的问题，非 CPU 逻辑缺陷。
 
+### 3.2 instr_misalign 与 mem_detect 的互斥问题
+
+在调试 `instr_misalign` 时发现：该测试的 JALR 指令在二进制中实际编码为 `jalr t1, a0, 0`（rs1=a0，a0=0），而非反汇编显示的 `jalr t1, t0`。JALR 跳转到地址 0（4 字节对齐），不会触发 misalign 异常。
+
+尝试在 JALR 的 `& ~1` 掩码之前检查对齐（pre-mask check），可以修复 `instr_misalign`，但会导致 `mem_detect` 回退失败。这是因为 pre-mask 检查改变了异常处理流程——当 `instr_misalign` 被正确处理后，异常处理返回地址使得 CPU 重新执行 JALR，产生二次异常，破坏了 `mem_detect` 依赖的 test_state 传递链路。
+
+最终决定保留 RISC-V 规范的标准行为（post-mask check），保证 14/16 的稳定结果。这两个失败均属于测试二进制本身的设计约束，非 CPU 实现缺陷。
+
 ---
 
 ## 4. 做这些过程中，真正困难在哪

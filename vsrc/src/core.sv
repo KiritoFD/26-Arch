@@ -23,11 +23,14 @@ module core
 	input  dbus_resp_t dresp,
 	input  logic       trint, swint, exint,
 	output logic [63:0]  csr_satp_o,
+	output logic [63:0]  csr_pmpcfg0_o,
+	output logic [63:0]  csr_pmpaddr0_o,
 	output logic [1:0]   privilege_mode_o,
 	output logic         flush_mmu_o,
 	input  logic         walk_fault,
 	input  logic [63:0]  fault_vaddr,
-	input  logic         fault_is_insn
+	input  logic         fault_is_insn,
+	input  logic [63:0]  fault_cause
 );
 	// The top level keeps only long-lived pipeline state and control flow.
 	// Decode / execute / MDU details live in dedicated source files now.
@@ -93,6 +96,7 @@ module core
 	logic        id_dec_is_illegal;
 	logic        ex_misalign;
 	logic        ex_instr_misalign;
+	logic        front_trap_pending;
 
 	logic [63:0] csr_mstatus;
 	logic [63:0] csr_sstatus;
@@ -116,6 +120,8 @@ module core
 	logic [63:0] csr_mideleg;
 	logic [63:0] csr_mcounteren;
 	logic [63:0] csr_menvcfg;
+	logic [63:0] csr_pmpcfg0;
+	logic [63:0] csr_pmpaddr0;
 	logic [63:0] csr_mstatus_diff;
 	logic [63:0] csr_mtvec_diff;
 	logic [63:0] csr_mip_diff;
@@ -125,6 +131,13 @@ module core
 	logic [63:0] csr_mtval_diff;
 	logic [63:0] csr_mepc_diff;
 	logic [63:0] csr_satp_diff;
+	logic [63:0] csr_medeleg_diff;
+	logic [63:0] csr_mideleg_diff;
+	logic [63:0] csr_stvec_diff;
+	logic [63:0] csr_sscratch_diff;
+	logic [63:0] csr_scause_diff;
+	logic [63:0] csr_stval_diff;
+	logic [63:0] csr_sepc_diff;
 	logic [1:0]  privilege_mode;
 	logic [1:0]  privilege_mode_diff;
 
@@ -140,6 +153,7 @@ module core
 
 	logic        mmu_trap;
 	logic [63:0] trap_vaddr;
+	logic [63:0] fault_pc;
 	logic        trap_redirect;
 	logic        mret_redirect;
 	logic [63:0] trap_redirect_pc;
@@ -147,6 +161,7 @@ module core
 
 	logic        ex_is_mdu;
 	logic        mdu_req;
+	logic        ex_to_mem_blocks_front;
 	logic        ex_result_ready;
 	logic        ex_forwardable;
 	logic        stall_ex_busy;
@@ -176,9 +191,9 @@ module core
 	logic        amo_issued_q;
 	logic        amo_done_q;
 	logic [63:0] amo_helper_result;
-
 	assign mdu_req = is_mdu_cmd(ex_r.alu_cmd);
 	assign ex_is_mdu = mdu_req || ex_r.is_amo;
+	assign ex_to_mem_blocks_front = ex_r.valid && (ex_r.is_load || ex_r.is_store);
 	assign amo_mask = (8'h0f << ex_mem_addr[2:0]);
 	assign amo_issue = ex_r.valid && ex_r.is_amo && !amo_issued_q && !amo_done_q;
 	assign amo_result = amo_helper_result;
@@ -212,6 +227,8 @@ module core
 		.csr_mideleg(csr_mideleg),
 		.csr_mcounteren(csr_mcounteren),
 		.csr_menvcfg(csr_menvcfg),
+		.csr_pmpcfg0(csr_pmpcfg0),
+		.csr_pmpaddr0(csr_pmpaddr0),
 		.ex_forwardable(ex_forwardable),
 		.ex_result(ex_result),
 		.id_rs1(id_rs1),
@@ -319,6 +336,8 @@ module core
 		.mmu_trap(mmu_trap),
 		.trap_vaddr(trap_vaddr),
 		.fault_is_insn(fault_is_insn),
+		.fault_cause(fault_cause),
+		.fault_pc(fault_pc),
 		.trap_commit(trap_commit),
 		.halted(halted),
 		.trap_valid_latched(trap_valid_latched),
@@ -352,6 +371,8 @@ module core
 		.csr_mideleg(csr_mideleg),
 		.csr_mcounteren(csr_mcounteren),
 		.csr_menvcfg(csr_menvcfg),
+		.csr_pmpcfg0(csr_pmpcfg0),
+		.csr_pmpaddr0(csr_pmpaddr0),
 		.csr_mstatus_diff(csr_mstatus_diff),
 		.csr_mtvec_diff(csr_mtvec_diff),
 		.csr_mip_diff(csr_mip_diff),
@@ -361,6 +382,13 @@ module core
 		.csr_mtval_diff(csr_mtval_diff),
 		.csr_mepc_diff(csr_mepc_diff),
 		.csr_satp_diff(csr_satp_diff),
+		.csr_medeleg_diff(csr_medeleg_diff),
+		.csr_mideleg_diff(csr_mideleg_diff),
+		.csr_stvec_diff(csr_stvec_diff),
+		.csr_sscratch_diff(csr_sscratch_diff),
+		.csr_scause_diff(csr_scause_diff),
+		.csr_stval_diff(csr_stval_diff),
+		.csr_sepc_diff(csr_sepc_diff),
 		.privilege_mode(privilege_mode),
 		.privilege_mode_diff(privilege_mode_diff),
 		.intr_fetch_pc(intr_fetch_pc),
@@ -375,8 +403,12 @@ module core
 	assign raw_hazard_mem =
 		id_r.valid && mem_r.valid && mem_r.wen && (mem_r.rd != 0) && stall_if_mem &&
 		((id_use_rs1 && (id_rs1 == mem_r.rd)) || (id_use_rs2 && (id_rs2 == mem_r.rd)));
+	assign front_trap_pending =
+		(ex_r.valid && ex_r.is_instr_misalign) ||
+		(mem_r.valid && mem_r.is_instr_misalign) ||
+		(wb_r.valid && wb_r.is_instr_misalign);
 	assign stall_pipe  = stall_ex_busy || stall_mem_busy || raw_hazard_ex || raw_hazard_mem;
-	assign stall_front = stall_ex_busy || raw_hazard_ex || raw_hazard_mem || fetch_redirect_pending || stall_if_mem;
+	assign stall_front = stall_ex_busy || raw_hazard_ex || raw_hazard_mem || fetch_redirect_pending || stall_if_mem || front_trap_pending || ex_to_mem_blocks_front;
 
 	assign fetch_can_consume   = (!halted) && (!trap_commit) && (fetch_redirect_bubble == 2'd0) && (!stall_front) && !ex_flush_front;
 	assign fetch_pop_buf       = fetch_can_consume && fetch_buf_valid;
@@ -453,6 +485,22 @@ module core
 				fetch_redirect_pending <= 1'b0;
 				fetch_pc <= trap_redirect_pc;
 				fetch_redirect_bubble <= 2'd2;
+			end else if (mmu_trap) begin
+				if (fetch_pending) begin
+					fetch_drop_resp_pending <= 1'b1;
+				end
+				fetch_buf_valid <= 1'b0;
+				fetch_pending <= 1'b0;
+				fetch_req_pc <= 64'd0;
+				fetch_redirect_pending <= 1'b0;
+			end else if (ex_instr_misalign) begin
+				if (fetch_pending) begin
+					fetch_drop_resp_pending <= 1'b1;
+				end
+				fetch_buf_valid <= 1'b0;
+				fetch_pending <= 1'b0;
+				fetch_req_pc <= 64'd0;
+				fetch_redirect_pending <= 1'b0;
 			end else if (ex_flush_front) begin
 					if (fetch_pending) begin
 						fetch_drop_resp_pending <= 1'b1;
@@ -490,7 +538,7 @@ module core
 					end
 				end
 
-				if (trap_redirect || mret_redirect || stall_mem_busy) begin
+				if (trap_redirect || mret_redirect || mmu_trap || stall_mem_busy) begin
 					wb_r.valid <= 1'b0;
 				end else begin
 					wb_r.valid <= mem_r.valid;
@@ -514,12 +562,20 @@ module core
 				wb_r.is_instr_misalign <= mem_r.is_instr_misalign;
 			end
 
-				if (stall_mem_busy) begin
+				if (mmu_trap) begin
+					mem_r <= '0;
+					ex_r <= '0;
+					id_r.valid <= 1'b0;
+					id_r.pc    <= 64'd0;
+					id_r.instr <= 32'd0;
+				end else if (stall_mem_busy) begin
 					// Hold MEM steady until the external bus returns valid data.
 					mem_r <= mem_r;
-			end else if (trap_redirect || mret_redirect || stall_ex_busy || raw_hazard_mem || fetch_redirect_pending) begin
+					ex_r <= '0;
+					id_r <= id_r;
+			end else if (trap_redirect || mret_redirect || mmu_trap || stall_ex_busy || raw_hazard_mem || fetch_redirect_pending) begin
 				mem_r <= '0;
-				if (trap_redirect || mret_redirect) begin
+				if (trap_redirect || mret_redirect || mmu_trap) begin
 					ex_r <= '0;
 					id_r.valid <= 1'b0;
 					id_r.pc    <= 64'd0;
@@ -552,16 +608,19 @@ module core
 				mem_r.is_misalign <= ex_misalign;
 				mem_r.is_instr_misalign <= ex_instr_misalign;
 
-			if (trap_redirect || mret_redirect) begin
+				if (trap_redirect || mret_redirect) begin
 					ex_r <= '0;
 					id_r.valid <= 1'b0;
 					id_r.pc    <= 64'd0;
 					id_r.instr <= 32'd0;
-				end else if (ex_flush_front) begin
+				end else if (ex_flush_front || ex_instr_misalign) begin
 					ex_r <= '0;
 					id_r.valid <= 1'b0;
 					id_r.pc    <= 64'd0;
 					id_r.instr <= 32'd0;
+				end else if (ex_to_mem_blocks_front) begin
+					ex_r <= '0;
+					id_r <= id_r;
 				end else if (raw_hazard_ex) begin
 						ex_r <= '0;
 					end else begin
@@ -598,7 +657,7 @@ module core
 				ex_r.is_misalign <= ex_misalign;
 				ex_r.is_instr_misalign <= ex_instr_misalign;
 
-				if (fetch_pop_buf) begin
+						if (fetch_pop_buf) begin
 							id_r.valid <= 1'b1;
 							id_r.pc    <= fetch_buf_pc;
 							id_r.instr <= fetch_buf_instr;
@@ -624,9 +683,15 @@ module core
 
 	// Output port assignments
 	assign csr_satp_o = csr_satp;
+	assign csr_pmpcfg0_o = csr_pmpcfg0;
+	assign csr_pmpaddr0_o = csr_pmpaddr0;
 	assign privilege_mode_o = privilege_mode;
-	assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front;
+	assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front || ex_instr_misalign || mmu_trap;
 	assign trap_vaddr = fault_vaddr;
+	assign fault_pc = mem_r.valid ? mem_r.pc :
+	                  ex_r.valid  ? ex_r.pc  :
+	                  wb_r.valid  ? wb_r.pc  :
+	                                64'd0;
 	assign mmu_trap = walk_fault && (fetch_redirect_bubble == 2'd0);
 
 `ifdef VERILATOR
@@ -699,20 +764,20 @@ module core
 		.mstatus            (csr_mstatus_diff),
 		.sstatus            (csr_mstatus_diff & SSTATUS_MASK),
 		.mepc               (csr_mepc_diff),
-		.sepc               (0),
+		.sepc               (csr_sepc_diff),
 		.mtval              (csr_mtval_diff),
-		.stval              (0),
+		.stval              (csr_stval_diff),
 		.mtvec              (csr_mtvec_diff),
-		.stvec              (0),
+		.stvec              (csr_stvec_diff),
 		.mcause             (csr_mcause_diff),
-		.scause             (0),
+		.scause             (csr_scause_diff),
 		.satp               (csr_satp_diff),
 		.mip                (csr_mip_diff),
 		.mie                (csr_mie_diff),
 		.mscratch           (csr_mscratch_diff),
-		.sscratch           (0),
-		.mideleg            (0),
-		.medeleg            (0)
+		.sscratch           (csr_sscratch_diff),
+		.mideleg            (csr_mideleg_diff),
+		.medeleg            (csr_medeleg_diff)
 	);
 `endif
 endmodule

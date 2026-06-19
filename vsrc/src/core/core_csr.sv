@@ -19,6 +19,8 @@ module core_csr
 	input  logic         mmu_trap,
 	input  logic [63:0]  trap_vaddr,
 	input  logic         fault_is_insn,
+	input  logic [63:0]  fault_cause,
+	input  logic [63:0]  fault_pc,
 	input  logic [1:0]   privilege_mode_i,
 	input  logic         intr_eval,  // evaluate interrupts this cycle
 	input  logic [63:0]  intr_fetch_pc,  // current fetch PC for interrupt mepc
@@ -45,6 +47,8 @@ module core_csr
 	output logic [63:0]  csr_mideleg,
 	output logic [63:0]  csr_mcounteren,
 	output logic [63:0]  csr_menvcfg,
+	output logic [63:0]  csr_pmpcfg0,
+	output logic [63:0]  csr_pmpaddr0,
 	output logic [63:0]  csr_mstatus_diff,
 	output logic [63:0]  csr_mtvec_diff,
 	output logic [63:0]  csr_mip_diff,
@@ -54,6 +58,13 @@ module core_csr
 	output logic [63:0]  csr_mtval_diff,
 	output logic [63:0]  csr_mepc_diff,
 	output logic [63:0]  csr_satp_diff,
+	output logic [63:0]  csr_medeleg_diff,
+	output logic [63:0]  csr_mideleg_diff,
+	output logic [63:0]  csr_stvec_diff,
+	output logic [63:0]  csr_sscratch_diff,
+	output logic [63:0]  csr_scause_diff,
+	output logic [63:0]  csr_stval_diff,
+	output logic [63:0]  csr_sepc_diff,
 	output logic [1:0]   privilege_mode_diff,
 	output logic         trap_redirect,  // pipeline should redirect to mtvec
 	output logic         mret_redirect,  // pipeline should redirect to mepc
@@ -70,6 +81,8 @@ module core_csr
 	logic [63:0] csr_mideleg_r;
 	logic [63:0] csr_mcounteren_r;
 	logic [63:0] csr_menvcfg_r;
+	logic [63:0] csr_pmpcfg0_r;
+	logic [63:0] csr_pmpaddr0_r;
 
 	// Interrupt evaluation
 	logic intr_pending;
@@ -133,6 +146,8 @@ module core_csr
 	assign csr_mideleg = csr_mideleg_r;
 	assign csr_mcounteren = csr_mcounteren_r;
 	assign csr_menvcfg = csr_menvcfg_r;
+	assign csr_pmpcfg0 = csr_pmpcfg0_r;
+	assign csr_pmpaddr0 = csr_pmpaddr0_r;
 
 	// Trap cause selection for exceptions (interrupts handled separately)
 	function automatic logic [63:0] get_ecall_cause(input logic [1:0] mode);
@@ -146,9 +161,7 @@ module core_csr
 
 	function automatic logic [63:0] get_excp_cause();
 		if (mmu_trap) begin
-			if (fault_is_insn) return 64'd12;
-			else if (wb_r.is_store) return 64'd15;
-			else return 64'd13;
+			return fault_cause;
 		end else if (wb_ecall) begin
 			return get_ecall_cause(privilege_mode_i);
 		end else if (wb_illegal) begin
@@ -179,6 +192,7 @@ module core_csr
 	logic [63:0] next_mip_raw, next_mie, next_mscratch, next_satp;
 	logic [63:0] next_stvec, next_sscratch, next_sepc, next_scause, next_stval;
 	logic [63:0] next_medeleg, next_mideleg, next_mcounteren, next_menvcfg;
+	logic [63:0] next_pmpcfg0, next_pmpaddr0;
 	logic [1:0]  next_privilege_mode;
 
 	always_ff @(posedge clk) begin
@@ -201,6 +215,8 @@ module core_csr
 			csr_mideleg_r   <= 64'd0;
 			csr_mcounteren_r<= 64'd0;
 			csr_menvcfg_r   <= 64'd0;
+			csr_pmpcfg0_r   <= 64'd0;
+			csr_pmpaddr0_r  <= 64'd0;
 			privilege_mode <= 2'd3;
 		end else begin
 			if (intr_eval && intr_pending && !sync_trap_or_mret) begin
@@ -241,21 +257,16 @@ module core_csr
 				end
 			end else if (mmu_trap) begin
 				if (delegate_to_s(1'b0, get_excp_cause())) begin
-					csr_sepc_r   <= fault_is_insn ? trap_vaddr : wb_r.pc;
-					csr_scause_r <= get_excp_cause();
+					csr_sepc_r   <= fault_is_insn ? trap_vaddr : fault_pc;
+					csr_scause_r <= fault_cause;
 					csr_stval_r  <= trap_vaddr;
 					csr_mstatus[5] <= csr_mstatus[1];
 					csr_mstatus[1] <= 1'b0;
 					csr_mstatus[8] <= privilege_mode_i[0];
 					privilege_mode <= 2'd1;
 				end else begin
-					csr_mepc   <= fault_is_insn ? trap_vaddr : wb_r.pc;
-					if (fault_is_insn)
-						csr_mcause <= 64'd12;
-					else if (wb_r.is_store)
-						csr_mcause <= 64'd15;
-					else
-						csr_mcause <= 64'd13;
+					csr_mepc   <= fault_is_insn ? trap_vaddr : fault_pc;
+					csr_mcause <= fault_cause;
 					csr_mtval  <= trap_vaddr;
 					csr_mstatus[7] <= csr_mstatus[3];
 					csr_mstatus[3] <= 1'b0;
@@ -352,6 +363,8 @@ module core_csr
 					CSR_MIDELEG:  csr_mideleg_r <= wb_r.csr_wdata;
 					CSR_MCOUNTEREN: csr_mcounteren_r <= wb_r.csr_wdata;
 					CSR_MENVCFG:  csr_menvcfg_r <= wb_r.csr_wdata;
+					CSR_PMPCFG0:  csr_pmpcfg0_r <= wb_r.csr_wdata & 64'hff;
+					CSR_PMPADDR0: csr_pmpaddr0_r <= wb_r.csr_wdata;
 					default: begin end
 				endcase
 			end
@@ -377,6 +390,8 @@ module core_csr
 		next_mideleg   = csr_mideleg_r;
 		next_mcounteren= csr_mcounteren_r;
 		next_menvcfg   = csr_menvcfg_r;
+		next_pmpcfg0   = csr_pmpcfg0_r;
+		next_pmpaddr0  = csr_pmpaddr0_r;
 		next_privilege_mode = privilege_mode;
 
 		trap_redirect = 1'b0;
@@ -435,7 +450,7 @@ module core_csr
 			end
 		end else if (mmu_trap) begin
 			if (delegate_to_s(1'b0, get_excp_cause())) begin
-				next_sepc = fault_is_insn ? trap_vaddr : wb_r.pc;
+				next_sepc = fault_is_insn ? trap_vaddr : fault_pc;
 				next_scause = get_excp_cause();
 				next_stval = trap_vaddr;
 				next_mstatus = csr_mstatus;
@@ -446,7 +461,7 @@ module core_csr
 				trap_redirect = 1'b1;
 				trap_redirect_pc = csr_stvec_r;
 			end else begin
-				next_mepc = fault_is_insn ? trap_vaddr : wb_r.pc;
+				next_mepc = fault_is_insn ? trap_vaddr : fault_pc;
 				next_mcause = get_excp_cause();
 				next_mtval = trap_vaddr;
 				next_mstatus = csr_mstatus;
@@ -496,6 +511,8 @@ module core_csr
 				CSR_MIDELEG:  next_mideleg  = wb_r.csr_wdata;
 				CSR_MCOUNTEREN: next_mcounteren = wb_r.csr_wdata;
 				CSR_MENVCFG:  next_menvcfg  = wb_r.csr_wdata;
+				CSR_PMPCFG0:  next_pmpcfg0  = wb_r.csr_wdata & 64'hff;
+				CSR_PMPADDR0: next_pmpaddr0 = wb_r.csr_wdata;
 				default: begin end
 			endcase
 		end
@@ -510,6 +527,13 @@ module core_csr
 	assign csr_mtval_diff    = next_mtval;
 	assign csr_mepc_diff     = next_mepc;
 	assign csr_satp_diff     = next_satp;
+	assign csr_medeleg_diff  = next_medeleg;
+	assign csr_mideleg_diff  = next_mideleg;
+	assign csr_stvec_diff    = next_stvec;
+	assign csr_sscratch_diff = next_sscratch;
+	assign csr_scause_diff   = next_scause;
+	assign csr_stval_diff    = next_stval;
+	assign csr_sepc_diff     = next_sepc;
 	assign privilege_mode_diff = next_privilege_mode;
 endmodule
 

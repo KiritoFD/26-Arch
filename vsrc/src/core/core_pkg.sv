@@ -38,6 +38,7 @@ package core_pkg;
 	localparam logic [11:0] CSR_MTVEC    = 12'h305;
 	localparam logic [11:0] CSR_MCOUNTEREN = 12'h306;
 	localparam logic [11:0] CSR_MENVCFG  = 12'h30a;
+	localparam logic [11:0] CSR_PMPCFG0  = 12'h3a0;
 	localparam logic [11:0] CSR_MSCRATCH = 12'h340;
 	localparam logic [11:0] CSR_SSCRATCH = 12'h140;
 	localparam logic [11:0] CSR_MEPC     = 12'h341;
@@ -48,6 +49,7 @@ package core_pkg;
 	localparam logic [11:0] CSR_STVAL    = 12'h143;
 	localparam logic [11:0] CSR_MIP      = 12'h344;
 	localparam logic [11:0] CSR_SIP      = 12'h144;
+	localparam logic [11:0] CSR_PMPADDR0 = 12'h3b0;
 	localparam logic [11:0] CSR_MCYCLE   = 12'hb00;
 	localparam logic [11:0] CSR_MHARTID  = 12'hf14;
 
@@ -58,7 +60,7 @@ package core_pkg;
 	localparam logic [63:0] STVEC_MASK   = ~64'h0000_0000_0000_0002;
 	localparam logic [63:0] SIE_MASK     = 64'h0000_0000_0000_0222;
 	localparam logic [63:0] SIP_MASK     = 64'h0000_0000_0000_0222;
-	localparam logic [63:0] MEDELEG_MASK = 64'h0000_0000_0000_b3ff;
+	localparam logic [63:0] MEDELEG_MASK = 64'h0000_0000_0000_f3ff;
 	localparam logic [63:0] MIDELEG_MASK = 64'h0000_0000_0000_0222;
 
 	typedef struct packed {

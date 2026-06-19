@@ -31,10 +31,16 @@ module core_execute
 );
 	logic [63:0] ex_result_word;
 	logic [63:0] ex_next_pc;
+	logic [63:0] ex_jump_target;
 	logic        ex_branch_taken;
 	logic [63:0] mem_load_data;
 	logic [63:0] mem_aligned_data;
 	logic [5:0]  mem_byte_shift;
+	logic signed [63:0] ex_op1_signed;
+	logic signed [31:0] ex_op1_word_signed;
+
+	assign ex_op1_signed = ex_r.op1;
+	assign ex_op1_word_signed = ex_r.op1[31:0];
 
 	assign ex_result_ready = ex_is_mdu ? mdu_out_valid : !ex_r.is_load;
 	assign stall_ex_busy   = ex_r.valid && ex_is_mdu && !mdu_out_valid;
@@ -55,7 +61,8 @@ module core_execute
 			ALU_AND: ex_result = ex_r.op1 & ex_r.op2;
 			ALU_SLL: ex_result = ex_r.is_word ? {32'd0, (ex_r.op1[31:0] << ex_r.op2[4:0])} : (ex_r.op1 << ex_r.op2[5:0]);
 			ALU_SRL: ex_result = ex_r.is_word ? {32'd0, (ex_r.op1[31:0] >> ex_r.op2[4:0])} : (ex_r.op1 >> ex_r.op2[5:0]);
-			ALU_SRA: ex_result = ex_r.is_word ? {32'd0, $unsigned($signed(ex_r.op1[31:0]) >>> ex_r.op2[4:0])} : ($signed(ex_r.op1) >>> ex_r.op2[5:0]);
+			ALU_SRA: ex_result = ex_r.is_word ? {32'd0, $unsigned(ex_op1_word_signed >>> ex_r.op2[4:0])} :
+			                                  $unsigned(ex_op1_signed >>> ex_r.op2[5:0]);
 			ALU_SLT: ex_result = ($signed(ex_r.op1) < $signed(ex_r.op2)) ? 64'd1 : 64'd0;
 			ALU_SLTU: ex_result = (ex_r.op1 < ex_r.op2) ? 64'd1 : 64'd0;
 			ALU_MUL,
@@ -91,7 +98,8 @@ module core_execute
 		if (ex_r.is_jal || ex_r.is_jalr) ex_branch_taken = 1'b1;
 	end
 
-	assign ex_next_pc = ex_r.is_jalr ? ((ex_r.op1 + ex_r.imm) & ~64'd1) : (ex_r.pc + ex_r.imm);
+	assign ex_jump_target = ex_r.is_jalr ? ((ex_r.op1 + ex_r.imm) & ~64'd1) : (ex_r.pc + ex_r.imm);
+	assign ex_next_pc = ex_branch_taken ? ex_jump_target : (ex_r.pc + 64'd4);
 	assign ex_instr_misalign = ex_r.valid && ex_branch_taken && |ex_next_pc[1:0];
 	assign ex_flush_front = ex_r.valid && ex_branch_taken && !ex_instr_misalign;
 	assign ex_redirect_pc = ex_next_pc;
@@ -137,7 +145,10 @@ module core_execute
 	end
 
 	assign mem_stage_result = mem_r.is_load ? mem_load_data : mem_r.result;
-	assign difftest_skip = wb_r.valid && (wb_r.is_load || wb_r.is_store) && !wb_r.mem_addr[31];
+	assign difftest_skip =
+		(wb_r.valid && (wb_r.is_load || wb_r.is_store) && !wb_r.mem_addr[31]) ||
+		(wb_r.valid && wb_r.csr_wen &&
+		 ((wb_r.csr_addr == CSR_PMPCFG0) || (wb_r.csr_addr == CSR_PMPADDR0)));
 endmodule
 
 `endif

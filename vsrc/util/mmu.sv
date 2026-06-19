@@ -10,6 +10,8 @@ module mmu
 	input  logic         clk,
 	input  logic         reset,
 	input  logic [63:0]  satp,
+	input  logic [63:0]  pmpcfg0,
+	input  logic [63:0]  pmpaddr0,
 	input  logic [1:0]   privilege_mode,
 	input  logic         flush,
 
@@ -27,7 +29,8 @@ module mmu
 
 	output logic         walk_fault,
 	output logic [63:0]  fault_vaddr,
-	output logic         fault_is_insn
+	output logic         fault_is_insn,
+	output logic [63:0]  fault_cause
 );
 
 	typedef enum logic [2:0] {
@@ -56,6 +59,18 @@ module mmu
 	logic        trap_pending;
 	logic        satp_mode;
 	logic [43:0] satp_ppn;
+	logic        direct_insn_pmp_fault;
+	logic        direct_load_pmp_fault;
+	logic        direct_store_pmp_fault;
+	logic        done_insn_pmp_fault;
+	logic        done_load_pmp_fault;
+	logic        done_store_pmp_fault;
+	logic        data_is_store;
+	logic        pmp_active;
+	logic        pmp_hit;
+	logic        pmp_allow_r;
+	logic        pmp_allow_w;
+	logic        pmp_allow_x;
 
 	assign satp_mode = (satp[63:60] == 4'd8);
 	assign satp_ppn  = satp[43:0];
@@ -66,6 +81,66 @@ module mmu
 	assign vpn1 = saved_vaddr[29:21];
 	assign vpn0 = saved_vaddr[20:12];
 	assign page_offset = saved_vaddr[11:0];
+	assign data_is_store = |saved_wstrb;
+
+	function automatic logic pmp_entry_match(
+		input logic [63:0] addr,
+		input logic [63:0] cfg,
+		input logic [63:0] paddr
+	);
+		logic [1:0] a_mode;
+		logic [63:0] base;
+		logic [63:0] top;
+		int ones;
+		begin
+			a_mode = cfg[4:3];
+			pmp_entry_match = 1'b0;
+			unique case (a_mode)
+				2'b00: pmp_entry_match = 1'b0;
+				2'b01: begin
+					base = 64'd0;
+					top  = {8'd0, paddr[53:0], 2'b00};
+					pmp_entry_match = (addr >= base) && (addr < top);
+				end
+				2'b10: pmp_entry_match = (addr[63:2] == paddr[63:2]);
+				2'b11: begin
+					ones = 0;
+					while ((ones < 54) && paddr[ones]) begin
+						ones = ones + 1;
+					end
+					base = ({8'd0, paddr[53:0], 2'b00} & ~((64'd1 << (ones + 3)) - 64'd1));
+					top  = base + (64'd1 << (ones + 3));
+					pmp_entry_match = (addr >= base) && (addr < top);
+				end
+				default: pmp_entry_match = 1'b0;
+			endcase
+		end
+	endfunction
+
+	function automatic logic pmp_req_fault(
+		input logic [63:0] addr,
+		input logic is_exec,
+		input logic is_write,
+		input logic [63:0] cfg,
+		input logic [63:0] paddr,
+		input logic [1:0] mode
+	);
+		logic active, hit, allow;
+		begin
+			active = (cfg[4:3] != 2'b00);
+			hit = pmp_entry_match(addr, cfg, paddr);
+			allow = is_exec ? cfg[2] : (is_write ? cfg[1] : cfg[0]);
+			if (mode == 2'd3) begin
+				pmp_req_fault = 1'b0;
+			end else if (!active) begin
+				pmp_req_fault = 1'b0;
+			end else if (!hit) begin
+				pmp_req_fault = 1'b1;
+			end else begin
+				pmp_req_fault = !allow;
+			end
+		end
+	endfunction
 
 	// Detect page walk failure
 	// Note: In WALK_IDLE, walk_fault_next is always 0 because we haven't started walking yet
@@ -77,8 +152,44 @@ module mmu
 		(state == WALK_LEVEL0 && dresp_out.data_ok && !dresp_out.data[0]) ||
 		(state == WALK_LEVEL0 && dresp_out.data_ok && dresp_out.data[0] &&
 		 !dresp_out.data[3] && !dresp_out.data[1] && !dresp_out.data[2]);
-	// Only assert walk_fault when we are actively walking (not in WALK_IDLE)
-	assign walk_fault = walk_active && walk_fault_next;
+	assign pmp_active  = (pmpcfg0[4:3] != 2'b00);
+	assign pmp_hit     = pmp_entry_match(phys_addr, pmpcfg0, pmpaddr0);
+	assign pmp_allow_r = pmp_hit && pmpcfg0[0];
+	assign pmp_allow_w = pmp_hit && pmpcfg0[1];
+	assign pmp_allow_x = pmp_hit && pmpcfg0[2];
+
+	assign direct_insn_pmp_fault  = !translate_en && ireq_in.valid &&
+	                                pmp_req_fault(ireq_in.addr, 1'b1, 1'b0, pmpcfg0, pmpaddr0, privilege_mode);
+	assign direct_load_pmp_fault  = !translate_en && dreq_in.valid && (dreq_in.strobe == 8'd0) &&
+	                                pmp_req_fault(dreq_in.addr, 1'b0, 1'b0, pmpcfg0, pmpaddr0, privilege_mode);
+	assign direct_store_pmp_fault = !translate_en && dreq_in.valid && (dreq_in.strobe != 8'd0) &&
+	                                pmp_req_fault(dreq_in.addr, 1'b0, 1'b1, pmpcfg0, pmpaddr0, privilege_mode);
+	assign done_insn_pmp_fault    = (state == WALK_DONE_INSN) &&
+	                                pmp_req_fault(phys_addr, 1'b1, 1'b0, pmpcfg0, pmpaddr0, privilege_mode);
+	assign done_load_pmp_fault    = (state == WALK_DONE_DATA) && !data_is_store &&
+	                                pmp_req_fault(phys_addr, 1'b0, 1'b0, pmpcfg0, pmpaddr0, privilege_mode);
+	assign done_store_pmp_fault   = (state == WALK_DONE_DATA) && data_is_store &&
+	                                pmp_req_fault(phys_addr, 1'b0, 1'b1, pmpcfg0, pmpaddr0, privilege_mode);
+
+	assign walk_fault = (walk_active && walk_fault_next) ||
+	                    direct_insn_pmp_fault || direct_load_pmp_fault || direct_store_pmp_fault ||
+	                    done_insn_pmp_fault || done_load_pmp_fault || done_store_pmp_fault;
+	assign fault_is_insn = (walk_active && walk_fault_next) ? saved_is_insn :
+	                       (direct_insn_pmp_fault || done_insn_pmp_fault);
+	assign fault_vaddr = (walk_active && walk_fault_next) ? saved_vaddr :
+	                     direct_insn_pmp_fault ? ireq_in.addr :
+	                     direct_load_pmp_fault ? dreq_in.addr :
+	                     direct_store_pmp_fault ? dreq_in.addr :
+	                     done_insn_pmp_fault ? saved_vaddr :
+	                     done_load_pmp_fault ? saved_vaddr :
+	                     done_store_pmp_fault ? saved_vaddr :
+	                     64'd0;
+	assign fault_cause = (walk_active && walk_fault_next) ?
+	                     (saved_is_insn ? 64'd12 : (data_is_store ? 64'd15 : 64'd13)) :
+	                     (direct_insn_pmp_fault || done_insn_pmp_fault) ? 64'd1 :
+	                     (direct_store_pmp_fault || done_store_pmp_fault) ? 64'd7 :
+	                     (direct_load_pmp_fault || done_load_pmp_fault) ? 64'd5 :
+	                     64'd0;
 
 	// Compute physical address from saved PTE and level
 	always_comb begin
@@ -106,8 +217,11 @@ module mmu
 	always_comb begin
 		if (!translate_en) begin
 			ireq_out = ireq_in;
+			if (direct_insn_pmp_fault) begin
+				ireq_out.valid = 1'b0;
+			end
 		end else if (state == WALK_DONE_INSN) begin
-			ireq_out.valid = 1'b1;
+			ireq_out.valid = !done_insn_pmp_fault;
 			ireq_out.addr  = phys_addr;
 		end else if (flush) begin
 			ireq_out.valid = 1'b0;
@@ -122,6 +236,9 @@ module mmu
 	always_comb begin
 		if (!translate_en) begin
 			dreq_out = dreq_in;
+			if (direct_load_pmp_fault || direct_store_pmp_fault) begin
+				dreq_out.valid = 1'b0;
+			end
 		end else if (walk_active) begin
 			dreq_out.valid  = 1'b1;
 			dreq_out.addr   = pte_addr;
@@ -129,7 +246,7 @@ module mmu
 			dreq_out.strobe = 8'd0;
 			dreq_out.data   = 64'd0;
 		end else if (state == WALK_DONE_DATA) begin
-			dreq_out.valid  = 1'b1;
+			dreq_out.valid  = !(done_load_pmp_fault || done_store_pmp_fault);
 			dreq_out.addr   = phys_addr;
 			dreq_out.size   = msize_t'(saved_size);
 			dreq_out.strobe = saved_wstrb;
@@ -155,8 +272,6 @@ module mmu
 			pte_addr      <= 64'd0;
 			saved_pte     <= 64'd0;
 			saved_level   <= 2'd0;
-			fault_vaddr   <= 64'd0;
-			fault_is_insn <= 1'b0;
 			trap_pending  <= 1'b0;
 		end else if (flush) begin
 			state         <= WALK_IDLE;
@@ -168,16 +283,8 @@ module mmu
 			pte_addr      <= 64'd0;
 			saved_pte     <= 64'd0;
 			saved_level   <= 2'd0;
-			fault_vaddr   <= 64'd0;
-			fault_is_insn <= 1'b0;
 			trap_pending  <= 1'b0;
 		end else begin
-			if (walk_fault_next) begin
-				fault_vaddr   <= saved_vaddr;
-				fault_is_insn <= saved_is_insn;
-				trap_pending  <= 1'b1;
-			end
-
 			case (state)
 				WALK_IDLE: begin
 					if (trap_pending) begin

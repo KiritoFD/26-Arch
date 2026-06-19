@@ -32,6 +32,8 @@ module core_decode
 	input  logic [63:0]   csr_mideleg,
 	input  logic [63:0]   csr_mcounteren,
 	input  logic [63:0]   csr_menvcfg,
+	input  logic [63:0]   csr_pmpcfg0,
+	input  logic [63:0]   csr_pmpaddr0,
 	input  logic          ex_forwardable,
 	input  logic [63:0]   ex_result,
 	output logic [4:0]    id_rs1,
@@ -144,6 +146,8 @@ module core_decode
 			CSR_MIDELEG:  id_csr_rdata = csr_mideleg;
 			CSR_MCOUNTEREN: id_csr_rdata = csr_mcounteren;
 			CSR_MENVCFG:  id_csr_rdata = csr_menvcfg;
+			CSR_PMPCFG0:  id_csr_rdata = csr_pmpcfg0;
+			CSR_PMPADDR0: id_csr_rdata = csr_pmpaddr0;
 			default:      id_csr_rdata = 64'd0;
 		endcase
 
@@ -248,6 +252,7 @@ module core_decode
 					if (id_funct3 == 3'b010) begin
 						id_dec_wen = (id_rd != 0);
 						id_dec_is_amo = 1'b1;
+						id_dec_imm = 64'd0;
 						id_dec_mem_size = MSIZE4;
 						unique case (id_funct7[6:2])
 							5'b00001: id_dec_amo_cmd = AMO_CMD_SWAP; // amoswap.w

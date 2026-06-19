@@ -36,7 +36,7 @@ module DBusToCBus
 
     assign okay = dcresp.ready && dcresp.last;
     assign issue_now = dreq.valid && !req_inflight && !resp_seen;
-    assign resp_fire = okay && (req_inflight || issue_now) && !resp_seen;
+    assign resp_fire = okay && ((req_inflight && dreq.valid) || issue_now) && !resp_seen;
 
     always_ff @(posedge clk) begin
         if (reset) begin

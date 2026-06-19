@@ -1,283 +1,279 @@
-# Lab6 实验报告：中断与异常支持
+# lab+ 实现说明
 
-## 1. 实验要求对照
+这份报告只说明当前稳定版本里我实际完成了什么、为什么这样做、以及实现过程中最关键的困难。
 
-Lab6 要求 CPU 支持 RISC-V 机器态 trap 相关机制。根据 Wiki，本次实验必须先理解特权架构，并完成以下内容：
+当前稳定完成的部分有三块：
 
-- 实现异常：指令地址不对齐、数据地址不对齐、非法指令、ECALL
-- 实现中断：时钟中断、外部中断、软件中断
-- 实现 `mret`
-- 发生 trap 时正确更新 `mepc`、`mcause`、`mstatus` 和当前 mode
-- trap 后跳转到 `mtvec`
-- trap/mret 后清除流水线，避免旧指令或旧访存响应污染新控制流
-- 运行 `make test-lab6`
-- 本次 Lab 不要求上板
+- xv6 主 track：内核启动并进入用户 shell
+- `labplus-3`：原子指令测试通过
+- `labplus-4`：PMP 测试通过
 
-Wiki 中还提到 MMU 缺页异常属于 bonus。本实现已在 Lab5 Sv39 MMU 基础上接入页错误 trap，因此公开要求和 bonus 方向都覆盖到了。
+`labplus-2` 我做过多轮尝试，但没有保留任何会降低正确性的性能改动，所以本文只把那部分作为尝试记录，不把它当作最终完成项。
 
-## 2. Trap 总体设计
+---
 
-本实现把中断和异常统一成 trap 流程处理。同步异常来自正在提交的指令，异步中断来自 `trint`、`exint`、`swint` 三根输入线。trap 发生后，CSR 模块完成架构状态更新，前端和 MMU 负责丢弃旧控制流下的状态。
+## 1. xv6 是怎么跑起来的
 
-一次 trap 的核心动作如下：
+### 1.1 先把 xv6 编译成当前 CPU 真能执行的 ISA
 
-```text
-mepc          <- trap 对应 PC
-mcause[63]    <- 0 表示异常，1 表示中断
-mcause[62:0]  <- trap 类型
-mstatus.MPIE <- mstatus.MIE
-mstatus.MIE  <- 0
-mstatus.MPP  <- trap 前 mode
-mode          <- M-mode
-next_pc       <- mtvec
-```
+上游 xv6 默认按 `rv64gc` 编译，但当前 CPU 并没有完整实现那套扩展。最直接的后果是：镜像虽然能链接出来，但一启动就会在早期指令上偏离。
 
-对应的返回由 `mret` 完成：
+所以第一步不是去改 CPU，而是先把 xv6 编译目标收窄到当前 CPU 已有的基础能力。具体做法是把 xv6 的编译参数改成：
 
 ```text
-mstatus.MIE  <- mstatus.MPIE
-mstatus.MPIE <- 1
-mode          <- mstatus.MPP
-mstatus.MPP  <- 0
-next_pc       <- mepc
+rv64im_zicsr_zifencei
+lp64
 ```
 
-代码上，trap 的核心状态更新集中在 `vsrc/src/core/core_csr.sv`，trap 信号从 `vsrc/src/core/core_commit.sv` 接入，前端 flush 和 difftest 接口在 `vsrc/src/core.sv` 中完成。
+这样做的效果很直接：xv6 的 `_entry -> start` 这条机器态启动路径可以先走起来，后面的特权级和 MMU 问题才有调试基础。
 
-## 3. 异常实现
+### 1.2 把 xv6 的锁从“多核原子语义”改成“单核可行语义”
 
-### 3.1 ECALL
+xv6 原本的 spinlock 依赖原子交换。对于一颗完整支持 `A` 扩展的核，这没有问题；但在 bring-up 阶段，如果锁本身先卡死，就连文件系统和进程调度都进不去。
 
-ECALL 的 `mcause` 由当前特权级决定：
+这里我没有走“先改 xv6 锁绕开原子”作为最终方案，而是把 CPU 的原子路径做到了能通过 `labplus-3`。不过在调试 xv6 的早期阶段，单核环境下锁的行为本质上只需要满足：
 
-| 来源特权级 | mcause |
-| --- | --- |
-| U-mode | 8 |
-| S-mode | 9 |
-| M-mode | 11 |
+- 进入临界区前关中断
+- 用普通 load/store 保护共享变量
+- 退出时恢复中断
 
-CSR 模块中使用 `get_ecall_cause()` 生成对应 cause。ECALL trap 时：
+这个思路帮助我先把“是锁语义问题”还是“是 trap / MMU / 磁盘路径问题”区分开，不至于一上来把所有问题混在一起。
+
+### 1.3 把仿真环境里的 MMIO 设备补成 xv6 真会访问的样子
+
+xv6 真正依赖的不是“抽象的内存总线”，而是非常具体的设备地址和寄存器语义。
+
+这次最关键的是两块：
+
+1. 串口
+2. 磁盘
+
+#### 串口
+
+xv6 使用的是 `UART0 = 0x10000000` 这套 16550 风格寄存器，而原来的仿真环境主要照顾的是课程测试程序使用的 `0x40600000` 一组简化 UART MMIO。
+
+如果只让 CPU 正确发起 load/store，而不把 `ram.sv` 里的设备语义补齐，xv6 会卡在最基本的“轮询发送寄存器”这一步。
+
+我在 `difftest/src/test/vsrc/common/ram.sv` 里补了最小可用的串口兼容：
+
+- `0x10000000`：收发数据
+- `0x10000003`：LCR
+- `0x10000005`：LSR
+
+其中真正踩坑的点有两个：
+
+1. **字节读返回值的 byte-lane 放置**
+   xv6 用 `lbu` 读串口状态位。如果仿真侧把返回值放在错误的 byte lane，CPU 读出来虽然“有数据”，但永远看不到 `LSR_TX_IDLE`，表现出来就是启动信息根本打不出来，或者卡在打印循环。
+
+2. **DLAB 位处理**
+   xv6 初始化串口时会改波特率相关寄存器。如果忽略 `LCR.DLAB`，这些初始化写会被误当成普通字符输出，串口日志会混乱，进一步干扰 bring-up 判断。
+
+#### 磁盘
+
+xv6 原始路径走的是 virtio-mmio，但课程这套环境并没有现成 virtio 设备。这里我没有实现完整 virtio，而是把 xv6 的磁盘访问改成一组简单 MMIO 协议，再由 `ram.sv` 映射到宿主机上的 `fs.img`。
+
+我采用的结构很简单：
+
+- 一个块号寄存器
+- 一个 ready/status 寄存器
+- 一个 1KB 数据窗口
+
+宿主侧通过 `SDCARD_IMAGE` 把 `fs.img` 载入仿真环境。CPU 侧发起 MMIO 读写时，`ram.sv` 直接从镜像缓冲区同步读出或写回数据。
+
+这个设计故意不复杂：
+
+- 不需要外部中断
+- 不需要 DMA
+- 不需要 virtqueue
+- 同步读写足够支撑 `bread`、日志和 superblock 初始化
+
+也正因为用了这个最小协议，我才能比较快地验证出 xv6 已经真的经过了：
+
+- `binit`
+- `iinit`
+- `fsinit(ROOTDEV)`
+
+而不是只停留在“打印了一句 booting”。
+
+### 1.4 真正让 xv6 跑起来的核心，其实是 Supervisor 闭环
+
+xv6 启动到 shell，真正的关键不是磁盘，也不是串口，而是这几个东西必须同时成立：
+
+- `mret` 行为正确
+- `medeleg/mideleg` 生效
+- `stvec/sepc/scause/sstatus` 正常工作
+- trap 进入和返回时流水线清空正确
+- MMU 在 trap / redirect 后不会把旧页表遍历状态带进新控制流
+
+这部分的核心代码集中在：
+
+- `vsrc/src/core/core_csr.sv`
+- `vsrc/src/core/core_commit.sv`
+- `vsrc/src/core.sv`
+- `vsrc/util/mmu.sv`
+
+我没有把 Supervisor 支持拆成“若干 CSR 补丁”来看，而是把它当作一个控制流闭环来修。因为实际现象已经证明：
+
+- CSR 写对了但 trap PC 选错，xv6 一样会死
+- `mret` 跳对了但前端旧请求没丢，xv6 一样会死
+- delegation 表面写进去了但 difftest 没同步，调试结论会被完全带偏
+
+这也是这部分最难的地方。
+
+### 1.5 xv6 bring-up 过程中最隐蔽的 bug：PMP 模式解释反了
+
+xv6 在 `start()` 早期就会配置：
+
+- `pmpaddr0`
+- `pmpcfg0`
+
+然后再 `mret` 进入 S-mode。
+
+这里我一开始已经把 PMP 寄存器和检查逻辑接上了，但 xv6 还是在 `mret` 之后“不再退休指令”。最后定位下来，不是 trap 逻辑错了，而是 `mmu.sv` 里把 PMP 的 `A` 字段解释反了：
+
+- 正确语义是 `01 = TOR`, `10 = NA4`
+- 之前写成了 `01 = NA4`, `10 = TOR`
+
+这类 bug 的麻烦在于它表面根本不像 PMP 问题，表现出来更像：
+
+- S-mode 入口卡死
+- `mret` 后取指不前进
+- trap / MMU / 页表像是哪里还没修好
+
+实际上只要把这一个编码修正，xv6 就能继续穿过 Supervisor 初始化，最后到 `init: starting sh` 和 shell prompt。
+
+---
+
+## 2. `labplus-3` 是怎么做的
+
+`labplus-3` 最核心的是原子访存路径必须真的“不可被 trap 在中间打断”。
+
+对于单核环境，这里的重点不是多核一致性，而是：
+
+- AMO 的读旧值、写 rd、写回内存必须作为一个完整结果出现
+- trap 不能打在中间，把状态切成一半
+
+这部分我做了两件事：
+
+1. 让原子指令在执行路径上有独立控制
+2. 修掉 AMO 地址 decode 错误
+
+第二个点是最关键的 bug：
+
+AMO 地址应当直接使用 `rs1`，不能像普通 I-type 那样把一个立即数再加到 `rs1` 上。
+
+这处错误如果不修，`atomicity.bin` 根本不会打到正确地址，现象会像是“原子语义错了”，但其实是 decode 阶段就已经把地址算错。
+
+修完之后，`labplus-3` 已经可以稳定：
 
 ```text
-mepc   <- wb_r.pc
-mcause <- get_ecall_cause(mode)
-mtval  <- 0
-mode   <- M-mode
-pc     <- mtvec
+HIT GOOD TRAP at pc = 0x800000dc
 ```
 
-### 3.2 非法指令
+---
 
-非法指令 trap 时写入：
+## 3. `labplus-4` 是怎么做的
 
-```text
-mepc   <- wb_r.pc
-mcause <- 2
-mtval  <- 原始非法指令编码
-```
+PMP 的实现点主要在：
 
-这样 handler 可以通过 `mtval` 判断触发异常的指令内容。
+- `pmpcfg0`
+- `pmpaddr0`
+- `mmu.sv` 里的权限判定
 
-### 3.3 地址不对齐
+我采用的是单 entry PMP，实现了：
 
-本实现覆盖三类地址不对齐：
+- `R/W/X`
+- `A` 字段匹配
+- M-mode 与非 M-mode 下的权限区别
+- 指令、load、store 三类 fault cause
 
-| 类型 | mcause | mtval |
-| --- | --- | --- |
-| 指令地址不对齐 | 0 | 跳转目标地址 |
-| load 地址不对齐 | 4 | load 地址 |
-| store 地址不对齐 | 6 | store 地址 |
+具体来说，MMU 会在两处做权限检查：
 
-执行级计算跳转目标后检测 `ex_next_pc[1:0]`。若目标不对齐，生成 `ex_instr_misalign`，同时禁止错误跳转继续刷新前端。数据地址不对齐使用访存地址检测，并在 commit/CSR 路径中生成对应 trap。
+1. **直通地址阶段**
+   如果当前不走分页，但访问本身就触发 PMP fault，直接产生异常。
 
-### 3.4 页错误
+2. **页表翻译后阶段**
+   如果先走 Sv39 得到物理地址，再在最终物理地址上做 PMP 检查。
 
-MMU 页表遍历发现无效 PTE 或非叶子错误时产生 page fault，并通过 `fault_vaddr` 和 `fault_is_insn` 送入 core：
+这个设计的好处是统一：
 
-| 类型 | mcause | mtval |
-| --- | --- | --- |
-| instruction page fault | 12 | fault_vaddr |
-| load page fault | 13 | fault_vaddr |
-| store page fault | 15 | fault_vaddr |
+- 不分页时能管
+- 分页后也能管
 
-这部分属于 Wiki 中的 bonus，但对 Lab5/Lab6 的特权级和分页组合测试也有实际作用。
+`labplus-4` 后面一度卡在 `uartlite` 输出循环里，看起来像串口问题，但真正让 xv6 和 privileged test 都稳定下来的关键，还是前面提到的 PMP `A` 编码修正。
 
-### 3.5 优先级处理
-
-同步异常已经到达 WB/commit 时，不能被同一拍的异步中断覆盖。因此 CSR 中加入 `sync_trap_or_mret`：
-
-```verilog
-assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_misalign_instr ||
-                           wb_misalign_data || mmu_trap || wb_mret;
-```
-
-中断只有在没有同步 trap/mret 抢占时才进入 trap。这使异常优先级更符合“当前提交指令先产生确定架构行为”的原则。
-
-## 4. 中断实现
-
-### 4.1 中断 pending 与 enable
-
-三类中断信号映射到 `mip`：
-
-| 输入 | mip 位 | mie 位 | mcause |
-| --- | --- | --- | --- |
-| `swint` | 3 | 3 | `0x8000000000000003` |
-| `trint` | 7 | 7 | `0x8000000000000007` |
-| `exint` | 11 | 11 | `0x800000000000000b` |
-
-中断进入 M-mode 的条件按 Wiki 实现：
-
-```text
-(当前 mode 不是 M-mode，或 mstatus.MIE = 1)
-并且
-mip[i] = 1 且 mie[i] = 1
-```
-
-实现中没有检测中断信号边沿，而是把外部中断输入组合到 `mip` 对应位，这符合 Wiki 中“不要检测 posedge/negedge”的要求。
-
-### 4.2 CSR 写回后的即时判定
-
-Wiki 指出中断条件依赖 `mip`、`mie`、`mstatus`，并且这些 CSR 被写入后需要重新 evaluate。当前实现对 `mstatus` 和 `mie` 使用本拍有效值：
-
-```verilog
-assign intr_mstatus =
-  (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MSTATUS))
-  ? wb_r.csr_wdata
-  : csr_mstatus;
-
-assign intr_mie =
-  (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MIE))
-  ? wb_r.csr_wdata
-  : csr_mie;
-```
-
-这样 `csrsi mstatus, 8` 打开 MIE 后能及时响应中断，而 `csrci mstatus, 8` 清除 MIE 后不会因为旧值重复进中断。
-
-### 4.3 精确中断 PC
-
-中断是异步事件，前端 PC 可能已经取到后续指令。若直接把 `fetch_pc` 写入 `mepc`，中断返回后可能跳过尚未提交的指令。
-
-因此 `mepc` 选择流水线中最老的未提交指令 PC：
-
-```verilog
-assign intr_fetch_pc = mem_r.valid ? mem_r.pc :
-                       ex_r.valid  ? ex_r.pc  :
-                       id_r.valid  ? id_r.pc  :
-                                     fetch_pc;
-```
-
-这个设计保证中断前已经提交的指令不会重复执行，尚未提交的指令不会丢失。公开测试中的 `m_trap` 对这个点很敏感。
-
-## 5. mret 与特权级恢复
-
-`mret` 在 CSR 模块中恢复中断使能和特权级：
-
-```text
-MIE  <- MPIE
-MPIE <- 1
-MPP  <- 0
-mode <- 原 MPP
-PC   <- mepc
-```
-
-`mret_redirect` 会通知前端跳转到 `mepc`，同时清除流水线中旧路径的指令，避免 trap handler 后续指令继续进入执行级。
-
-## 6. 流水线与 MMU flush
-
-trap、mret、执行级跳转都会改变控制流。实现中在这些事件发生时清理前端状态：
-
-- `fetch_pending`
-- `fetch_req_pc`
-- `fetch_redirect_pending`
-- `fetch_buf_valid`
-
-同时加入 `fetch_redirect_bubble`，屏蔽 redirect 后短时间内返回的旧取指响应。
-
-MMU 也接入 `flush_mmu_o`：
-
-```verilog
-assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front;
-```
-
-MMU 收到 flush 后清理 page walk 状态、保存的虚拟地址、PTE、fault 地址、fault 类型和 `trap_pending`。这可以避免旧 U-mode 请求或旧 page fault 在切到 M-mode trap handler 后污染新状态。
-
-## 7. Difftest 状态
-
-Lab6 官方测试暂时不使用 Difftest，但 Lab5 和后续测试需要 CSR 状态一致。本实现将 `DifftestCSRState.priviledgeMode` 接到真实 privilege mode：
-
-```verilog
-.priviledgeMode(privilege_mode_diff)
-```
-
-并让 `privilege_mode_diff` 使用 `next_privilege_mode`，避免 trap/mret 提交点上报滞后一拍的特权级。
-
-## 8. 测试结果
-
-### 8.1 Lab6
-
-在 WSL 中运行：
-
-```bash
-make test-lab6
-```
-
-关键输出如下：
+最终稳定结果是：
 
 ```text
 Single test passed.
-Run sys-test
-trap here, epc 8000600c, cause 8
-Test ecall_u [OK]
-trap here, epc 80006028, cause 0
-Test instr_misalign [OK]
-trap here, epc 80006040, cause 4
-Test load_misalign [OK]
-trap here, epc 80006050, cause 6
-Test store_misalign [OK]
-trap here, epc 800060a8, cause 8000000000000007
-Test timer_intr [OK]
-trap here, epc 80006090, cause 8000000000000003
-Test software_intr [OK]
-Test m_trap [OK]
-Privileged test finished.
+HIT GOOD TRAP at pc = 0x80007d64
 ```
 
-Wiki 中说明后续循环输出 `m_trap_test [X]` / `---TEST FAILED---` 属于正常现象，可以手动退出。当前实现已经能输出 `Test m_trap [OK]` 和 `Privileged test finished.`，因此公开 Lab6 测试通过。
+---
 
-### 8.2 前五个 Lab 回归
+## 4. 做这些过程中，真正困难在哪
 
-为确认没有破坏前五个实验，回归结果如下：
+### 4.1 trap 问题几乎从来不只在 trap 自己身上
 
-```text
-Lab1: HIT GOOD TRAP at pc = 0x80010004
-Lab2: HIT GOOD TRAP at pc = 0x8001fffc
-Lab3: HIT GOOD TRAP at pc = 0x80000030
-Lab4: HIT GOOD TRAP at pc = 0x8001fff8
-Lab5: Return from init! Test passed
-```
+最难调的不是“没进 trap”，而是“trap 进去了，但架构状态和微结构状态没一起收干净”。
 
-Lab5 和 Lab6 在打印通过信息后不会立即自然退出，因此验证时使用 `timeout` 截断仿真进程。判断通过与否以输出中的通过信息为准。
+最典型的几个坑是：
 
-## 9. 提交说明
+- `mepc` 取错 PC
+- trap 后前端旧请求没丢
+- MMU 旧 walk 状态没清
+- 访存返回晚了一拍，落到了新路径上
 
-本次 Lab6 不要求上板。提交包通过：
+这些问题最后都会表现成：
 
-```bash
-make handin
-```
+- 重复执行
+- 丢指令
+- `m_trap` 失败
+- xv6 在一个看似无关的地方卡死
 
-生成，报告同时提供 `docs/report.md` 和 `docs/report.pdf`，并保留 `docs/lab6_report.md` 作为同内容的 Lab6 专项报告。
+### 4.2 xv6 bring-up 会把“边角 bug”全部放大
 
-## 10. 小结
+单独跑课程测试程序时，很多 bug 并不会立刻暴露；一旦换成 xv6，这些 bug 会被连续控制流、特权切换、文件系统和用户态拉满。
 
-本实现覆盖了 Wiki 中列出的异常、中断和 `mret` 行为，并额外接入了 MMU 缺页异常。关键设计点包括：
+比如：
 
-- WB/commit 收口同步异常
-- CSR 统一维护 trap 架构状态
-- 中断按 `mip`、`mie`、`mstatus.MIE` 判定
-- CSR 写回后的 `mstatus`/`mie` 参与同拍中断判定
-- 中断 `mepc` 保存流水线中最老的未提交指令 PC
-- trap/mret 后清理前端和 MMU 旧状态
-- 同步异常和 mret 不被同拍异步中断覆盖
+- delegation 少同步一个 bit，xv6 会在很早就分叉
+- byte-lane 错一位，串口状态位永远读不对
+- PMP 模式错一位，`mret` 后整个 S-mode 死掉
 
-公开测试 `make test-lab6` 已通过，且 Lab1-Lab5 回归保持通过。
+也就是说，xv6 更像是一个“系统级放大镜”。
+
+### 4.3 性能优化比功能修复更容易伤 correctness
+
+`labplus-2` 我确实做过几轮尝试：
+
+- 静态分支预测
+- 放松前端阻塞
+- 尝试接入更积极的取指缓存路径
+
+最终都没有保留。原因不是没做出来，而是：
+
+- 有的没有净收益
+- 有的直接打坏 `lab6`
+- 有的会打坏 xv6 或 `labplus-4`
+
+这说明当前这套前端/总线/流水线结构里，很多 stall 条件并不是“纯性能差”，而是 correctness 的一部分。
+
+所以最终交付里，我只保留了功能正确、可稳定复现的版本。
+
+---
+
+## 5. 当前版本的结论
+
+当前稳定版本已经完成并验证：
+
+- xv6 主 track 到 shell
+- `lab6`
+- `labplus-3`
+- `labplus-4`
+
+没有纳入最终稳定版本的内容：
+
+- `labplus-2` 性能优化
+
+理由很直接：现有尝试要么无净收益，要么破坏正确性。为了保证提交版本可运行、可解释、可复现，最终保留的是功能正确的稳定基线。

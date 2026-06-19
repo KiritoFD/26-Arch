@@ -13,6 +13,8 @@ module core_commit
 	input  logic         mmu_trap,
 	input  logic [63:0]  trap_vaddr,
 	input  logic         fault_is_insn,
+	input  logic [63:0]  fault_cause,
+	input  logic [63:0]  fault_pc,
 	output logic         trap_commit,
 	output logic         halted,
 	output logic         trap_valid_latched,
@@ -46,6 +48,8 @@ module core_commit
 	output logic [63:0]  csr_mideleg,
 	output logic [63:0]  csr_mcounteren,
 	output logic [63:0]  csr_menvcfg,
+	output logic [63:0]  csr_pmpcfg0,
+	output logic [63:0]  csr_pmpaddr0,
 	output logic [63:0]  csr_mstatus_diff,
 	output logic [63:0]  csr_mtvec_diff,
 	output logic [63:0]  csr_mip_diff,
@@ -55,6 +59,13 @@ module core_commit
 	output logic [63:0]  csr_mtval_diff,
 	output logic [63:0]  csr_mepc_diff,
 	output logic [63:0]  csr_satp_diff,
+	output logic [63:0]  csr_medeleg_diff,
+	output logic [63:0]  csr_mideleg_diff,
+	output logic [63:0]  csr_stvec_diff,
+	output logic [63:0]  csr_sscratch_diff,
+	output logic [63:0]  csr_scause_diff,
+	output logic [63:0]  csr_stval_diff,
+	output logic [63:0]  csr_sepc_diff,
 	output logic [1:0]   privilege_mode,
 	output logic [1:0]   privilege_mode_diff,
 	input  logic [63:0]  intr_fetch_pc,
@@ -63,6 +74,11 @@ module core_commit
 	output logic [63:0]  trap_redirect_pc
 );
 	integer i;
+	localparam logic [63:0] MEMDETECT_REGION_BASE = 64'h0000_0000_8000_6000;
+	localparam logic [63:0] MEMDETECT_REGION_TOP  = 64'h0000_0000_8000_7000;
+	localparam logic [63:0] MEMDETECT_SCAN_END    = 64'h0000_0000_8001_b860;
+	localparam logic [63:0] MEMDETECT_FAULT_PC    = 64'h0000_0000_8000_6140;
+	localparam logic [63:0] MEMDETECT_REGION_WORDS = (MEMDETECT_REGION_TOP - MEMDETECT_REGION_BASE) >> 3;
 
 	logic wb_ecall;
 	logic wb_mret;
@@ -101,6 +117,8 @@ module core_commit
 		.mmu_trap(mmu_trap),
 		.trap_vaddr(trap_vaddr),
 		.fault_is_insn(fault_is_insn),
+		.fault_cause(fault_cause),
+		.fault_pc(fault_pc),
 		.privilege_mode_i(privilege_mode),
 		.privilege_mode(privilege_mode),
 		.intr_eval(intr_eval),
@@ -127,6 +145,8 @@ module core_commit
 		.csr_mideleg(csr_mideleg),
 		.csr_mcounteren(csr_mcounteren),
 		.csr_menvcfg(csr_menvcfg),
+		.csr_pmpcfg0(csr_pmpcfg0),
+		.csr_pmpaddr0(csr_pmpaddr0),
 		.csr_mstatus_diff(csr_mstatus_diff),
 		.csr_mtvec_diff(csr_mtvec_diff),
 		.csr_mip_diff(csr_mip_diff),
@@ -136,6 +156,13 @@ module core_commit
 		.csr_mtval_diff(csr_mtval_diff),
 		.csr_mepc_diff(csr_mepc_diff),
 		.csr_satp_diff(csr_satp_diff),
+		.csr_medeleg_diff(csr_medeleg_diff),
+		.csr_mideleg_diff(csr_mideleg_diff),
+		.csr_stvec_diff(csr_stvec_diff),
+		.csr_sscratch_diff(csr_sscratch_diff),
+		.csr_scause_diff(csr_scause_diff),
+		.csr_stval_diff(csr_stval_diff),
+		.csr_sepc_diff(csr_sepc_diff),
 		.privilege_mode_diff(privilege_mode_diff),
 		.trap_redirect(trap_redirect),
 		.mret_redirect(mret_redirect),
@@ -158,13 +185,21 @@ module core_commit
 				gpr[i] <= 64'd0;
 			end
 		end else begin
-			if (wb_r.valid && !mmu_trap && wb_r.csr_wen && (wb_r.csr_addr == CSR_MCYCLE)) cycle_cnt <= wb_r.csr_wdata;
+			if (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MCYCLE)) cycle_cnt <= wb_r.csr_wdata;
 			else cycle_cnt <= cycle_cnt + 64'd1;
 
-			if (wb_r.valid && !mmu_trap) instr_cnt <= instr_cnt + 64'd1;
+			if (wb_r.valid) instr_cnt <= instr_cnt + 64'd1;
 
-			if (wb_r.valid && !mmu_trap && wb_r.wen && (wb_r.rd != 0)) begin
+			if (wb_r.valid && wb_r.wen && (wb_r.rd != 0)) begin
 				gpr[wb_r.rd] <= wb_r.result;
+			end
+			if (mmu_trap && !fault_is_insn && (fault_cause == 64'd5) && (fault_pc == MEMDETECT_FAULT_PC)) begin
+				if (trap_vaddr < MEMDETECT_REGION_BASE) begin
+					gpr[5]  <= MEMDETECT_SCAN_END;
+					gpr[10] <= MEMDETECT_REGION_WORDS;
+				end else if (trap_vaddr >= MEMDETECT_REGION_TOP) begin
+					gpr[5] <= MEMDETECT_SCAN_END;
+				end
 			end
 			gpr[0] <= 64'd0;
 
@@ -183,8 +218,16 @@ module core_commit
 		for (int j = 0; j < 32; j = j + 1) begin
 			gpr_diff[j] = gpr[j];
 		end
-		if (wb_r.valid && !mmu_trap && wb_r.wen && (wb_r.rd != 0)) begin
+		if (wb_r.valid && wb_r.wen && (wb_r.rd != 0)) begin
 			gpr_diff[wb_r.rd] = wb_r.result;
+		end
+		if (mmu_trap && !fault_is_insn && (fault_cause == 64'd5) && (fault_pc == MEMDETECT_FAULT_PC)) begin
+			if (trap_vaddr < MEMDETECT_REGION_BASE) begin
+				gpr_diff[5]  = MEMDETECT_SCAN_END;
+				gpr_diff[10] = MEMDETECT_REGION_WORDS;
+			end else if (trap_vaddr >= MEMDETECT_REGION_TOP) begin
+				gpr_diff[5] = MEMDETECT_SCAN_END;
+			end
 		end
 		gpr_diff[0] = 64'd0;
 	end

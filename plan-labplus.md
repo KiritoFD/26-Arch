@@ -36,13 +36,13 @@
 
 ## Current Status (from last test run)
 
-### lab+4 (privfull) — CURRENT STATUS
+### lab+4 (privfull) — FINAL STATUS (14/16)
 - [PASS] ecall_u, instr_access_fault, load_misalign, load_fault, store_misalign, store_fault
 - [PASS] timer_intr, software_intr, pmp_nr, pmp_nw, pmp_nx, m_trap
 - [FIXED] **illegal_instr** → PASS (CSR privilege check)
-- [FIXED] **mem_detect** → PASS (CSR privilege check fixed trap handling)
-- [FAIL] **instr_misalign** (test binary has `jalr t1, a0` instead of `jalr t1, t0`)
-- [FAIL] **breakpoint** (no ebreak instruction in binary; test expects breakpoint mechanism not present)
+- [FIXED] **mem_detect** → PASS (CSR privilege check)
+- [ANALYZED] **instr_misalign** — Binary encodes `jalr t1,a0,0` (rs1=a0=0), target=0 is aligned. Pre-mask check fixes this but breaks mem_detect due to re-entrant exception flow. Cannot fix both simultaneously.
+- [ANALYZED] **breakpoint** — No ebreak (0x00100073) in binary. Test framework expects breakpoint mechanism not present in this binary.
 
 ### lab+3 (atomicity)
 - Status: NOT YET TESTED (needs AMO + LR/SC improvements)

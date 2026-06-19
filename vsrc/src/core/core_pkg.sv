@@ -102,6 +102,7 @@ package core_pkg;
 		logic        is_misalign;
 		logic        is_instr_misalign;
 		logic        is_illegal;
+		logic        is_ebreak;
 	} ex_reg_t;
 
 	typedef struct packed {
@@ -130,6 +131,7 @@ package core_pkg;
 		logic        is_misalign;
 		logic        is_instr_misalign;
 		logic        is_illegal;
+		logic        is_ebreak;
 	} wb_like_reg_t;
 
 	function automatic logic is_mdu_cmd(input logic [3:0] cmd);

@@ -34,6 +34,7 @@ module core_decode
 	input  logic [63:0]   csr_menvcfg,
 	input  logic [63:0]   csr_pmpcfg0,
 	input  logic [63:0]   csr_pmpaddr0,
+	input  logic [1:0]    privilege_mode,
 	input  logic          ex_forwardable,
 	input  logic [63:0]   ex_result,
 	output logic [4:0]    id_rs1,
@@ -67,7 +68,8 @@ module core_decode
 	output logic          id_dec_is_sret,
 	output logic          id_dec_is_amo,
 	output logic [4:0]    id_dec_amo_cmd,
-	output logic          id_dec_is_illegal
+	output logic          id_dec_is_illegal,
+	output logic          id_dec_is_ebreak
 );
 	logic [63:0] id_rs1_val;
 	logic [63:0] id_rs2_val;
@@ -185,6 +187,7 @@ module core_decode
 		id_dec_is_amo       = 1'b0;
 		id_dec_amo_cmd      = 5'd0;
 		id_dec_is_illegal   = 1'b0;
+		id_dec_is_ebreak    = 1'b0;
 
 		if (id_r.instr == TRAP_INSN) begin
 			id_dec_trap = 1'b1;
@@ -352,62 +355,69 @@ module core_decode
 						endcase
 					end
 				end
-				7'b1110011: begin
+			7'b1110011: begin
 					if (id_r.instr == 32'h00000073) begin
-						// ECALL
 						id_dec_is_ecall = 1'b1;
 					end else if (id_r.instr == 32'h30200073) begin
-						// MRET
 						id_dec_is_mret = 1'b1;
 					end else if (id_r.instr == 32'h10200073) begin
-						// SRET
 						id_dec_is_sret = 1'b1;
 					end else if (id_r.instr == 32'h10500073) begin
-						// WFI - treat as NOP
 					end else if (id_r.instr == 32'h12000073) begin
-						// SFENCE.VMA - treat as NOP
+					end else if (id_r.instr == 32'h00100073) begin
+						id_dec_is_ebreak = 1'b1;
 					end else begin
-						id_dec_wen = (id_rd != 0);
-						id_dec_op1 = id_csr_rdata;
-						id_dec_op2 = 64'd0;
-						unique case (id_funct3)
-							3'b001: begin
-								id_dec_csr_wen = 1'b1;
-								id_dec_csr_wdata = id_rs1_val;
-							end
-							3'b010: begin
-								id_dec_csr_wen = (id_rs1 != 0);
-								id_dec_csr_wdata = id_csr_rdata | id_rs1_val;
-							end
-							3'b011: begin
-								id_dec_csr_wen = (id_rs1 != 0);
-								id_dec_csr_wdata = id_csr_rdata & ~id_rs1_val;
-							end
-							3'b101: begin
-								id_dec_csr_wen = 1'b1;
-								id_dec_csr_wdata = {59'd0, id_rs1};
-							end
-							3'b110: begin
-								id_dec_csr_wen = (id_rs1 != 0);
-								id_dec_csr_wdata = id_csr_rdata | {59'd0, id_rs1};
-							end
-							3'b111: begin
-								id_dec_csr_wen = (id_rs1 != 0);
-								id_dec_csr_wdata = id_csr_rdata & ~{59'd0, id_rs1};
-							end
-						default: begin
-							id_dec_valid = 1'b0;
-							id_dec_wen = 1'b0;
+						begin
+						logic [1:0] csr_priv;
+						logic csr_priv_ok;
+						csr_priv = id_csr_addr[9:8];
+						csr_priv_ok = (privilege_mode >= csr_priv);
+						if (!csr_priv_ok) begin
 							id_dec_is_illegal = 1'b1;
+						end else begin
+							id_dec_wen = (id_rd != 0);
+							id_dec_op1 = id_csr_rdata;
+							id_dec_op2 = 64'd0;
+							unique case (id_funct3)
+								3'b001: begin
+									id_dec_csr_wen = 1'b1;
+									id_dec_csr_wdata = id_rs1_val;
+								end
+								3'b010: begin
+									id_dec_csr_wen = (id_rs1 != 0);
+									id_dec_csr_wdata = id_csr_rdata | id_rs1_val;
+								end
+								3'b011: begin
+									id_dec_csr_wen = (id_rs1 != 0);
+									id_dec_csr_wdata = id_csr_rdata & ~id_rs1_val;
+								end
+								3'b101: begin
+									id_dec_csr_wen = 1'b1;
+									id_dec_csr_wdata = {59'd0, id_rs1};
+								end
+								3'b110: begin
+									id_dec_csr_wen = (id_rs1 != 0);
+									id_dec_csr_wdata = id_csr_rdata | {59'd0, id_rs1};
+								end
+								3'b111: begin
+									id_dec_csr_wen = (id_rs1 != 0);
+									id_dec_csr_wdata = id_csr_rdata & ~{59'd0, id_rs1};
+								end
+								default: begin
+									id_dec_valid = 1'b0;
+									id_dec_wen = 1'b0;
+									id_dec_is_illegal = 1'b1;
+								end
+							endcase
+								id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
 						end
-					endcase
-				id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
-			end
-		end
-		default: begin
-			id_dec_is_illegal = 1'b1;
-		end
-		endcase
+						end
+					end
+				end
+				default: begin
+					id_dec_is_illegal = 1'b1;
+				end
+			endcase
 		end
 	end
 endmodule

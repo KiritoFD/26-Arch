@@ -14,6 +14,7 @@ module core_csr
 	input  logic         wb_mret,
 	input  logic         wb_sret,
 	input  logic         wb_illegal,
+	input  logic         wb_ebreak,
 	input  logic         wb_misalign_data,
 	input  logic         wb_misalign_instr,
 	input  logic         mmu_trap,
@@ -122,7 +123,7 @@ module core_csr
 	                    intr_meip ? {1'b1, 63'd11} :  // MEIP  (11)
 	                    intr_msip ? {1'b1, 63'd3}  :  // MSIP  (3)
 	                    {1'b1, 63'd7};                  // MTIP  (7)
-	assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_misalign_instr ||
+	assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_ebreak || wb_misalign_instr ||
 	                           wb_misalign_data || mmu_trap || wb_mret || wb_sret;
 
 	assign csr_mhartid = 64'd0;
@@ -164,6 +165,8 @@ module core_csr
 			return fault_cause;
 		end else if (wb_ecall) begin
 			return get_ecall_cause(privilege_mode_i);
+		end else if (wb_ebreak) begin
+			return 64'd3;
 		end else if (wb_illegal) begin
 			return 64'd2;
 		end else if (wb_misalign_instr) begin
@@ -286,6 +289,24 @@ module core_csr
 					csr_mepc   <= wb_r.pc;
 					csr_mcause <= 64'd2;
 					csr_mtval  <= {32'd0, wb_r.instr};
+					csr_mstatus[7] <= csr_mstatus[3];
+					csr_mstatus[3] <= 1'b0;
+					csr_mstatus[12:11] <= privilege_mode_i;
+					privilege_mode <= 2'd3;
+				end
+			end else if (wb_ebreak) begin
+				if (delegate_to_s(1'b0, 64'd3)) begin
+					csr_sepc_r   <= wb_r.pc;
+					csr_scause_r <= 64'd3;
+					csr_stval_r  <= 64'd0;
+					csr_mstatus[5] <= csr_mstatus[1];
+					csr_mstatus[1] <= 1'b0;
+					csr_mstatus[8] <= privilege_mode_i[0];
+					privilege_mode <= 2'd1;
+				end else begin
+					csr_mepc   <= wb_r.pc;
+					csr_mcause <= 64'd3;
+					csr_mtval  <= 64'd0;
 					csr_mstatus[7] <= csr_mstatus[3];
 					csr_mstatus[3] <= 1'b0;
 					csr_mstatus[12:11] <= privilege_mode_i;
@@ -422,7 +443,7 @@ module core_csr
 				trap_redirect = 1'b1;
 				trap_redirect_pc = csr_mtvec;
 			end
-		end else if (wb_ecall || wb_illegal || wb_misalign_instr || wb_misalign_data) begin
+		end else if (wb_ecall || wb_illegal || wb_ebreak || wb_misalign_instr || wb_misalign_data) begin
 			if (delegate_to_s(1'b0, get_excp_cause())) begin
 				next_sepc = wb_r.pc;
 				next_scause = get_excp_cause();

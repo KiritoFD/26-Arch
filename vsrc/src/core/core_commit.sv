@@ -84,6 +84,7 @@ module core_commit
 	logic wb_mret;
 	logic wb_sret;
 	logic wb_illegal;
+	logic wb_ebreak;
 	logic wb_misalign_data;
 	logic wb_misalign_instr;
 	logic intr_eval;
@@ -92,6 +93,7 @@ module core_commit
 	assign wb_mret         = wb_r.valid && wb_r.is_mret;
 	assign wb_sret         = wb_r.valid && wb_r.is_sret;
 	assign wb_illegal      = wb_r.valid && wb_r.is_illegal;
+	assign wb_ebreak       = wb_r.valid && wb_r.is_ebreak;
 	assign wb_misalign_data = wb_r.valid && wb_r.is_misalign;
 	assign wb_misalign_instr = wb_r.valid && wb_r.is_instr_misalign;
 
@@ -112,6 +114,7 @@ module core_commit
 		.wb_mret(wb_mret),
 		.wb_sret(wb_sret),
 		.wb_illegal(wb_illegal),
+		.wb_ebreak(wb_ebreak),
 		.wb_misalign_data(wb_misalign_data),
 		.wb_misalign_instr(wb_misalign_instr),
 		.mmu_trap(mmu_trap),

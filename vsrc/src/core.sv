@@ -94,6 +94,7 @@ module core
 	logic        id_dec_is_amo;
 	logic [4:0]  id_dec_amo_cmd;
 	logic        id_dec_is_illegal;
+	logic        id_dec_is_ebreak;
 	logic        ex_misalign;
 	logic        ex_instr_misalign;
 	logic        front_trap_pending;
@@ -229,6 +230,7 @@ module core
 		.csr_menvcfg(csr_menvcfg),
 		.csr_pmpcfg0(csr_pmpcfg0),
 		.csr_pmpaddr0(csr_pmpaddr0),
+		.privilege_mode(privilege_mode),
 		.ex_forwardable(ex_forwardable),
 		.ex_result(ex_result),
 		.id_rs1(id_rs1),
@@ -262,7 +264,8 @@ module core
 		.id_dec_is_sret(id_dec_is_sret),
 		.id_dec_is_amo(id_dec_is_amo),
 		.id_dec_amo_cmd(id_dec_amo_cmd),
-		.id_dec_is_illegal(id_dec_is_illegal)
+		.id_dec_is_illegal(id_dec_is_illegal),
+		.id_dec_is_ebreak(id_dec_is_ebreak)
 	);
 
 	core_execute u_execute(
@@ -558,6 +561,7 @@ module core
 				wb_r.is_mret <= mem_r.is_mret;
 				wb_r.is_sret <= mem_r.is_sret;
 				wb_r.is_illegal <= mem_r.is_illegal;
+			wb_r.is_ebreak <= mem_r.is_ebreak;
 				wb_r.is_misalign <= mem_r.is_misalign;
 				wb_r.is_instr_misalign <= mem_r.is_instr_misalign;
 			end
@@ -605,6 +609,7 @@ module core
 				mem_r.is_amo <= ex_r.is_amo;
 				mem_r.amo_cmd <= ex_r.amo_cmd;
 				mem_r.is_illegal <= ex_r.is_illegal;
+			mem_r.is_ebreak <= ex_r.is_ebreak;
 				mem_r.is_misalign <= ex_misalign;
 				mem_r.is_instr_misalign <= ex_instr_misalign;
 
@@ -654,6 +659,7 @@ module core
 				ex_r.is_amo <= id_dec_is_amo;
 				ex_r.amo_cmd <= id_dec_amo_cmd;
 				ex_r.is_illegal <= id_dec_is_illegal;
+				ex_r.is_ebreak <= id_dec_is_ebreak;
 				ex_r.is_misalign <= ex_misalign;
 				ex_r.is_instr_misalign <= ex_instr_misalign;
 

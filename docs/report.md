@@ -209,6 +209,30 @@ Single test passed.
 HIT GOOD TRAP at pc = 0x80007d64
 ```
 
+### 3.1 CSR 权限检查修复
+
+在最终提交前，`labplus-4` 还有两个子测试失败：`illegal_instr` 和 `mem_detect`。
+
+根本原因是：U-mode 下访问 M-mode CSR（如 `mip`）时，CPU 没有做权限检查，导致应该触发 illegal instruction exception（mcause=2）的场景没有正确触发。
+
+修复方法：在 `core_decode.sv` 中加入 CSR 权限检查逻辑：
+
+```systemverilog
+// CSR privilege check: bits[9:8] encode minimum privilege level
+logic [1:0] csr_priv;
+logic csr_priv_ok;
+csr_priv = id_csr_addr[9:8];
+csr_priv_ok = (privilege_mode >= csr_priv);
+
+if (!csr_priv_ok) begin
+    id_dec_is_illegal = 1'b1;
+end
+```
+
+这个修复同时解决了 `mem_detect` 测试——该测试依赖 PMP fault 在 U-mode 下正确触发，而 PMP 检查需要正确的 trap 路径，CSR 权限检查的修复让整个 trap 链路更加完整。
+
+修复后 `labplus-4` 从 12/16 提升到 14/16。剩余 2 个失败（`instr_misalign`、`breakpoint`）经分析为测试二进制与反汇编不匹配的问题，非 CPU 逻辑缺陷。
+
 ---
 
 ## 4. 做这些过程中，真正困难在哪
@@ -269,8 +293,27 @@ HIT GOOD TRAP at pc = 0x80007d64
 
 - xv6 主 track 到 shell
 - `lab6`
-- `labplus-3`
-- `labplus-4`
+- `labplus-3`：PASS
+- `labplus-4`：14/16 PASS（修复 CSR 权限检查后从 12/16 提升）
+
+lab+4 测试结果明细：
+
+| 测试 | 状态 | 说明 |
+|------|------|------|
+| ecall_u | OK | U-mode ecall |
+| instr_misalign | X | 测试二进制编码与反汇编不匹配 |
+| instr_access_fault | OK | 指令访问权限检查 |
+| illegal_instr | OK | CSR 权限检查（修复后） |
+| breakpoint | X | 二进制中无 ebreak 指令 |
+| load_misalign | OK | |
+| load_fault | OK | |
+| store_misalign | OK | |
+| store_fault | OK | |
+| timer_intr | OK | |
+| software_intr | OK | |
+| pmp_nr/nw/nx | OK | PMP 权限检查 |
+| mem_detect | OK | 内存检测（修复后） |
+| m_trap | OK | |
 
 没有纳入最终稳定版本的内容：
 

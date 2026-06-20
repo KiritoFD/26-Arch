@@ -1,0 +1,4 @@
+Emu compiled at May 19 2026, 23:52:30
+The image is ./ready-to-run/lab+/4/all-test-privfull.bin
+Using simulated 256MB RAM
+Single test passed.

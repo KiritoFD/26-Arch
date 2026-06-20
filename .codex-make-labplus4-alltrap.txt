@@ -1,0 +1,577 @@
+rm -rf build
+mkdir -p build
+make EMU_TRACE=1 emu -j1 NOOP_HOME=/mnt/g/Github/26-Arch NEMU_HOME=/mnt/g/Github/26-Arch/ready-to-run
+make[1]: Entering directory '/mnt/g/Github/26-Arch'
+make -C ./difftest emu 
+make[2]: Entering directory '/mnt/g/Github/26-Arch/difftest'
+find: 
+../src/main/scala
+: No such file or directory
+Sun, 07 Jun 2026 04:04:38 +0800
+verilator --cc --exe --top-module SimTop +define+VERILATOR=1 +define+PRINTF_COND=1 +define+RANDOMIZE_REG_INIT +define+RANDOMIZE_MEM_INIT +define+RANDOMIZE_GARBAGE_ASSIGN +define+RANDOMIZE_DELAY=3 +define+BENCHMARK=0 -I/mnt/g/Github/26-Arch/build/../vsrc --x-assign unique -O3 -CFLAGS "-g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1" -LDFLAGS "-lpthread -lSDL2 -ldl -lz" --trace --assert --stats-vars --output-split 30000 --output-split-cfuncs 30000 --trace-fst --trace-structs --no-trace-params -y ../vsrc/ram  \
+	-o /mnt/g/Github/26-Arch/build/emu -Mdir ../build/emu-compile ../build/../vsrc/SimTop.sv ./src/test/vsrc/common/assert.v ./src/test/vsrc/common/difftest.v ./src/test/vsrc/common/EICG_wrapper.v ./src/test/vsrc/common/ram.sv ./src/test/vsrc/common/ram.v ./src/test/vsrc/common/ref.v ./src/test/vsrc/common/SimJTAG.v /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/axi4.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/common.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/compress.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/device.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/flash.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/keyboard.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/ram.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/sdcard.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/SimJTAG.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/uart.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/vga.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/difftest.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/interface.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/nemuproxy.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/ref.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/spikedasm.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/vcs/main.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/verilator/emu.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/verilator/main.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/verilator/snapshot.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/axi4.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/common.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/compress.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/device.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/flash.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/keyboard.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/ram.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/sdcard.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/SimJTAG.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/uart.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/vga.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/difftest.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/interface.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/nemuproxy.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/ref.cpp /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/spikedasm.cpp
+- V e r i l a t i o n   R e p o r t: Verilator 5.032 2025-01-01 rev v5.032
+- Verilator: Built from 2.948 MB sources in 33 modules, into 3.197 MB in 29 C++ files needing 0.003 MB
+- Verilator: Walltime 0.786 s (elab=0.010, cvt=0.162, bld=0.000); cpu 0.231 s on 1 threads; alloced 44.523 MB
+mkdir -p /mnt/g/Github/26-Arch/build
+gcc scripts/utils/lock-emu.c -o /mnt/g/Github/26-Arch/build/lock-emu
+make build_emu_local
+make[3]: Entering directory '/mnt/g/Github/26-Arch/difftest'
+find: 
+../src/main/scala
+: No such file or directory
+Sun, 07 Jun 2026 04:04:39 +0800
+make VM_PARALLEL_BUILDS=1 OPT_FAST="-O3" -C ../build/emu-compile -f VSimTop.mk 
+make[4]: Entering directory '/mnt/g/Github/26-Arch/build/emu-compile'
+VSimTop.mk:131: warning: overriding recipe for target 'main.o'
+VSimTop.mk:127: warning: ignoring old recipe for target 'main.o'
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o SimJTAG.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/SimJTAG.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o axi4.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/axi4.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o common.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/common.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o compress.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/compress.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o device.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/device.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o flash.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/flash.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o keyboard.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/keyboard.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o ram.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/ram.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o remote_bitbang.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.cpp
+In file included from /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.cpp:15:
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.h: In constructor 
+remote_bitbang_t::remote_bitbang_t(uint16_t)
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.h:43:23: warning: 
+remote_bitbang_t::recv_end
+ will be initialized after [-Wreorder]
+   43 |   ssize_t recv_start, recv_end;
+      |                       ^~~~~~~~
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.h:29:7: warning:   
+int remote_bitbang_t::err
+ [-Wreorder]
+   29 |   int err;
+      |       ^~~
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/common/remote_bitbang.cpp:19:1: warning:   when initialized here [-Wreorder]
+   19 | remote_bitbang_t::remote_bitbang_t(uint16_t port) :
+      | ^~~~~~~~~~~~~~~~
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o sdcard.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/sdcard.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o uart.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/uart.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o vga.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/vga.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o difftest.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/difftest.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o goldenmem.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp: In function 
+void init_goldenmem()
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp:37:20: warning: empty parentheses were disambiguated as a function declaration [-Wvexing-parse]
+   37 |   long get_img_size();
+      |                    ^~
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp:37:20: note: remove parentheses to default-initialize a variable
+   37 |   long get_img_size();
+      |                    ^~
+      |                    --
+/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/goldenmem.cpp:37:20: note: or replace parentheses with braces to value-initialize a variable
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o interface.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/interface.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o nemuproxy.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/nemuproxy.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o ref.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/ref.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o spikedasm.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest/spikedasm.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o main.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/verilator/main.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o emu.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/verilator/emu.cpp
+ccache g++  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -O3  -c -o snapshot.o /mnt/g/Github/26-Arch/difftest/src/test/csrc/verilator/snapshot.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -c -o verilated.o /usr/local/share/verilator/include/verilated.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -c -o verilated_dpi.o /usr/local/share/verilator/include/verilated_dpi.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -c -o verilated_fst_c.o /usr/local/share/verilator/include/verilated_fst_c.cpp
+ccache g++ -Os  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -c -o verilated_threads.o /usr/local/share/verilator/include/verilated_threads.cpp
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -x c++-header VSimTop__pch.h -o VSimTop__pch.h.fast.gch
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.fast -c -o VSimTop.o VSimTop.cpp
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.fast -c -o VSimTop___024root__DepSet_h278d43d2__0.o VSimTop___024root__DepSet_h278d43d2__0.cpp
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.fast -c -o VSimTop___024root__DepSet_hd5918264__0.o VSimTop___024root__DepSet_hd5918264__0.cpp
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.fast -c -o VSimTop___024unit__DepSet_hd90c3539__0.o VSimTop___024unit__DepSet_hd90c3539__0.cpp
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.fast -c -o VSimTop__Dpi.o VSimTop__Dpi.cpp
+ccache g++ -O3  -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.fast -c -o VSimTop__Trace__0.o VSimTop__Trace__0.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -x c++-header VSimTop__pch.h -o VSimTop__pch.h.slow.gch
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop__ConstPool_0.o VSimTop__ConstPool_0.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop___024root__Slow.o VSimTop___024root__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop___024root__DepSet_h278d43d2__0__Slow.o VSimTop___024root__DepSet_h278d43d2__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop___024root__DepSet_hd5918264__0__Slow.o VSimTop___024root__DepSet_hd5918264__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop___024unit__Slow.o VSimTop___024unit__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop___024unit__DepSet_hab1093f9__0__Slow.o VSimTop___024unit__DepSet_hab1093f9__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop__Syms.o VSimTop__Syms.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop__Trace__0__Slow.o VSimTop__Trace__0__Slow.cpp
+ccache g++   -I.  -MMD -I/usr/local/share/verilator/include -I/usr/local/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TIMING=0 -DVM_TRACE=1 -DVM_TRACE_FST=1 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-shadow -Wno-sign-compare -Wno-tautological-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable    -g -std=c++2a -static -Wall -I/mnt/g/Github/26-Arch/difftest/src/test/csrc -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/common -I/mnt/g/Github/26-Arch/difftest/src/test/csrc/difftest -DVERILATOR -Wno-maybe-uninitialized  -DNUM_CORES=1   -include VSimTop__pch.h.slow -c -o VSimTop__TraceDecls__0__Slow.o VSimTop__TraceDecls__0__Slow.cpp
+echo "" > VSimTop__ALL.verilator_deplist.tmp
+g++    SimJTAG.o axi4.o common.o compress.o device.o flash.o keyboard.o ram.o remote_bitbang.o sdcard.o uart.o vga.o difftest.o goldenmem.o interface.o nemuproxy.o ref.o spikedasm.o main.o emu.o snapshot.o verilated.o verilated_dpi.o verilated_fst_c.o verilated_threads.o VSimTop__ALL.a   -lpthread -lSDL2 -ldl -lz -lz  -pthread -lpthread -latomic   -o /mnt/g/Github/26-Arch/build/emu
+rm VSimTop__ALL.verilator_deplist.tmp
+make[4]: Leaving directory '/mnt/g/Github/26-Arch/build/emu-compile'
+make[3]: Leaving directory '/mnt/g/Github/26-Arch/difftest'
+make[2]: Leaving directory '/mnt/g/Github/26-Arch/difftest'
+make[1]: Leaving directory '/mnt/g/Github/26-Arch'
+TEST=all ./build/emu --no-diff -i ./ready-to-run/lab+/4/all-test-privfull.bin  || true
+Emu compiled at May 19 2026, 23:52:30
+The image is ./ready-to-run/lab+/4/all-test-privfull.bin
+Using simulated 256MB RAM
+Single test passed.
+Run paint
+Aptenodytes patagonicus
+paint 0/22
+paint 1/22
+paint 2/22
+paint 3/22
+paint 4/22
+paint 5/22
+paint 6/22
+paint 7/22
+paint 8/22
+paint 9/22
+paint 10/22
+paint 11/22
+paint 12/22
+paint 13/22
+paint 14/22
+paint 15/22
+paint 16/22
+paint 17/22
+paint 18/22
+paint 19/22
+paint 20/22
+paint 21/22
+paint 22/22
+Picture generated.
+compress 0/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+Compressed size=2148
+encoding
+Done! Result:
+data:image/bmp;base64,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
+Run coremark
+Running CoreMark for 10 iterations
+2K performance run parameters for coremark.
+[0]ERROR! list crc 0xe594 - should be 0xe714
+[0]ERROR! matrix crc 0x7cb1 - should be 0x1fd7
+[0]ERROR! state crc 0x542c - should be 0x8e3a
+CoreMark Size    : 666
+Total time (ms)  : 899
+Iterations       : 10
+Compiler version : GCC9.4.0
+seedcrc          : 0xe9f5
+[0]crclist       : 0xe594
+[0]crcmatrix     : 0x7cb1
+[0]crcstate      : 0x542c
+[0]crcfinal      : 0x259e
+Finised in 899 ms.
+Errors detected
+Run dhrystone
+Dhrystone Benchmark, Version C, Version 2.2
+Trying 10000 runs through Dhrystone.
+Ptr_Glob->Enum_Comp:         0
+        should be:   2
+Ptr_Glob->Str_Comp:          
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+Next_Ptr_Glob->Enum_Comp:         0
+        should be:   1
+Int_1_Loc:           13
+        should be:   5
+Int_2_Loc:           5
+        should be:   13
+Finished in 1 ms
+==================================================
+Dhrystone FAIL         17618 Marks
+                   vs. 100000 Marks (i7-7700K @ 4.20GHz)
+Run stream
+-------------------------------------------------------------
+STREAM version $Revision: 5.10 $
+-------------------------------------------------------------
+This system uses 8 bytes per array element.
+-------------------------------------------------------------
+Array size = 2048 (elements), Offset = 0 (elements)
+Memory per array = 0.0 MiB (= 0.0 GiB).
+Total memory required = 0.0 MiB (= 0.0 GiB).
+Each kernel will be executed 10 times.
+ The *best* time for each kernel (excluding the first iteration)
+ will be used to compute the reported bandwidth.
+-------------------------------------------------------------
+* checktick: start=1.368636
+* checktick: start=1.369255
+* checktick: start=1.369867
+* checktick: start=1.370487
+* checktick: start=1.371089
+* checktick: start=1.371692
+* checktick: start=1.372310
+* checktick: start=1.372929
+* checktick: start=1.373544
+* checktick: start=1.374153
+* checktick: start=1.374769
+* checktick: start=1.375386
+* checktick: start=1.375991
+* checktick: start=1.376612
+* checktick: start=1.377236
+* checktick: start=1.377853
+* checktick: start=1.378459
+* checktick: start=1.379070
+* checktick: start=1.379672
+* checktick: start=1.380278
+Your clock granularity/precision appears to be 49 microseconds.
+Each test below will take on the order of 22920 microseconds.
+   (= 467 clock ticks)
+Increase the size of the arrays if this shows that
+you are not getting at least 20 clock ticks per test.
+-------------------------------------------------------------
+WARNING -- The above is only a rough guideline.
+For best results, please be sure you know the
+precision of your system timer.
+-------------------------------------------------------------
+Loop 0/10
+Loop 1/10
+Loop 2/10
+Loop 3/10
+Loop 4/10
+Loop 5/10
+Loop 6/10
+Loop 7/10
+Loop 8/10
+Loop 9/10
+Function    Best Rate MB/s  Avg time     Min time     Max time
+Copy:              12.2     0.002701     0.002689     0.002716
+Scale:              0.8     0.042876     0.041948     0.044717
+Add:                1.5     0.033135     0.032250     0.034909
+Triad:              0.7     0.067949     0.066143     0.071518
+-------------------------------------------------------------
+Solution Validates: avg error less than 1.000000e-13 on all three arrays
+-------------------------------------------------------------
+Run conwaygame
+Play Conway's life game for 200 rounds.
+seed=3055
+Round 0/200
+Round 1/200
+Round 2/200
+Round 3/200
+Round 4/200
+Round 5/200
+Round 6/200
+Round 7/200
+Round 8/200
+Round 9/200
+Round 10/200
+Round 11/200
+Round 12/200
+Round 13/200
+Round 14/200
+Round 15/200
+Round 16/200
+Round 17/200
+Round 18/200
+Round 19/200
+Round 20/200
+Round 21/200
+Round 22/200
+Round 23/200
+Round 24/200
+Round 25/200
+Round 26/200
+Round 27/200
+Round 28/200
+Round 29/200
+Round 30/200
+Round 31/200
+Round 32/200
+Round 33/200
+Round 34/200
+Round 35/200
+Round 36/200
+Round 37/200
+Round 38/200
+Round 39/200
+Round 40/200
+Round 41/200
+Round 42/200
+Round 43/200
+Round 44/200
+Round 45/200
+Round 46/200
+Round 47/200
+Round 48/200
+Round 49/200
+Round 50/200
+Round 51/200
+Round 52/200
+Round 53/200
+Round 54/200
+Round 55/200
+Round 56/200
+Round 57/200
+Round 58/200
+Round 59/200
+Round 60/200
+Round 61/200
+Round 62/200
+Round 63/200
+Round 64/200
+Round 65/200
+Round 66/200
+Round 67/200
+Round 68/200
+Round 69/200
+Round 70/200
+Round 71/200
+Round 72/200
+Round 73/200
+Round 74/200
+Round 75/200
+Round 76/200
+Round 77/200
+Round 78/200
+Round 79/200
+Round 80/200
+Round 81/200
+Round 82/200
+Round 83/200
+Round 84/200
+Round 85/200
+Round 86/200
+Round 87/200
+Round 88/200
+Round 89/200
+Round 90/200
+Round 91/200
+Round 92/200
+Round 93/200
+Round 94/200
+Round 95/200
+Round 96/200
+Round 97/200
+Round 98/200
+Round 99/200
+Round 100/200
+Round 101/200
+Round 102/200
+Round 103/200
+Round 104/200
+Round 105/200
+Round 106/200
+Round 107/200
+Round 108/200
+Round 109/200
+Round 110/200
+Round 111/200
+Round 112/200
+Round 113/200
+Round 114/200
+Round 115/200
+Round 116/200
+Round 117/200
+Round 118/200
+Round 119/200
+Round 120/200
+Round 121/200
+Round 122/200
+Round 123/200
+Round 124/200
+Round 125/200
+Round 126/200
+Round 127/200
+Round 128/200
+Round 129/200
+Round 130/200
+Round 131/200
+Round 132/200
+Round 133/200
+Round 134/200
+Round 135/200
+Round 136/200
+Round 137/200
+Round 138/200
+Round 139/200
+Round 140/200
+Round 141/200
+Round 142/200
+Round 143/200
+Round 144/200
+Round 145/200
+Round 146/200
+Round 147/200
+Round 148/200
+Round 149/200
+Round 150/200
+Round 151/200
+Round 152/200
+Round 153/200
+Round 154/200
+Round 155/200
+Round 156/200
+Round 157/200
+Round 158/200
+Round 159/200
+Round 160/200
+Round 161/200
+Round 162/200
+Round 163/200
+Round 164/200
+Round 165/200
+Round 166/200
+Round 167/200
+Round 168/200
+Round 169/200
+Round 170/200
+Round 171/200
+Round 172/200
+Round 173/200
+Round 174/200
+Round 175/200
+Round 176/200
+Round 177/200
+Round 178/200
+Round 179/200
+Round 180/200
+Round 181/200
+Round 182/200
+Round 183/200
+Round 184/200
+Round 185/200
+Round 186/200
+Round 187/200
+Round 188/200
+Round 189/200
+Round 190/200
+Round 191/200
+Round 192/200
+Round 193/200
+Round 194/200
+Round 195/200
+Round 196/200
+Round 197/200
+Round 198/200
+Round 199/200
+                                        
+              ***                       
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+Run sys-test
+[trapdbg] wb_mret pc=000000008000511c mepc=0000000080006000 mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000600c mode=0
+Test ecall_u [OK]
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006010 mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000616c mode=0
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006170 mstatus=0000000000000000
+[trapdbg-ex] pc=0000000080006028 next_pc=000000008000602d instr=00028367
+[trapdbg] wb_misalign_instr pc=0000000080006028 mtval_src=000000008000602c
+Test instr_misalign [OK]
+[trapdbg] wb_mret pc=00000000800051c4 mepc=000000008000602c mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000616c mode=0
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006170 mstatus=0000000000000000
+[trapdbg] mmu_trap cause=1 mode=0 fault_is_insn=1 wb_pc=0000000000000000 fault_pc=0000000000000000 vaddr=0000000080007000
+[trapdbg] mstatus_before=0000000000000080
+Test instr_access_fault [OK]
+[trapdbg] wb_mret pc=00000000800051c4 mepc=000000008000603c mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000616c mode=0
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006170 mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000616c mode=0
+Test illegal_instr [X]
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006170 mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000616c mode=0
+Test breakpoint [X]
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006170 mstatus=0000000000000000
+[trapdbg] wb_misalign_data pc=000000008000605c addr=000000008000602d is_store=0
+Test load_misalign [OK]
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006060 mstatus=0000000000000000
+[trapdbg] wb_ecall pc=000000008000616c mode=0
+[trapdbg] wb_mret pc=00000000800051c4 mepc=0000000080006170 mstatus=0000000000000000
+[trapdbg] mmu_trap cause=5 mode=0 fault_is_insn=0 wb_pc=0000000000000000 fault_pc=0000000080006074 vaddr=0000000080007100
+[trapdbg] mstatus_before=0000000000000080
+[trapdbg] wb_ecall pc=000000008000616c mode=3
+Unexpected M-mode trap
+---TEST FAILED---
+make: *** [Makefile:110: test-labplus-4] Terminated

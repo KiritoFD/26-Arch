@@ -1,0 +1,9 @@
+Emu compiled at May 19 2026, 23:52:30
+The image is ./third_party/xv6-riscv/kernel/kernel.bin
+Using simulated 256MB RAM
+Core 0: [33mEXCEEDING CYCLE/INSTR LIMIT at pc = 0x0
+[0m[35mtotal guest instructions = 0
+[0m[35minstrCnt = 0, cycleCnt = 0, IPC = -nan
+[0m[34mSeed=0 Guest cycle spent: 200000001 (this will be different from cycleCnt if emu loads a snapshot)
+[0m[34mHost time spent: 48220ms
+[0m

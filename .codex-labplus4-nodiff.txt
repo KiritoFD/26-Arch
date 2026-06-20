@@ -1,0 +1,10 @@
+Emu compiled at May 19 2026, 23:52:30
+The image is ./ready-to-run/lab+/4/all-test-privfull.bin
+Using simulated 256MB RAM
+Single test passed.
+Core 0: [33mEXCEEDING CYCLE/INSTR LIMIT at pc = 0x80007d64
+[0m[35mtotal guest instructions = 1026
+[0m[35minstrCnt = 1026, cycleCnt = 6553, IPC = 0.156570
+[0m[34mSeed=0 Guest cycle spent: 200000001 (this will be different from cycleCnt if emu loads a snapshot)
+[0m[34mHost time spent: 44818ms
+[0m

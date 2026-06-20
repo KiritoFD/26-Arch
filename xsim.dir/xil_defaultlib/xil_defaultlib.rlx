@@ -1,0 +1,18 @@
+0.6
+2018.1
+Apr  4 2018
+19:30:32
+G:/Github/26-Arch/vsrc/VTop.sv,1779359628,systemVerilog,,G:/Github/26-Arch/vsrc/src/core.sv,,VTop,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/include/common.sv,1772544762,systemVerilog,G:/Github/26-Arch/vsrc/VTop.sv;G:/Github/26-Arch/vsrc/src/core.sv;G:/Github/26-Arch/vsrc/src/core/core_commit.sv;G:/Github/26-Arch/vsrc/src/core/core_csr.sv;G:/Github/26-Arch/vsrc/src/core/core_decode.sv;G:/Github/26-Arch/vsrc/src/core/core_execute.sv;G:/Github/26-Arch/vsrc/src/core/core_mdu.sv;G:/Github/26-Arch/vsrc/src/core/core_pkg.sv;G:/Github/26-Arch/vsrc/util/CBusArbiter.sv;G:/Github/26-Arch/vsrc/util/DBusToCBus.sv;G:/Github/26-Arch/vsrc/util/IBusToCBus.sv;G:/Github/26-Arch/vsrc/util/mmu.sv,G:/Github/26-Arch/vsrc/util/CBusArbiter.sv,,common,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/include/config.sv,1772544762,systemVerilog,G:/Github/26-Arch/vsrc/VTop.sv;G:/Github/26-Arch/vsrc/include/common.sv;G:/Github/26-Arch/vsrc/src/core.sv;G:/Github/26-Arch/vsrc/src/core/core_commit.sv;G:/Github/26-Arch/vsrc/src/core/core_csr.sv;G:/Github/26-Arch/vsrc/src/core/core_decode.sv;G:/Github/26-Arch/vsrc/src/core/core_execute.sv;G:/Github/26-Arch/vsrc/src/core/core_mdu.sv;G:/Github/26-Arch/vsrc/util/CBusArbiter.sv;G:/Github/26-Arch/vsrc/util/DBusToCBus.sv;G:/Github/26-Arch/vsrc/util/IBusToCBus.sv;G:/Github/26-Arch/vsrc/util/mmu.sv,G:/Github/26-Arch/vsrc/include/common.sv,,$unit_g__github_26_arch_vsrc_include_config_sv;config_pkg,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/src/core.sv,1779359628,systemVerilog,,G:/Github/26-Arch/vsrc/util/mmu.sv,G:/Github/26-Arch/vsrc/src/core/core_pkg.sv;G:/Github/26-Arch/vsrc/src/core/core_decode.sv;G:/Github/26-Arch/vsrc/src/core/core_execute.sv;G:/Github/26-Arch/vsrc/src/core/core_mdu.sv;G:/Github/26-Arch/vsrc/src/core/core_csr.sv;G:/Github/26-Arch/vsrc/src/core/core_commit.sv,core,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/src/core/core_commit.sv,1779212106,verilog,,,,core_commit,,,,,,,,
+G:/Github/26-Arch/vsrc/src/core/core_csr.sv,1779294296,verilog,,,,core_csr,,,,,,,,
+G:/Github/26-Arch/vsrc/src/core/core_decode.sv,1779205171,verilog,,,,core_decode,,,,,,,,
+G:/Github/26-Arch/vsrc/src/core/core_execute.sv,1779208498,verilog,,,,core_execute,,,,,,,,
+G:/Github/26-Arch/vsrc/src/core/core_mdu.sv,1775379899,verilog,,,,core_mdu,,,,,,,,
+G:/Github/26-Arch/vsrc/src/core/core_pkg.sv,1779208431,verilog,G:/Github/26-Arch/vsrc/src/core.sv;G:/Github/26-Arch/vsrc/src/core/core_commit.sv;G:/Github/26-Arch/vsrc/src/core/core_csr.sv;G:/Github/26-Arch/vsrc/src/core/core_decode.sv;G:/Github/26-Arch/vsrc/src/core/core_execute.sv;G:/Github/26-Arch/vsrc/src/core/core_mdu.sv,,,core_pkg,,,,,,,,
+G:/Github/26-Arch/vsrc/util/CBusArbiter.sv,1779212045,systemVerilog,,G:/Github/26-Arch/vsrc/util/DBusToCBus.sv,,CBusArbiter,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/util/DBusToCBus.sv,1779358890,systemVerilog,,G:/Github/26-Arch/vsrc/util/IBusToCBus.sv,,DBusToCBus,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/util/IBusToCBus.sv,1779359628,systemVerilog,,G:/Github/26-Arch/vsrc/VTop.sv,,IBusToCBus,,,G:\Github\26-Arch\vsrc,,,,,
+G:/Github/26-Arch/vsrc/util/mmu.sv,1779359628,systemVerilog,,,,mmu,,,G:\Github\26-Arch\vsrc,,,,,

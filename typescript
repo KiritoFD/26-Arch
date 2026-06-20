@@ -1,0 +1,34 @@
+Script started on 2026-06-07 07:41:40+08:00 [COMMAND="./build/emu" <not executed on terminal>]
+Emu compiled at May 19 2026, 23:52:30
+emu: /mnt/g/Github/26-Arch/difftest/src/test/csrc/common/ram.cpp:126: void init_ram(const char*): Assertion `img != NULL' failed.
+
+Script done on 2026-06-07 07:41:40+08:00 [COMMAND_EXIT_CODE="134"]
+NAME=f
+NAME=Archer
+PWD=/mnt/g/Github/26-Arch
+LOGNAME=root
+_=/usr/bin/env
+HOME=/root
+LANG=C.UTF-8
+WSL_INTEROP=/run/WSL/74293_interop
+WAYLAND_DISPLAY=wayland-0
+https_proxy=http://127.0.0.1:7890
+TERM=xterm-256color
+USER=root
+NO_PROXY=172.31.*,172.30.*,172.29.*,172.28.*,172.27.*,172.26.*,172.25.*,172.24.*,172.23.*,172.22.*,172.21.*,172.20.*,172.19.*,172.18.*,172.17.*,172.16.*,10.*,192.168.*,127.*,localhost,<local>
+DISPLAY=:0
+SHLVL=0
+HTTPS_PROXY=http://127.0.0.1:7890
+HTTP_PROXY=http://127.0.0.1:7890
+http_proxy=http://127.0.0.1:7890
+XDG_RUNTIME_DIR=/run/user/0/
+DEBUGINFOD_URLS=https://debuginfod.ubuntu.com 
+WSLENV=
+XDG_DATA_DIRS=/usr/local/share:/usr/share:/var/lib/snapd/desktop
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Users/xy/.codex/tmp/arg0/codex-arg0Wkpcca:/mnt/c/Program Files/coreutils/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/bin:/mnt/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8/libnvvp:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/ProgramData/chocolatey/bin:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA App/NvDLISR:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/nodejs/:/mnt/c/Program Files/Process Lasso/:/mnt/c/Program Files/Java/jdk-17/bin:/mnt/c/Windows/dll:/mnt/c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.15/bin:/mnt/c/Program Files/Tailscale/:/mnt/c/WINDOWS/system32:/mnt/c/Program Files/GitHub CLI/:/mnt/c/Users/xy/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/xy/AppData/Local/Programs/Python/Python312:/mnt/c/Users/xy/AppData/Local/Programs/Python/Python312/Scripts:/mnt/c/texlive/2026/bin/windows:/mnt/c/Users/xy/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/xy/AppData/Local/OpenAI/Codex/bin/ada252862d154cdd:/mnt/c/Program Files/WindowsApps/OpenAI.Codex_26.602.4764.0_x64__2p2nqsd0c76g0/app/resources:/snap/bin
+DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus
+HOSTTYPE=x86_64
+PULSE_SERVER=unix:/mnt/wslg/PulseServer
+OLDPWD=/mnt/g/Github/26-Arch
+
+Script done on 2026-06-07 07:41:40+08:00 [COMMAND_EXIT_CODE="0"]

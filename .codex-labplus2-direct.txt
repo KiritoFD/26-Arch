@@ -1,0 +1,17 @@
+[1;34m[src/device/io/mmio.c:18,add_mmio_map] Add mmio map 'clint' at [0xa2000000, 0xa200ffff]
+[1;34m[src/device/io/mmio.c:18,add_mmio_map] Add mmio map 'uartlite' at [0x40600000, 0x4060000c]
+[1;34m[src/device/io/mmio.c:18,add_mmio_map] Add mmio map 'uartlite1' at [0x23333000, 0x2333300f]
+Emu compiled at May 19 2026, 23:52:30
+The image is ./ready-to-run/lab+/2/microbench-riscv64-nutshell.bin
+Using simulated 256MB RAM
+Using ./ready-to-run/riscv64-nemu-interpreter-so for difftest
+The first instruction of core 0 has commited. Difftest enabled. 
+Empty mainargs. Use "ref" by default
+======= Running MicroBench [input *ref*] =======
+[qsort] Quick sort: * Passed.
+  min time: 5 ms [102280]
+[queen] Queen placement: * Passed.
+  min time: 7 ms [67242]
+[bf] Brainf**k interpreter: * Passed.
+  min time: 44 ms [53802]
+[fib] Fibonacci number: 

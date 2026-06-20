@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Lab6 实验报告</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="docs/report.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Lab6 实验报告</h1>
+</header>
+<h1 id="lab6-实验报告中断与异常支持">Lab6 实验报告：中断与异常支持</h1>
+<h2 id="实验要求对照">1. 实验要求对照</h2>
+<p>Lab6 要求 CPU 支持 RISC-V 机器态 trap 相关机制。根据
+Wiki，本次实验必须先理解特权架构，并完成以下内容：</p>
+<ul>
+<li>实现异常：指令地址不对齐、数据地址不对齐、非法指令、ECALL</li>
+<li>实现中断：时钟中断、外部中断、软件中断</li>
+<li>实现 <code>mret</code></li>
+<li>发生 trap 时正确更新
+<code>mepc</code>、<code>mcause</code>、<code>mstatus</code> 和当前
+mode</li>
+<li>trap 后跳转到 <code>mtvec</code></li>
+<li>trap/mret 后清除流水线，避免旧指令或旧访存响应污染新控制流</li>
+<li>运行 <code>make test-lab6</code></li>
+<li>本次 Lab 不要求上板</li>
+</ul>
+<p>Wiki 中还提到 MMU 缺页异常属于 bonus。本实现已在 Lab5 Sv39 MMU
+基础上接入页错误 trap，因此公开要求和 bonus 方向都覆盖到了。</p>
+<h2 id="trap-总体设计">2. Trap 总体设计</h2>
+<p>本实现把中断和异常统一成 trap
+流程处理。同步异常来自正在提交的指令，异步中断来自
+<code>trint</code>、<code>exint</code>、<code>swint</code>
+三根输入线。trap 发生后，CSR 模块完成架构状态更新，前端和 MMU
+负责丢弃旧控制流下的状态。</p>
+<p>一次 trap 的核心动作如下：</p>
+<pre class="text"><code>mepc          &lt;- trap 对应 PC
+mcause[63]    &lt;- 0 表示异常，1 表示中断
+mcause[62:0]  &lt;- trap 类型
+mstatus.MPIE &lt;- mstatus.MIE
+mstatus.MIE  &lt;- 0
+mstatus.MPP  &lt;- trap 前 mode
+mode          &lt;- M-mode
+next_pc       &lt;- mtvec</code></pre>
+<p>对应的返回由 <code>mret</code> 完成：</p>
+<pre class="text"><code>mstatus.MIE  &lt;- mstatus.MPIE
+mstatus.MPIE &lt;- 1
+mode          &lt;- mstatus.MPP
+mstatus.MPP  &lt;- 0
+next_pc       &lt;- mepc</code></pre>
+<p>代码上，trap 的核心状态更新集中在
+<code>vsrc/src/core/core_csr.sv</code>，trap 信号从
+<code>vsrc/src/core/core_commit.sv</code> 接入，前端 flush 和 difftest
+接口在 <code>vsrc/src/core.sv</code> 中完成。</p>
+<h2 id="异常实现">3. 异常实现</h2>
+<h3 id="ecall">3.1 ECALL</h3>
+<p>ECALL 的 <code>mcause</code> 由当前特权级决定：</p>
+<table>
+<thead>
+<tr>
+<th>来源特权级</th>
+<th>mcause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U-mode</td>
+<td>8</td>
+</tr>
+<tr>
+<td>S-mode</td>
+<td>9</td>
+</tr>
+<tr>
+<td>M-mode</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+<p>CSR 模块中使用 <code>get_ecall_cause()</code> 生成对应 cause。ECALL
+trap 时：</p>
+<pre class="text"><code>mepc   &lt;- wb_r.pc
+mcause &lt;- get_ecall_cause(mode)
+mtval  &lt;- 0
+mode   &lt;- M-mode
+pc     &lt;- mtvec</code></pre>
+<h3 id="非法指令">3.2 非法指令</h3>
+<p>非法指令 trap 时写入：</p>
+<pre class="text"><code>mepc   &lt;- wb_r.pc
+mcause &lt;- 2
+mtval  &lt;- 原始非法指令编码</code></pre>
+<p>这样 handler 可以通过 <code>mtval</code> 判断触发异常的指令内容。</p>
+<h3 id="地址不对齐">3.3 地址不对齐</h3>
+<p>本实现覆盖三类地址不对齐：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>mcause</th>
+<th>mtval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>指令地址不对齐</td>
+<td>0</td>
+<td>跳转目标地址</td>
+</tr>
+<tr>
+<td>load 地址不对齐</td>
+<td>4</td>
+<td>load 地址</td>
+</tr>
+<tr>
+<td>store 地址不对齐</td>
+<td>6</td>
+<td>store 地址</td>
+</tr>
+</tbody>
+</table>
+<p>执行级计算跳转目标后检测
+<code>ex_next_pc[1:0]</code>。若目标不对齐，生成
+<code>ex_instr_misalign</code>，同时禁止错误跳转继续刷新前端。数据地址不对齐使用访存地址检测，并在
+commit/CSR 路径中生成对应 trap。</p>
+<h3 id="页错误">3.4 页错误</h3>
+<p>MMU 页表遍历发现无效 PTE 或非叶子错误时产生 page fault，并通过
+<code>fault_vaddr</code> 和 <code>fault_is_insn</code> 送入 core：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>mcause</th>
+<th>mtval</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>instruction page fault</td>
+<td>12</td>
+<td>fault_vaddr</td>
+</tr>
+<tr>
+<td>load page fault</td>
+<td>13</td>
+<td>fault_vaddr</td>
+</tr>
+<tr>
+<td>store page fault</td>
+<td>15</td>
+<td>fault_vaddr</td>
+</tr>
+</tbody>
+</table>
+<p>这部分属于 Wiki 中的 bonus，但对 Lab5/Lab6
+的特权级和分页组合测试也有实际作用。</p>
+<h3 id="优先级处理">3.5 优先级处理</h3>
+<p>同步异常已经到达 WB/commit 时，不能被同一拍的异步中断覆盖。因此 CSR
+中加入 <code>sync_trap_or_mret</code>：</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode verilog"><code class="sourceCode verilog"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">assign</span> sync_trap_or_mret <span class="op">=</span> wb_ecall <span class="op">||</span> wb_illegal <span class="op">||</span> wb_misalign_instr <span class="op">||</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                           wb_misalign_data <span class="op">||</span> mmu_trap <span class="op">||</span> wb_mret<span class="op">;</span></span></code></pre></div>
+<p>中断只有在没有同步 trap/mret 抢占时才进入
+trap。这使异常优先级更符合“当前提交指令先产生确定架构行为”的原则。</p>
+<h2 id="中断实现">4. 中断实现</h2>
+<h3 id="中断-pending-与-enable">4.1 中断 pending 与 enable</h3>
+<p>三类中断信号映射到 <code>mip</code>：</p>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th>mip 位</th>
+<th>mie 位</th>
+<th>mcause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>swint</code></td>
+<td>3</td>
+<td>3</td>
+<td><code>0x8000000000000003</code></td>
+</tr>
+<tr>
+<td><code>trint</code></td>
+<td>7</td>
+<td>7</td>
+<td><code>0x8000000000000007</code></td>
+</tr>
+<tr>
+<td><code>exint</code></td>
+<td>11</td>
+<td>11</td>
+<td><code>0x800000000000000b</code></td>
+</tr>
+</tbody>
+</table>
+<p>中断进入 M-mode 的条件按 Wiki 实现：</p>
+<pre class="text"><code>(当前 mode 不是 M-mode，或 mstatus.MIE = 1)
+并且
+mip[i] = 1 且 mie[i] = 1</code></pre>
+<p>实现中没有检测中断信号边沿，而是把外部中断输入组合到 <code>mip</code>
+对应位，这符合 Wiki 中“不要检测 posedge/negedge”的要求。</p>
+<h3 id="csr-写回后的即时判定">4.2 CSR 写回后的即时判定</h3>
+<p>Wiki 指出中断条件依赖
+<code>mip</code>、<code>mie</code>、<code>mstatus</code>，并且这些 CSR
+被写入后需要重新 evaluate。当前实现对 <code>mstatus</code> 和
+<code>mie</code> 使用本拍有效值：</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode verilog"><code class="sourceCode verilog"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">assign</span> intr_mstatus <span class="op">=</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>wb_r.valid <span class="op">&amp;&amp;</span> wb_r.csr_wen <span class="op">&amp;&amp;</span> <span class="op">(</span>wb_r.csr_addr <span class="op">==</span> CSR_MSTATUS<span class="op">))</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">?</span> wb_r.csr_wdata</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span> csr_mstatus<span class="op">;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">assign</span> intr_mie <span class="op">=</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">(</span>wb_r.valid <span class="op">&amp;&amp;</span> wb_r.csr_wen <span class="op">&amp;&amp;</span> <span class="op">(</span>wb_r.csr_addr <span class="op">==</span> CSR_MIE<span class="op">))</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">?</span> wb_r.csr_wdata</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span> csr_mie<span class="op">;</span></span></code></pre></div>
+<p>这样 <code>csrsi mstatus, 8</code> 打开 MIE 后能及时响应中断，而
+<code>csrci mstatus, 8</code> 清除 MIE 后不会因为旧值重复进中断。</p>
+<h3 id="精确中断-pc">4.3 精确中断 PC</h3>
+<p>中断是异步事件，前端 PC 可能已经取到后续指令。若直接把
+<code>fetch_pc</code> 写入
+<code>mepc</code>，中断返回后可能跳过尚未提交的指令。</p>
+<p>因此 <code>mepc</code> 选择流水线中最老的未提交指令 PC：</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode verilog"><code class="sourceCode verilog"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">assign</span> intr_fetch_pc <span class="op">=</span> mem_r.valid <span class="op">?</span> mem_r.pc <span class="op">:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                       ex_r.valid  <span class="op">?</span> ex_r.pc  <span class="op">:</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                       id_r.valid  <span class="op">?</span> id_r.pc  <span class="op">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                                     fetch_pc<span class="op">;</span></span></code></pre></div>
+<p>这个设计保证中断前已经提交的指令不会重复执行，尚未提交的指令不会丢失。公开测试中的
+<code>m_trap</code> 对这个点很敏感。</p>
+<h2 id="mret-与特权级恢复">5. mret 与特权级恢复</h2>
+<p><code>mret</code> 在 CSR 模块中恢复中断使能和特权级：</p>
+<pre class="text"><code>MIE  &lt;- MPIE
+MPIE &lt;- 1
+MPP  &lt;- 0
+mode &lt;- 原 MPP
+PC   &lt;- mepc</code></pre>
+<p><code>mret_redirect</code> 会通知前端跳转到
+<code>mepc</code>，同时清除流水线中旧路径的指令，避免 trap handler
+后续指令继续进入执行级。</p>
+<h2 id="流水线与-mmu-flush">6. 流水线与 MMU flush</h2>
+<p>trap、mret、执行级跳转都会改变控制流。实现中在这些事件发生时清理前端状态：</p>
+<ul>
+<li><code>fetch_pending</code></li>
+<li><code>fetch_req_pc</code></li>
+<li><code>fetch_redirect_pending</code></li>
+<li><code>fetch_buf_valid</code></li>
+</ul>
+<p>同时加入 <code>fetch_redirect_bubble</code>，屏蔽 redirect
+后短时间内返回的旧取指响应。</p>
+<p>MMU 也接入 <code>flush_mmu_o</code>：</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode verilog"><code class="sourceCode verilog"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">assign</span> flush_mmu_o <span class="op">=</span> trap_redirect <span class="op">||</span> mret_redirect <span class="op">||</span> ex_flush_front<span class="op">;</span></span></code></pre></div>
+<p>MMU 收到 flush 后清理 page walk 状态、保存的虚拟地址、PTE、fault
+地址、fault 类型和 <code>trap_pending</code>。这可以避免旧 U-mode
+请求或旧 page fault 在切到 M-mode trap handler 后污染新状态。</p>
+<h2 id="difftest-状态">7. Difftest 状态</h2>
+<p>Lab6 官方测试暂时不使用 Difftest，但 Lab5 和后续测试需要 CSR
+状态一致。本实现将 <code>DifftestCSRState.priviledgeMode</code> 接到真实
+privilege mode：</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode verilog"><code class="sourceCode verilog"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>.priviledgeMode<span class="op">(</span>privilege_mode_diff<span class="op">)</span></span></code></pre></div>
+<p>并让 <code>privilege_mode_diff</code> 使用
+<code>next_privilege_mode</code>，避免 trap/mret
+提交点上报滞后一拍的特权级。</p>
+<h2 id="测试结果">8. 测试结果</h2>
+<h3 id="lab6">8.1 Lab6</h3>
+<p>在 WSL 中运行：</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test-lab6</span></code></pre></div>
+<p>关键输出如下：</p>
+<pre class="text"><code>Single test passed.
+Run sys-test
+trap here, epc 8000600c, cause 8
+Test ecall_u [OK]
+trap here, epc 80006028, cause 0
+Test instr_misalign [OK]
+trap here, epc 80006040, cause 4
+Test load_misalign [OK]
+trap here, epc 80006050, cause 6
+Test store_misalign [OK]
+trap here, epc 800060a8, cause 8000000000000007
+Test timer_intr [OK]
+trap here, epc 80006090, cause 8000000000000003
+Test software_intr [OK]
+Test m_trap [OK]
+Privileged test finished.</code></pre>
+<p>Wiki 中说明后续循环输出 <code>m_trap_test [X]</code> /
+<code>---TEST FAILED---</code>
+属于正常现象，可以手动退出。当前实现已经能输出
+<code>Test m_trap [OK]</code> 和
+<code>Privileged test finished.</code>，因此公开 Lab6 测试通过。</p>
+<h3 id="前五个-lab-回归">8.2 前五个 Lab 回归</h3>
+<p>为确认没有破坏前五个实验，回归结果如下：</p>
+<pre class="text"><code>Lab1: HIT GOOD TRAP at pc = 0x80010004
+Lab2: HIT GOOD TRAP at pc = 0x8001fffc
+Lab3: HIT GOOD TRAP at pc = 0x80000030
+Lab4: HIT GOOD TRAP at pc = 0x8001fff8
+Lab5: Return from init! Test passed</code></pre>
+<p>Lab5 和 Lab6 在打印通过信息后不会立即自然退出，因此验证时使用
+<code>timeout</code>
+截断仿真进程。判断通过与否以输出中的通过信息为准。</p>
+<h2 id="提交说明">9. 提交说明</h2>
+<p>本次 Lab6 不要求上板。提交包通过：</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> handin</span></code></pre></div>
+<p>生成，报告同时提供 <code>docs/report.md</code> 和
+<code>docs/report.pdf</code>，并保留 <code>docs/lab6_report.md</code>
+作为同内容的 Lab6 专项报告。</p>
+<h2 id="小结">10. 小结</h2>
+<p>本实现覆盖了 Wiki 中列出的异常、中断和 <code>mret</code>
+行为，并额外接入了 MMU 缺页异常。关键设计点包括：</p>
+<ul>
+<li>WB/commit 收口同步异常</li>
+<li>CSR 统一维护 trap 架构状态</li>
+<li>中断按 <code>mip</code>、<code>mie</code>、<code>mstatus.MIE</code>
+判定</li>
+<li>CSR 写回后的 <code>mstatus</code>/<code>mie</code>
+参与同拍中断判定</li>
+<li>中断 <code>mepc</code> 保存流水线中最老的未提交指令 PC</li>
+<li>trap/mret 后清理前端和 MMU 旧状态</li>
+<li>同步异常和 mret 不被同拍异步中断覆盖</li>
+</ul>
+<p>公开测试 <code>make test-lab6</code> 已通过，且 Lab1-Lab5
+回归保持通过。</p>
+</body>
+</html>

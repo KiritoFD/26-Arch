@@ -1,0 +1,459 @@
+Emu compiled at May 19 2026, 23:52:30
+The image is ./ready-to-run/lab+/4/all-test-privfull.bin
+Using simulated 256MB RAM
+Single test passed.
+Run paint
+Aptenodytes patagonicus
+paint 0/22
+paint 1/22
+paint 2/22
+paint 3/22
+paint 4/22
+paint 5/22
+paint 6/22
+paint 7/22
+paint 8/22
+paint 9/22
+paint 10/22
+paint 11/22
+paint 12/22
+paint 13/22
+paint 14/22
+paint 15/22
+paint 16/22
+paint 17/22
+paint 18/22
+paint 19/22
+paint 20/22
+paint 21/22
+paint 22/22
+Picture generated.
+compress 0/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 1/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 2/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 3/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 4/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+compress 5/5
+Compressed size=2140
+encoding
+Done! Result:
+data:image/bmp;base64,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
+Run coremark
+Running CoreMark for 10 iterations
+2K performance run parameters for coremark.
+CoreMark Size    : 666
+Total time (ms)  : 861
+Iterations       : 10
+Compiler version : GCC9.4.0
+seedcrc          : 0xe9f5
+[0]crclist       : 0xe714
+[0]crcmatrix     : 0x1fd7
+[0]crcstate      : 0x8e3a
+[0]crcfinal      : 0xfcaf
+Finised in 861 ms.
+==================================================
+CoreMark Iterations/Sec 11
+Run dhrystone
+Dhrystone Benchmark, Version C, Version 2.2
+Trying 10000 runs through Dhrystone.
+Finished in 1245 ms
+==================================================
+Dhrystone PASS         14 Marks
+                   vs. 100000 Marks (i7-7700K @ 4.20GHz)
+Run stream
+-------------------------------------------------------------
+STREAM version $Revision: 5.10 $
+-------------------------------------------------------------
+This system uses 8 bytes per array element.
+-------------------------------------------------------------
+Array size = 2048 (elements), Offset = 0 (elements)
+Memory per array = 0.0 MiB (= 0.0 GiB).
+Total memory required = 0.0 MiB (= 0.0 GiB).
+Each kernel will be executed 10 times.
+ The *best* time for each kernel (excluding the first iteration)
+ will be used to compute the reported bandwidth.
+-------------------------------------------------------------
+* checktick: start=1.260484
+* checktick: start=1.261084
+* checktick: start=1.261673
+* checktick: start=1.262266
+* checktick: start=1.262861
+* checktick: start=1.263445
+* checktick: start=1.264047
+* checktick: start=1.264648
+* checktick: start=1.265227
+* checktick: start=1.265818
+* checktick: start=1.266411
+* checktick: start=1.267004
+* checktick: start=1.267586
+* checktick: start=1.268175
+* checktick: start=1.268767
+* checktick: start=1.269351
+* checktick: start=1.269949
+* checktick: start=1.270531
+* checktick: start=1.271126
+* checktick: start=1.271713
+Your clock granularity/precision appears to be 48 microseconds.
+Each test below will take on the order of 22116 microseconds.
+   (= 460 clock ticks)
+Increase the size of the arrays if this shows that
+you are not getting at least 20 clock ticks per test.
+-------------------------------------------------------------
+WARNING -- The above is only a rough guideline.
+For best results, please be sure you know the
+precision of your system timer.
+-------------------------------------------------------------
+Loop 0/10
+Loop 1/10
+Loop 2/10
+Loop 3/10
+Loop 4/10
+Loop 5/10
+Loop 6/10
+Loop 7/10
+Loop 8/10
+Loop 9/10
+Function    Best Rate MB/s  Avg time     Min time     Max time
+Copy:              12.9     0.002547     0.002535     0.002562
+Scale:              0.8     0.041205     0.040273     0.043037
+Add:                1.6     0.031751     0.030866     0.033502
+Triad:              0.8     0.065392     0.063560     0.068991
+-------------------------------------------------------------
+Solution Validates: avg error less than 1.000000e-13 on all three arrays
+-------------------------------------------------------------
+Run conwaygame
+Play Conway's life game for 200 rounds.
+seed=2882
+Round 0/200
+Round 1/200
+Round 2/200
+Round 3/200
+Round 4/200
+Round 5/200
+Round 6/200
+Round 7/200
+Round 8/200
+Round 9/200
+Round 10/200
+Round 11/200
+Round 12/200
+Round 13/200
+Round 14/200
+Round 15/200
+Round 16/200
+Round 17/200
+Round 18/200
+Round 19/200
+Round 20/200
+Round 21/200
+Round 22/200
+Round 23/200
+Round 24/200
+Round 25/200
+Round 26/200
+Round 27/200
+Round 28/200
+Round 29/200
+Round 30/200
+Round 31/200
+Round 32/200
+Round 33/200
+Round 34/200
+Round 35/200
+Round 36/200
+Round 37/200
+Round 38/200
+Round 39/200
+Round 40/200
+Round 41/200
+Round 42/200
+Round 43/200
+Round 44/200
+Round 45/200
+Round 46/200
+Round 47/200
+Round 48/200
+Round 49/200
+Round 50/200
+Round 51/200
+Round 52/200
+Round 53/200
+Round 54/200
+Round 55/200
+Round 56/200
+Round 57/200
+Round 58/200
+Round 59/200
+Round 60/200
+Round 61/200
+Round 62/200
+Round 63/200
+Round 64/200
+Round 65/200
+Round 66/200
+Round 67/200
+Round 68/200
+Round 69/200
+Round 70/200
+Round 71/200
+Round 72/200
+Round 73/200
+Round 74/200
+Round 75/200
+Round 76/200
+Round 77/200
+Round 78/200
+Round 79/200
+Round 80/200
+Round 81/200
+Round 82/200
+Round 83/200
+Round 84/200
+Round 85/200
+Round 86/200
+Round 87/200
+Round 88/200
+Round 89/200
+Round 90/200
+Round 91/200
+Round 92/200
+Round 93/200
+Round 94/200
+Round 95/200
+Round 96/200
+Round 97/200
+Round 98/200
+Round 99/200
+Round 100/200
+Round 101/200
+Round 102/200
+Round 103/200
+Round 104/200
+Round 105/200
+Round 106/200
+Round 107/200
+Round 108/200
+Round 109/200
+Round 110/200
+Round 111/200
+Round 112/200
+Round 113/200
+Round 114/200
+Round 115/200
+Round 116/200
+Round 117/200
+Round 118/200
+Round 119/200
+Round 120/200
+Round 121/200
+Round 122/200
+Round 123/200
+Round 124/200
+Round 125/200
+Round 126/200
+Round 127/200
+Round 128/200
+Round 129/200
+Round 130/200
+Round 131/200
+Round 132/200
+Round 133/200
+Round 134/200
+Round 135/200
+Round 136/200
+Round 137/200
+Round 138/200
+Round 139/200
+Round 140/200
+Round 141/200
+Round 142/200
+Round 143/200
+Round 144/200
+Round 145/200
+Round 146/200
+Round 147/200
+Round 148/200
+Round 149/200
+Round 150/200
+Round 151/200
+Round 152/200
+Round 153/200
+Round 154/200
+Round 155/200
+Round 156/200
+Round 157/200
+Round 158/200
+Round 159/200
+Round 160/200
+Round 161/200
+Round 162/200
+Round 163/200
+Round 164/200
+Round 165/200
+Round 166/200
+Round 167/200
+Round 168/200
+Round 169/200
+Round 170/200
+Round 171/200
+Round 172/200
+Round 173/200
+Round 174/200
+Round 175/200
+Round 176/200
+Round 177/200
+Round 178/200
+Round 179/200
+Round 180/200
+Round 181/200
+Round 182/200
+Round 183/200
+Round 184/200
+Round 185/200
+Round 186/200
+Round 187/200
+Round 188/200
+Round 189/200
+Round 190/200
+Round 191/200
+Round 192/200
+Round 193/200
+Round 194/200
+Round 195/200
+Round 196/200
+Round 197/200
+Round 198/200
+Round 199/200
+                                        
+                                        
+                                        
+                                        
+                                        
+                          **            
+                         *  *           
+                          **            
+                                        
+                                        
+Run sys-test
+Test ecall_u [OK]
+[trapdbg-ex] pc=0000000080006028 next_pc=000000008000602d instr=00028367
+[trapdbg] wb_misalign_instr pc=0000000080006028 mtval_src=000000008000602c
+Test instr_misalign [OK]
+[trapdbg] mmu_trap cause=1 fault_is_insn=1 pc=0000000000000000 vaddr=0000000080007000
+Test instr_access_fault [OK]
+Test illegal_instr [X]
+Test breakpoint [X]
+Test load_misalign [OK]
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080007100
+Test load_fault [OK]
+Test store_misalign [OK]
+[trapdbg] mmu_trap cause=7 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080007100
+Test store_fault [OK]
+Test timer_intr [OK]
+Test software_intr [OK]
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080006200
+Test pmp_nr [OK]
+[trapdbg] mmu_trap cause=7 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080006200
+Test pmp_nw [OK]
+[trapdbg] mmu_trap cause=1 fault_is_insn=1 pc=0000000000000000 vaddr=0000000080006170
+Test pmp_nx [OK]
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000000
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000008
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000010
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000018
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000020
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000028
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000080000030
+[trapdbg] mmu_trap cause=5 fault_is_insn=0 pc=0000000000000000 vaddr=0000000000000004
+Unexpected M-mode trap
+---TEST FAILED---

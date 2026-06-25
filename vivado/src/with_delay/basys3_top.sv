@@ -20,13 +20,13 @@ module basys3_top (
 	logic dbg_ever_uart_write;
 	logic dbg_ever_device_read;
 	logic dbg_lsr_read;
-	logic dbg_ever_thr_write;
+	(* mark_debug = "true" *) logic dbg_ever_thr_write;
 	logic dbg_tx_state_rdy;
 	logic dbg_tx_fifo_nonempty;
 	logic [63:0] dbg_lsr_rdata;
 	logic [63:0] dbg_device_addr;
-	logic cpu_tx;
-	logic jtag_cpu_rx;
+	(* mark_debug = "true" *) logic cpu_tx;
+	(* mark_debug = "true" *) logic jtag_cpu_rx;
 	logic [3:0] cpu_led;
 
 	// SPI Flash internal signals

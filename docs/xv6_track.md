@@ -241,3 +241,42 @@ LED2=`jtag_tx_avail` 测试：按下 btnC 后 LED2 闪一下然后灭。
 2. **研究 OpenOCD**：OpenOCD 可能支持 BSCANE2 的 USER1/USER2 指令访问
 3. **使用 Vivado ILA**：添加 Integrated Logic Analyzer 抓取 cpu_tx 信号波形
 4. **使用 PMOD 接口**：Basys3 的 PMOD 可能有其他可用的通信接口
+
+### ILA 实施记录 (2026-06-26)
+
+**选择方案**：Vivado ILA（方案 3）。无需额外硬件，通过 JTAG 读取 FPGA 内部信号。
+
+#### 改动内容
+
+1. **basys3_top.sv**：给关键信号添加 `(* mark_debug = "true" *)` 属性
+   - `cpu_tx` —— UART TX 串行输出，ILA 主触发信号
+   - `jtag_cpu_rx` —— JTAG UART RX 路径
+   - `dbg_ever_thr_write` —— CPU 是否到达 `printf()` → `WriteReg(THR, c)`（之前 LED3 验证已亮）
+
+2. **build_with_ila.tcl**（新增脚本）：自动化 ILA 构建流程
+   - 复用 `build_bitstream_only.tcl` 的 IP 升级、BRAM COE 更新、OOC 综合
+   - 综合后 `open_run synth_1`，调用 `setup_debug` 显式配置 ILA core
+   - ILA 时钟域：`dbg_cpu_clk`（25MHz CPU 时钟，UART 状态机时基）
+   - ILA 深度：4096（每 UART bit = 216 个 25MHz 周期，深度 4096 可抓约 19 个 bit = 1.9 个 UART 帧）
+   - 实现 + `write_bitstream` 启用 `DEBUG_BITSTREAM`，生成 `.bit` + `.ltx`（探针定义文件）
+
+3. **imports 副本同步**：所有源文件覆盖到 `project_3.srcs/sources_1/imports/`，避免 Vivado 综合时使用过期 RTL（前述根因 1 的预防）。
+
+#### 触发策略
+
+- probe0 (`cpu_tx`) 下降沿触发 —— 对应 UART 起始位
+- 抓取 4096 个 `dbg_cpu_clk` 周期（约 164us），足以覆盖一个完整 UART 帧（10 bits × 8.64us = 86.4us）
+- 验证目标：
+  - 起始位（`cpu_tx = 0`）
+  - 8 个数据位（LSB first）
+  - 停止位（`cpu_tx = 1`）
+  - 位周期：216 × 40ns = 8.64us（≈ 115740 baud，接近 115200）
+
+#### 后续步骤
+
+1. 运行 `vivado.bat -mode batch -source build_with_ila.tcl` 生成带 ILA 的 bitstream
+2. 打开 Vivado Hardware Manager，连接 Basys3
+3. Program Device 时选择 `basys3_top.bit`，Vivado 会自动加载 `basys3_top.ltx` 探针定义
+4. 在 ILA Dashboard 设置 `probe0(cpu_tx)` 触发为下降沿
+5. 按 btnC 复位 → ILA 触发抓取波形
+6. 分析 `cpu_tx` 波形，确认 UART 数据正确性

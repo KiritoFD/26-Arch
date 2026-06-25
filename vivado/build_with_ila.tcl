@@ -130,21 +130,37 @@ if {[llength $marked_nets] == 0} {
 }
 
 # Find dbg_cpu_clk net for ILA clock domain
-set cpu_clk_net [get_nets -hier -filter {NAME =~ "*dbg_cpu_clk*"}]
-if {[llength $cpu_clk_net] == 0} {
-    # Try alternative names
-    set cpu_clk_net [get_nets -hier -filter {NAME =~ "u_clk_wiz_0/clk_out1*"}]
+# Strategy: search marked_nets first (dbg_cpu_clk has mark_debug + KEEP),
+# then fall back to name pattern search.
+set ila_clk ""
+foreach net $marked_nets {
+    if {[string match "*dbg_cpu_clk*" $net] || [string match "*cpu_clk*" $net]} {
+        set ila_clk $net
+        break
+    }
 }
-if {[llength $cpu_clk_net] == 0} {
+if {$ila_clk eq ""} {
+    set cpu_clk_net [get_nets -hier -filter {NAME =~ "*dbg_cpu_clk*"}]
+    if {[llength $cpu_clk_net] > 0} { set ila_clk [lindex $cpu_clk_net 0] }
+}
+if {$ila_clk eq ""} {
+    # Try PLL output directly
+    set cpu_clk_net [get_nets -hier -filter {NAME =~ "*clk_wiz_0*clk_out1*"}]
+    if {[llength $cpu_clk_net] > 0} { set ila_clk [lindex $cpu_clk_net 0] }
+}
+if {$ila_clk eq ""} {
+    set cpu_clk_net [get_nets -hier -filter {NAME =~ "u_clk_wiz_0/clk_out1*"}]
+    if {[llength $cpu_clk_net] > 0} { set ila_clk [lindex $cpu_clk_net 0] }
+}
+if {$ila_clk eq ""} {
     puts "ERROR: dbg_cpu_clk net not found, cannot create ILA core"
     exit 1
 }
-set ila_clk [lindex $cpu_clk_net 0]
 puts "ILA clock: $ila_clk"
 
 # Find probe nets
 set probe0_list [get_nets -hier -filter {NAME =~ "*cpu_tx*"}]
-set probe1_list [get_nets -hier -filter {NAME =~ "*jtag_cpu_rx*"}]
+set probe1_list [get_nets -hier -filter {NAME =~ "*dbg_ever_uart_write*"}]
 set probe2_list [get_nets -hier -filter {NAME =~ "*dbg_ever_thr_write*"}]
 
 if {[llength $probe0_list] == 0} {
@@ -179,7 +195,8 @@ create_debug_port u_ila probe
 set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe0]
 connect_debug_port u_ila/probe0 [get_nets [lindex $probe0_list 0]]
 
-# Create and connect probe 1: jtag_cpu_rx (1-bit)
+# Create and connect probe 1: dbg_ever_uart_write (1-bit)
+# (jtag_cpu_rx is now tied to constant 1'b1 and optimized away; use uart_write instead)
 if {[llength $probe1_list] > 0} {
     create_debug_port u_ila probe
     set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe1]
@@ -212,7 +229,7 @@ if {[llength $extra_probe] > 0} {
 puts "ILA core created:"
 puts "  Clock: $ila_clk"
 puts "  Probe0: cpu_tx"
-if {[llength $probe1_list] > 0} { puts "  Probe1: jtag_cpu_rx" }
+if {[llength $probe1_list] > 0} { puts "  Probe1: dbg_ever_uart_write" }
 if {[llength $probe2_list] > 0} { puts "  Probe2: dbg_ever_thr_write" }
 if {[llength $probe3_list] > 0} { puts "  Probe3: dbg_cpu_valid" }
 puts "  Depth: 4096"

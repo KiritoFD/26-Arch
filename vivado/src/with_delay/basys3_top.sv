@@ -11,7 +11,7 @@ module basys3_top (
 );
 	logic dbg_clk_locked;
 	logic dbg_sys_reset;
-	logic dbg_cpu_clk;
+	(* mark_debug = "true", KEEP = "true" *) logic dbg_cpu_clk;
 	(* mark_debug = "true", KEEP = "true" *) logic dbg_cpu_valid;
 	logic dbg_ram_ready;
 	logic dbg_device_valid;

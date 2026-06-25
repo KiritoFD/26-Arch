@@ -12,12 +12,12 @@ module basys3_top (
 	logic dbg_clk_locked;
 	logic dbg_sys_reset;
 	logic dbg_cpu_clk;
-	logic dbg_cpu_valid;
+	(* mark_debug = "true", KEEP = "true" *) logic dbg_cpu_valid;
 	logic dbg_ram_ready;
 	logic dbg_device_valid;
 	logic dbg_cpu_tx_write;
 	logic dbg_any_device_write;
-	logic dbg_ever_uart_write;
+	(* mark_debug = "true", KEEP = "true" *) logic dbg_ever_uart_write;
 	logic dbg_ever_device_read;
 	logic dbg_lsr_read;
 	(* mark_debug = "true" *) logic dbg_ever_thr_write;
@@ -26,7 +26,7 @@ module basys3_top (
 	logic [63:0] dbg_lsr_rdata;
 	logic [63:0] dbg_device_addr;
 	(* mark_debug = "true" *) logic cpu_tx;
-	(* mark_debug = "true" *) logic jtag_cpu_rx;
+	logic jtag_cpu_rx;
 	logic [3:0] cpu_led;
 
 	// SPI Flash internal signals
@@ -98,19 +98,12 @@ module basys3_top (
 	);
 
 	// ================================================================
-	// JTAG UART Bridge
-	// Captures CPU UART TX via BSCANE2, sends RX data back to CPU
-	// This bypasses the non-functional FTDI Channel B UART path
+	// JTAG UART Bridge DISABLED
+	// BSCANE2 path proven non-functional (xsdb cannot read USER1 TDO),
+	// and BSCANE2 primitive conflicts with Vivado ILA (both use JTAG).
+	// jtag_cpu_rx tied to idle (1) so CPU UART RX sees no input.
 	// ================================================================
-	logic jtag_tx_avail;
-
-	jtag_uart jtag_uart_inst (
-		.clk(dbg_cpu_clk),      // Use 25MHz CPU clock for UART timing
-		.reset(btnC),
-		.cpu_tx(cpu_tx),        // CPU UART TX output
-		.cpu_rx(jtag_cpu_rx),   // UART RX input to CPU
-		.tx_data_avail(jtag_tx_avail)
-	);
+	assign jtag_cpu_rx = 1'b1;  // UART idle line
 
 	// RsTx outputs CPU UART TX directly (for USB-serial adapter on PC)
 	assign RsTx = cpu_tx;

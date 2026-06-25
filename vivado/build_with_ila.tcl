@@ -135,35 +135,100 @@ if {[llength $cpu_clk_net] == 0} {
     # Try alternative names
     set cpu_clk_net [get_nets -hier -filter {NAME =~ "u_clk_wiz_0/clk_out1*"}]
 }
-if {[llength $cpu_clk_net] > 0} {
-    set ila_clk [lindex $cpu_clk_net 0]
-    puts "ILA clock: $ila_clk"
+if {[llength $cpu_clk_net] == 0} {
+    puts "ERROR: dbg_cpu_clk net not found, cannot create ILA core"
+    exit 1
+}
+set ila_clk [lindex $cpu_clk_net 0]
+puts "ILA clock: $ila_clk"
 
-    # Find probe nets
-    set probe0 [get_nets -hier -filter {NAME =~ "*cpu_tx*"}]
-    set probe1 [get_nets -hier -filter {NAME =~ "*jtag_cpu_rx*"}]
-    set probe2 [get_nets -hier -filter {NAME =~ "*dbg_ever_thr_write*"}]
+# Find probe nets
+set probe0_list [get_nets -hier -filter {NAME =~ "*cpu_tx*"}]
+set probe1_list [get_nets -hier -filter {NAME =~ "*jtag_cpu_rx*"}]
+set probe2_list [get_nets -hier -filter {NAME =~ "*dbg_ever_thr_write*"}]
 
-    # Setup debug with explicit clock and probes
-    if {[llength $probe0] > 0} {
-        set probe_list [list [lindex $probe0 0]]
-        if {[llength $probe1] > 0} { lappend probe_list [lindex $probe1 0] }
-        if {[llength $probe2] > 0} { lappend probe_list [lindex $probe2 0] }
-
-        puts "Setting up ILA with probes: $probe_list"
-        setup_debug -clock $ila_clk -depth 4096 -num_stages 2 -probes $probe_list
-        puts "setup_debug completed."
-    } else {
-        puts "ERROR: cpu_tx net not found, cannot setup ILA"
-        exit 1
-    }
-} else {
-    puts "WARNING: dbg_cpu_clk net not found, trying auto setup_debug..."
-    setup_debug -depth 4096 -num_stages 2
+if {[llength $probe0_list] == 0} {
+    puts "ERROR: cpu_tx net not found, cannot setup ILA"
+    exit 1
 }
 
+# ================================================================
+# Create ILA debug core manually (setup_debug is GUI-only in batch mode)
+# ================================================================
+puts "Creating ILA debug core manually..."
+
+# Remove existing debug core if any
+set existing_dc [get_debug_cores -quiet u_ila]
+if {[llength $existing_dc] > 0} {
+    delete_debug_core $existing_dc
+}
+
+# Create debug core
+create_debug_core u_ila ila
+set_property C_DATA_DEPTH 4096 [get_debug_cores u_ila]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila]
+set_property C_INPUT_PIPE_STAGES 2 [get_debug_cores u_ila]
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila]
+set_property ALL_PROBE_SAME_MU_CNT 2 [get_debug_cores u_ila]
+
+# Connect clock port (clk port is auto-created by create_debug_core)
+connect_debug_port u_ila/clk [get_nets $ila_clk]
+
+# Create and connect probe 0: cpu_tx (1-bit)
+create_debug_port u_ila probe
+set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe0]
+connect_debug_port u_ila/probe0 [get_nets [lindex $probe0_list 0]]
+
+# Create and connect probe 1: jtag_cpu_rx (1-bit)
+if {[llength $probe1_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe1]
+    connect_debug_port u_ila/probe1 [get_nets [lindex $probe1_list 0]]
+}
+
+# Create and connect probe 2: dbg_ever_thr_write (1-bit)
+if {[llength $probe2_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe2]
+    connect_debug_port u_ila/probe2 [get_nets [lindex $probe2_list 0]]
+}
+
+# Create and connect probe 3: dbg_cpu_valid (1-bit, CPU valid signal)
+# Required because ILA core defaults to 5 probes; probe3 must be connected
+set probe3_list [get_nets -hier -filter {NAME =~ "*dbg_cpu_valid*"}]
+if {[llength $probe3_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe3]
+    connect_debug_port u_ila/probe3 [get_nets [lindex $probe3_list 0]]
+}
+
+# Delete extra probes (probe4+) that ILA core creates by default but are unused
+set extra_probe [get_debug_ports -quiet u_ila/probe4]
+if {[llength $extra_probe] > 0} {
+    delete_debug_port $extra_probe
+    puts "Deleted unused probe4"
+}
+
+puts "ILA core created:"
+puts "  Clock: $ila_clk"
+puts "  Probe0: cpu_tx"
+if {[llength $probe1_list] > 0} { puts "  Probe1: jtag_cpu_rx" }
+if {[llength $probe2_list] > 0} { puts "  Probe2: dbg_ever_thr_write" }
+if {[llength $probe3_list] > 0} { puts "  Probe3: dbg_cpu_valid" }
+puts "  Depth: 4096"
+
+# Save design before implementing debug core (required by Vivado)
 save_constraints
-close_run
+
+# Implement debug core (writes .ltx probe definitions)
+implement_debug_core [get_debug_cores u_ila]
+puts "implement_debug_core completed."
+
+# Save again after implement_debug_core to persist probe definitions
+save_constraints
+
+# Close the synthesized design to allow impl_1 to launch
+close_design
 
 # ================================================================
 # Step 6: Implementation + bitstream with DEBUG_BITSTREAM
@@ -171,8 +236,8 @@ close_run
 puts "=========================================="
 puts "Step 6: Running implementation + bitstream..."
 puts "=========================================="
-set_property STEPS.OPT_DESIGN.ARGS.DEBUG_ENABLED 1 [get_runs impl_1]
-set_property STEPS.WRITE_BITSTREAM.ARGS.DEBUG_BITSTREAM TRUE [get_runs impl_1]
+# Note: ILA core already implemented via implement_debug_core above.
+# Vivado will auto-generate .ltx probe definitions during write_bitstream.
 reset_run impl_1
 launch_runs impl_1 -to_step write_bitstream -jobs 32
 wait_on_run impl_1

@@ -280,3 +280,67 @@ LED2=`jtag_tx_avail` 测试：按下 btnC 后 LED2 闪一下然后灭。
 4. 在 ILA Dashboard 设置 `probe0(cpu_tx)` 触发为下降沿
 5. 按 btnC 复位 → ILA 触发抓取波形
 6. 分析 `cpu_tx` 波形，确认 UART 数据正确性
+
+### ILA 构建迭代记录 (2026-06-26)
+
+`build_with_ila.tcl` 在 batch mode 下创建 ILA core 共经历 9 次迭代才走通 API 调用序列，每次错误及修复如下：
+
+| # | 错误 | 根因 | 修复 |
+|---|------|------|------|
+| 1 | `invalid command name "setup_debug"` | `setup_debug` 是 GUI-only 命令 | 改用 `create_debug_core` + `create_debug_port` + `connect_debug_port` + `implement_debug_core` |
+| 2 | `Could not create debug port as it exceeds the maximum '1' allowed` | `create_debug_core` 自动创建 clk 端口 | 移除 `create_debug_port u_ila clk`，只保留 `connect_debug_port u_ila/clk` |
+| 3 | `Too many positional options when parsing '0'` | probe 索引由 Vivado 自动递增 | 改为 `create_debug_port u_ila probe`（无索引） |
+| 4 | `Design needs to be saved before implementing debug cores` | 缺少 `save_constraints` | 在 `implement_debug_core` 前添加 `save_constraints` |
+| 5 | `invalid command name "close_run"` | `close_run` 非有效命令 | 改为 `close_design` |
+| 6 | `run does not have property STEPS.OPT_DESIGN.ARGS.DEBUG_ENABLED` | 属性名错误 | 移除该 set_property（ILA core 已通过 implement_debug_core 实现） |
+| 7 | `probe3 has 1 unconnected channels` | ILA core 默认 4 probe，只接 3 个 | 添加 `dbg_cpu_valid` 作为 probe3，加 `mark_debug + KEEP` 属性 |
+| 8 | `probe4 has 1 unconnected channels` | ILA core 默认 5 probe | `delete_debug_port [get_debug_ports -quiet u_ila/probe4]` |
+| 9 | `[Place 30-433] Unplaced instances: jtag_uart_inst/bscane2_user1 (BSCANE2)` | BSCANE2 与 ILA 都用 JTAG 资源，无法共存 | **禁用 jtag_uart 模块**，`assign jtag_cpu_rx = 1'b1` |
+
+#### mark_debug 信号被综合优化问题
+
+`dbg_cpu_valid` 仅在 `always_ff` 中赋值且未被外部使用，综合时会被优化掉，导致 `get_nets -filter {MARK_DEBUG == 1}` 返回空。修复方法：
+
+```systemverilog
+(* mark_debug = "true", KEEP = "true" *) logic dbg_cpu_valid;
+```
+
+`KEEP = "true"` 属性防止综合器将该信号当作冗余逻辑优化掉，确保 ILA probe 能正确连接。
+
+#### BSCANE2 与 ILA 冲突
+
+BSCANE2 原语（`jtag_uart.sv` 中使用）和 Vivado ILA core 都使用 FPGA 的 JTAG 资源（TCK/TMS/TDI/TDO）。两者无法在同一 bitstream 中共存：
+
+- BSCANE2 用于通过 JTAG 读写 FPGA 内部寄存器（USER1/USER2 指令）
+- ILA 通过 JTAG 读取内部信号采样数据
+
+由于 BSCANE2 路径之前已证明不可用（xsdb 无法读取 USER1 TDO），且 ILA 是当前选择的调试方案，禁用 jtag_uart 模块是合理的：
+
+```systemverilog
+// JTAG UART Bridge DISABLED
+assign jtag_cpu_rx = 1'b1;  // UART idle line
+```
+
+CPU UART RX 永远看到 idle 状态（高电平），不影响 UART TX 输出抓取。
+
+#### 最终 ILA core 配置
+
+```tcl
+create_debug_core u_ila ila
+set_property C_DATA_DEPTH 4096 [get_debug_cores u_ila]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila]
+set_property C_INPUT_PIPE_STAGES 2 [get_debug_cores u_ila]
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila]
+set_property ALL_PROBE_SAME_MU_CNT 2 [get_debug_cores u_ila]
+
+connect_debug_port u_ila/clk [get_nets $ila_clk]
+# probe0: cpu_tx (1-bit)         — UART TX 串行输出
+# probe1: jtag_cpu_rx (1-bit)    — 现为常量 1（jtag_uart 禁用后）
+# probe2: dbg_ever_thr_write     — CPU 写过 THR 数据字节
+# probe3: dbg_cpu_valid          — CPU valid 信号（带 KEEP 防优化）
+# probe4: 已 delete（ILA core 默认创建但未用）
+```
+
+#### 当前阻塞解除
+
+第 9 次构建阻塞于 BSCANE2/ILA 冲突，本次修改（jtag_uart 禁用）已同步到源文件与 imports 副本，重新运行 `build_with_ila.tcl` 应可完成 bitstream 生成。

@@ -54,7 +54,7 @@ package core_pkg;
 	localparam logic [11:0] CSR_MHARTID  = 12'hf14;
 
 	localparam logic [63:0] MSTATUS_MASK = 64'h0000_0000_007e_79bb;
-	localparam logic [63:0] SSTATUS_MASK = 64'h8000_0003_0001_e000;
+	localparam logic [63:0] SSTATUS_MASK = 64'h8000_0003_000d_e000;
 	localparam logic [63:0] MIP_MASK     = 64'h0000_0000_0000_0333;
 	localparam logic [63:0] MTVEC_MASK   = ~64'h0000_0000_0000_0002;
 	localparam logic [63:0] STVEC_MASK   = ~64'h0000_0000_0000_0002;
@@ -99,6 +99,7 @@ package core_pkg;
 		logic        is_sret;
 		logic        is_amo;
 		logic [4:0]  amo_cmd;
+		logic        is_sfence;     // SFENCE.VMA: flush TLB
 		logic        is_misalign;
 		logic        is_instr_misalign;
 		logic        is_illegal;
@@ -128,6 +129,7 @@ package core_pkg;
 		logic        is_sret;
 		logic        is_amo;
 		logic [4:0]  amo_cmd;
+		logic        is_sfence;     // SFENCE.VMA: flush TLB
 		logic        is_misalign;
 		logic        is_instr_misalign;
 		logic        is_illegal;

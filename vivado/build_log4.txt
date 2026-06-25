@@ -1,0 +1,11 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jun 25 15:39:24 2026
+# Process ID: 39944
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source G:\GitHub\26-Arch\vivado\build_bitstream.tcl -log G:\GitHub\26-Arch\vivado\build_log4.txt
+# Log file: G:/GitHub/26-Arch/vivado/build_log4.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------

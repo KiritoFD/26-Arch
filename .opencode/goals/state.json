@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "goals": [
+    {
+      "goalId": "47b35906-d59e-47a6-8bae-9597a92ec632",
+      "condition": "去远程查看所有历史实验，包括所有其他分支的，然后做完整的消融实验，我给你三天时间，务必对当前模型所有实现，所有实验摸清楚，哪些是有用的，开销如何；哪些结果很差应该删掉？同步建立数学理论并不断修正。可以补充评估，比如白化雾化指标",
+      "successCriteria": "",
+      "constraints": "",
+      "mode": "normal",
+      "sessionID": "ses_143b8b57fffer6qwqdas9GGNcu",
+      "turnCount": 2,
+      "startedAt": 1782042985450,
+      "totalTokens": 0,
+      "options": {
+        "maxTurns": 10,
+        "maxDurationMs": 900000,
+        "maxTokens": 200000,
+        "minDelayMs": 1500,
+        "maxRecentMessages": 50,
+        "noProgressTokenThreshold": 50,
+        "noProgressTurnsBeforePause": 2,
+        "noToolCallTurnsBeforePause": 2,
+        "budgetWrapupRatio": 0.8,
+        "warnTurnsRemaining": 3,
+        "warnDurationMsRemaining": 60000,
+        "warnTokensRemaining": 25000,
+        "maxPromptFailures": 3,
+        "resultRetentionMs": 604800000,
+        "maxStoredResults": 200
+      },
+      "lastStatus": "Recovered persisted goal state. Review /goal status and run /goal resume when ready.",
+      "lastAssistantText": "",
+      "lastAssistantMessageID": "msg_eea0a06180025BQcd5HZtQGw01",
+      "lastContinueAt": 1782043016444,
+      "lastProgressAt": 0,
+      "noProgressTurns": 1,
+      "noToolCallTurns": 0,
+      "blockedReason": "",
+      "budgetWrapupSent": false,
+      "stopped": true,
+      "stopReason": "recovered after restart",
+      "promptFailures": 0,
+      "messageIDs": [],
+      "history": [
+        {
+          "type": "set",
+          "detail": "Goal created with limits: 10 auto-continues, 900s, 200,000 context tokens.",
+          "timestamp": 1782042985450
+        },
+        {
+          "type": "auto-continue",
+          "detail": "Sent auto-continue prompt 1/10.",
+          "timestamp": 1782043014483
+        },
+        {
+          "type": "warning",
+          "detail": "Observed a low-progress turn below 50 output tokens; grace count 1/2.",
+          "timestamp": 1782043016444
+        },
+        {
+          "type": "auto-continue",
+          "detail": "Sent auto-continue prompt 2/10.",
+          "timestamp": 1782043016457
+        },
+        {
+          "type": "recovered",
+          "detail": "Recovered persisted goal state after plugin restart; auto-continue remains paused until you resume.",
+          "timestamp": 1782043088091
+        }
+      ],
+      "checkpoints": [],
+      "lastCheckpoint": null,
+      "focused": true
+    },
+    {
+      "goalId": "00d270fd-9e5a-4fa7-9c83-0aca6471ba97",
+      "condition": "去远程查看所有历史实验，包括所有其他分支的，然后做完整的消融实验，我给你三天时间，务必对当前模型所有实现，所有实验摸清楚，哪些是有用的，开销如何；哪些结果很差应该删掉？同步建立数学理论并不断修正。可以补充评估，比如白化雾化指标",
+      "successCriteria": "",
+      "constraints": "",
+      "mode": "normal",
+      "sessionID": "ses_115f44799ffeJcFs2vcvy0FkHW",
+      "turnCount": 1,
+      "startedAt": 1782043336981,
+      "totalTokens": 0,
+      "options": {
+        "maxTurns": 10,
+        "maxDurationMs": 900000,
+        "maxTokens": 200000,
+        "minDelayMs": 1500,
+        "maxRecentMessages": 50,
+        "noProgressTokenThreshold": 50,
+        "noProgressTurnsBeforePause": 2,
+        "noToolCallTurnsBeforePause": 2,
+        "budgetWrapupRatio": 0.8,
+        "warnTurnsRemaining": 3,
+        "warnDurationMsRemaining": 60000,
+        "warnTokensRemaining": 25000,
+        "maxPromptFailures": 3,
+        "resultRetentionMs": 604800000,
+        "maxStoredResults": 200
+      },
+      "lastStatus": "Recovered persisted goal state. Review /goal status and run /goal resume when ready.",
+      "lastAssistantText": "",
+      "lastAssistantMessageID": "msg_eea0f6126001lD2AkdI78Wn2Uo",
+      "lastContinueAt": 1782043367441,
+      "lastProgressAt": 0,
+      "noProgressTurns": 0,
+      "noToolCallTurns": 0,
+      "blockedReason": "",
+      "budgetWrapupSent": false,
+      "stopped": true,
+      "stopReason": "recovered after restart",
+      "promptFailures": 0,
+      "messageIDs": [],
+      "history": [
+        {
+          "type": "set",
+          "detail": "Goal created with limits: 10 auto-continues, 900s, 200,000 context tokens.",
+          "timestamp": 1782043336981
+        },
+        {
+          "type": "auto-continue",
+          "detail": "Sent auto-continue prompt 1/10.",
+          "timestamp": 1782043367445
+        },
+        {
+          "type": "recovered",
+          "detail": "Recovered persisted goal state after plugin restart; auto-continue remains paused until you resume.",
+          "timestamp": 1782043368888
+        }
+      ],
+      "checkpoints": [],
+      "lastCheckpoint": null,
+      "focused": true
+    }
+  ],
+  "results": [],
+  "archives": [],
+  "orderedSessions": []
+}

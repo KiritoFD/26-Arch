@@ -15,6 +15,7 @@ module core_csr
 	input  logic         wb_sret,
 	input  logic         wb_illegal,
 	input  logic         wb_ebreak,
+	input  logic         wb_sfence,      // SFENCE.VMA: flush TLB
 	input  logic         wb_misalign_data,
 	input  logic         wb_misalign_instr,
 	input  logic         mmu_trap,
@@ -124,7 +125,7 @@ module core_csr
 	                    intr_msip ? {1'b1, 63'd3}  :  // MSIP  (3)
 	                    {1'b1, 63'd7};                  // MTIP  (7)
 	assign sync_trap_or_mret = wb_ecall || wb_illegal || wb_ebreak || wb_misalign_instr ||
-	                           wb_misalign_data || mmu_trap || wb_mret || wb_sret;
+	                           wb_misalign_data || mmu_trap || wb_mret || wb_sret || wb_sfence;
 
 	assign csr_mhartid = 64'd0;
 	assign csr_sstatus = csr_mstatus & SSTATUS_MASK;
@@ -509,6 +510,10 @@ module core_csr
 			next_privilege_mode = {1'b0, csr_mstatus[8]};
 			mret_redirect = 1'b1;
 			trap_redirect_pc = csr_sepc_r;
+		end else if (wb_sfence) begin
+			// SFENCE.VMA: redirect to PC+4, flush MMU (handled by flush_mmu_o in core.sv)
+			mret_redirect = 1'b1;
+			trap_redirect_pc = wb_r.pc + 64'd4;
 		end else if (wb_r.valid && wb_r.csr_wen) begin
 			unique case (wb_r.csr_addr)
 				CSR_MSTATUS:  next_mstatus  = wb_r.csr_wdata;

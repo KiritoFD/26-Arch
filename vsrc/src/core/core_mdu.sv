@@ -29,6 +29,34 @@ module core_mdu
 	logic        mdu_q_neg;
 	logic        mdu_r_neg;
 
+	// combinational signals (moved from always_ff for Vivado 2018 compatibility)
+	logic [63:0] width_mask;
+	logic [6:0]  width_steps;
+	logic [5:0]  sign_bit;
+	logic [63:0] op1_eff;
+	logic [63:0] op2_eff;
+	logic [63:0] dividend_abs;
+	logic [63:0] divisor_abs;
+	logic        op1_neg;
+	logic        op2_neg;
+	logic [63:0] mul_acc_next;
+	logic [63:0] mul_a_next;
+	logic [63:0] mul_b_next;
+	logic [64:0] div_rem_next;
+	logic [63:0] div_quot_next;
+	logic [63:0] q_unsigned;
+	logic [63:0] r_unsigned;
+	logic [63:0] final_val;
+	logic [63:0] mul_src0;
+	logic [63:0] mul_src1;
+	logic [63:0] div_q_abs_fast;
+	logic [63:0] div_r_abs_fast;
+	logic [63:0] div_pow2_mask;
+	logic        div_is_pow2;
+	logic [5:0]  div_pow2_shift;
+	logic        div_is_signed;
+	logic        div_is_rem;
+
 	always_ff @(posedge clk) begin
 		if (reset) begin
 			mdu_busy <= 1'b0;
@@ -48,33 +76,6 @@ module core_mdu
 			mdu_q_neg <= 1'b0;
 			mdu_r_neg <= 1'b0;
 		end else begin
-			logic [63:0] width_mask;
-			logic [6:0]  width_steps;
-			logic [5:0]  sign_bit;
-			logic [63:0] op1_eff;
-			logic [63:0] op2_eff;
-			logic [63:0] dividend_abs;
-			logic [63:0] divisor_abs;
-			logic        op1_neg;
-			logic        op2_neg;
-			logic [63:0] mul_acc_next;
-			logic [63:0] mul_a_next;
-			logic [63:0] mul_b_next;
-			logic [64:0] div_rem_next;
-			logic [63:0] div_quot_next;
-			logic [63:0] q_unsigned;
-			logic [63:0] r_unsigned;
-			logic [63:0] final_val;
-			logic [63:0] mul_src0;
-			logic [63:0] mul_src1;
-			logic [63:0] div_q_abs_fast;
-			logic [63:0] div_r_abs_fast;
-			logic [63:0] div_pow2_mask;
-			logic        div_is_pow2;
-			logic [5:0]  div_pow2_shift;
-			logic        div_is_signed;
-			logic        div_is_rem;
-
 			width_mask = ex_r.is_word ? 64'h0000_0000_ffff_ffff : 64'hffff_ffff_ffff_ffff;
 			width_steps = ex_r.is_word ? 7'd32 : 7'd64;
 			sign_bit = ex_r.is_word ? 6'd31 : 6'd63;
@@ -187,7 +188,7 @@ module core_mdu
 					divisor_abs = op2_neg ? ((~op2_eff + 64'd1) & width_mask) : (op2_eff & width_mask);
 					div_is_pow2 = ((divisor_abs & (divisor_abs - 64'd1)) == 64'd0);
 					div_pow2_shift = 6'd0;
-					for (int b = 0; b < 64; b = b + 1) begin
+					for (integer b = 0; b < 64; b = b + 1) begin
 						if (divisor_abs[b]) div_pow2_shift = b[5:0];
 					end
 					div_pow2_mask = (div_pow2_shift == 6'd0) ? 64'd0 : ((64'd1 << div_pow2_shift) - 64'd1);

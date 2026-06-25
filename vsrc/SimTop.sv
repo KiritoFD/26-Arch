@@ -43,6 +43,7 @@ module SimTop import common::*;(
     logic [63:0] pmpcfg0;
     logic [63:0] pmpaddr0;
     logic [1:0]  priv_mode;
+    logic        mstatus_sum;
     logic        flush_mmu;
     logic        walk_fault;
     logic [63:0] fault_vaddr;
@@ -58,6 +59,7 @@ module SimTop import common::*;(
       .csr_pmpcfg0_o(pmpcfg0),
       .csr_pmpaddr0_o(pmpaddr0),
       .privilege_mode_o(priv_mode),
+      .mstatus_sum_o(mstatus_sum),
       .flush_mmu_o(flush_mmu),
       .walk_fault(walk_fault),
       .fault_vaddr(fault_vaddr),
@@ -71,6 +73,7 @@ module SimTop import common::*;(
       .pmpcfg0(pmpcfg0),
       .pmpaddr0(pmpaddr0),
       .privilege_mode(priv_mode),
+      .mstatus_sum(mstatus_sum),
       .flush(flush_mmu),
       .ireq_in(ireq_core),  .iresp_in(iresp_core),
       .dreq_in(dreq_core),  .dresp_in(dresp_core),

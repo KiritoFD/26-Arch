@@ -1,0 +1,19 @@
+// Verilated -*- C++ -*-
+// DESCRIPTION: Verilator output: Constant pool
+//
+
+#include "verilated.h"
+
+extern const VlWide<13>/*415:0*/ VSimTopFPGA__ConstPool__CONST_h2986b6f6_0 = {{
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000
+}};
+
+extern const VlWide<15>/*479:0*/ VSimTopFPGA__ConstPool__CONST_hbda38995_0 = {{
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000
+}};

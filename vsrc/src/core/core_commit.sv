@@ -83,6 +83,7 @@ module core_commit
 	logic wb_ecall;
 	logic wb_mret;
 	logic wb_sret;
+	logic wb_sfence;
 	logic wb_illegal;
 	logic wb_ebreak;
 	logic wb_misalign_data;
@@ -92,6 +93,7 @@ module core_commit
 	assign wb_ecall        = wb_r.valid && wb_r.is_ecall;
 	assign wb_mret         = wb_r.valid && wb_r.is_mret;
 	assign wb_sret         = wb_r.valid && wb_r.is_sret;
+	assign wb_sfence       = wb_r.valid && wb_r.is_sfence;
 	assign wb_illegal      = wb_r.valid && wb_r.is_illegal;
 	assign wb_ebreak       = wb_r.valid && wb_r.is_ebreak;
 	assign wb_misalign_data = wb_r.valid && wb_r.is_misalign;
@@ -115,6 +117,7 @@ module core_commit
 		.wb_sret(wb_sret),
 		.wb_illegal(wb_illegal),
 		.wb_ebreak(wb_ebreak),
+		.wb_sfence(wb_sfence),
 		.wb_misalign_data(wb_misalign_data),
 		.wb_misalign_instr(wb_misalign_instr),
 		.mmu_trap(mmu_trap),
@@ -218,7 +221,7 @@ module core_commit
 	end
 
 	always_comb begin
-		for (int j = 0; j < 32; j = j + 1) begin
+		for (integer j = 0; j < 32; j = j + 1) begin
 			gpr_diff[j] = gpr[j];
 		end
 		if (wb_r.valid && wb_r.wen && (wb_r.rd != 0)) begin

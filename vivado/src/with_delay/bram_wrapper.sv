@@ -1,5 +1,5 @@
 module bram_wrapper #(
-	parameter logic SIMULATION = 1'b0
+	parameter SIMULATION = 1'b0
 )(
 	input logic clk, reset,
 
@@ -15,7 +15,7 @@ module bram_wrapper #(
 	output logic last
 
 );
-	localparam BRAM_DELAY = 32;
+	localparam BRAM_DELAY = 2;
 	logic [15:0] counter;
 	logic txn_active;
 	logic [63:0] latched_addr;
@@ -55,7 +55,7 @@ module bram_wrapper #(
 	end
 	
 	always_ff @(posedge clk) begin
-		if (reset || !txn_active || counter != BRAM_DELAY || last) real_valid <= '0;
+		if (reset || !txn_active || counter != BRAM_DELAY || last || real_valid) real_valid <= '0;
 		else real_valid <= '1;
 	end
 

@@ -13,6 +13,7 @@ module mmu
 	input  logic [63:0]  pmpcfg0,
 	input  logic [63:0]  pmpaddr0,
 	input  logic [1:0]   privilege_mode,
+	input  logic         mstatus_sum,    // SUM bit: S-mode can access U pages
 	input  logic         flush,
 
 	input  ibus_req_t    ireq_in,
@@ -71,6 +72,10 @@ module mmu
 	logic        pmp_allow_r;
 	logic        pmp_allow_w;
 	logic        pmp_allow_x;
+	logic        pte_u;          // PTE User bit
+	logic        u_bit_fault_insn;
+	logic        u_bit_fault_load;
+	logic        u_bit_fault_store;
 
 	assign satp_mode = (satp[63:60] == 4'd8);
 	assign satp_ppn  = satp[43:0];
@@ -146,6 +151,15 @@ module mmu
 	// Note: In WALK_IDLE, walk_fault_next is always 0 because we haven't started walking yet
 	// In other states, we check the PTE from the bus response
 	logic walk_fault_next;
+	logic leaf_valid_next;  // PTE is a valid leaf at current level
+	assign leaf_valid_next =
+		(state == WALK_LEVEL2 && dresp_out.data_ok && dresp_out.data[0] &&
+		 (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2])) ||
+		(state == WALK_LEVEL1 && dresp_out.data_ok && dresp_out.data[0] &&
+		 (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2])) ||
+		(state == WALK_LEVEL0 && dresp_out.data_ok && dresp_out.data[0] &&
+		 (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]));
+
 	assign walk_fault_next =
 		(state == WALK_LEVEL2 && dresp_out.data_ok && !dresp_out.data[0]) ||
 		(state == WALK_LEVEL1 && dresp_out.data_ok && !dresp_out.data[0]) ||
@@ -157,6 +171,25 @@ module mmu
 	assign pmp_allow_r = pmp_hit && pmpcfg0[0];
 	assign pmp_allow_w = pmp_hit && pmpcfg0[1];
 	assign pmp_allow_x = pmp_hit && pmpcfg0[2];
+
+	// U bit (PTE[4]) checking for leaf PTEs
+	assign pte_u = saved_pte[4];
+
+	// U-mode: can only access U=1 pages
+	// S-mode: can only access U=0 pages, unless SUM=1 (then can access U=1 for loads only, not stores or insn)
+	// M-mode: not translated (never reaches here)
+	assign u_bit_fault_insn = leaf_valid_next && (
+		(privilege_mode == 2'd0 && !dresp_out.data[4]) ||  // U-mode: U bit must be 1 for insn
+		(privilege_mode == 2'd1 && dresp_out.data[4])       // S-mode: U=1 pages cannot be executed
+	);
+	assign u_bit_fault_load = (state == WALK_DONE_INSN) && !saved_is_insn && !data_is_store && (
+		(privilege_mode == 2'd0 && !pte_u) ||               // U-mode: U=0 page
+		(privilege_mode == 2'd1 && pte_u && !mstatus_sum)    // S-mode: U=1 page without SUM
+	);
+	assign u_bit_fault_store = (state == WALK_DONE_DATA) && data_is_store && (
+		(privilege_mode == 2'd0 && !pte_u) ||               // U-mode: U=0 page
+		(privilege_mode == 2'd1 && pte_u)                    // S-mode: SUM does not apply to stores
+	);
 
 	assign direct_insn_pmp_fault  = !translate_en && ireq_in.valid &&
 	                                pmp_req_fault(ireq_in.addr, 1'b1, 1'b0, pmpcfg0, pmpaddr0, privilege_mode);
@@ -172,11 +205,15 @@ module mmu
 	                                pmp_req_fault(phys_addr, 1'b0, 1'b1, pmpcfg0, pmpaddr0, privilege_mode);
 
 	assign walk_fault = (walk_active && walk_fault_next) ||
+	                    (walk_active && u_bit_fault_insn) ||
+	                    u_bit_fault_load || u_bit_fault_store ||
 	                    direct_insn_pmp_fault || direct_load_pmp_fault || direct_store_pmp_fault ||
 	                    done_insn_pmp_fault || done_load_pmp_fault || done_store_pmp_fault;
-	assign fault_is_insn = (walk_active && walk_fault_next) ? saved_is_insn :
-	                       (direct_insn_pmp_fault || done_insn_pmp_fault);
-	assign fault_vaddr = (walk_active && walk_fault_next) ? saved_vaddr :
+	assign fault_is_insn = (walk_active && (walk_fault_next || u_bit_fault_insn)) ? (u_bit_fault_insn ? 1'b1 : saved_is_insn) :
+	                       (direct_insn_pmp_fault || done_insn_pmp_fault || u_bit_fault_insn);
+	assign fault_vaddr = (walk_active && (walk_fault_next || u_bit_fault_insn)) ? saved_vaddr :
+	                     u_bit_fault_load ? saved_vaddr :
+	                     u_bit_fault_store ? saved_vaddr :
 	                     direct_insn_pmp_fault ? ireq_in.addr :
 	                     direct_load_pmp_fault ? dreq_in.addr :
 	                     direct_store_pmp_fault ? dreq_in.addr :
@@ -186,6 +223,9 @@ module mmu
 	                     64'd0;
 	assign fault_cause = (walk_active && walk_fault_next) ?
 	                     (saved_is_insn ? 64'd12 : (data_is_store ? 64'd15 : 64'd13)) :
+	                     u_bit_fault_insn ? 64'd12 :
+	                     u_bit_fault_load ? 64'd13 :
+	                     u_bit_fault_store ? 64'd15 :
 	                     (direct_insn_pmp_fault || done_insn_pmp_fault) ? 64'd1 :
 	                     (direct_store_pmp_fault || done_store_pmp_fault) ? 64'd7 :
 	                     (direct_load_pmp_fault || done_load_pmp_fault) ? 64'd5 :

@@ -1,0 +1,228 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jun 25 05:03:41 2026
+# Process ID: 35932
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source g:\GitHub\26-Arch\vivado\rebuild_project3.tcl -log g:\GitHub\26-Arch\vivado\rebuild_log2.txt
+# Log file: g:/GitHub/26-Arch/vivado/rebuild_log2.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------
+source {g:\GitHub\26-Arch\vivado\rebuild_project3.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set project_path [file join $repo_root vivado test-cpu project project_3 project_3.xpr]
+# open_project $project_path
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'G:/Vivado/2018.3/data/ip'.
+# update_compile_order -fileset sources_1
+# generate_target all [get_ips]
+# reset_run synth_1
+WARNING: [Vivado 12-1017] Problems encountered:
+1. Failed to delete one or more files in run directory G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1
+
+# launch_runs synth_1 -jobs 4
+[Thu Jun 25 05:03:46 2026] Launched bram_1_synth_1...
+Run output will be captured here: G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/bram_1_synth_1/runme.log
+[Thu Jun 25 05:03:46 2026] Launched synth_1...
+Run output will be captured here: G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/runme.log
+# wait_on_run synth_1
+[Thu Jun 25 05:03:46 2026] Waiting for synth_1 to finish...
+
+*** Running vivado
+    with args -log basys3_top.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source basys3_top.tcl
+
+
+****** Vivado v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source basys3_top.tcl -notrace
+Command: synth_design -top basys3_top -part xc7a35tcpg236-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 31464 
+WARNING: [Synth 8-992] disk_rdy is already implicitly declared earlier [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:461]
+WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:127]
+WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:128]
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:01 ; elapsed = 00:00:02 . Memory (MB): peak = 408.105 ; gain = 115.469
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'basys3_top' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/basys3_top.sv:1]
+	Parameter BIT_TMR_MAX bound to: 14'b00000011011000 
+INFO: [Synth 8-6157] synthesizing module 'soc_top' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/soc_top.sv:1]
+	Parameter SIMULATION bound to: 1'b0 
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/.Xil/Vivado-63176-Archer/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/.Xil/Vivado-63176-Archer/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'mycpu_top' [G:/GitHub/26-Arch/vsrc/mycpu_top.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'VTop' [G:/GitHub/26-Arch/vsrc/VTop.sv:12]
+INFO: [Synth 8-6157] synthesizing module 'core' [G:/GitHub/26-Arch/vsrc/src/core.sv:17]
+INFO: [Synth 8-6157] synthesizing module 'core_decode' [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:128]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:197]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:234]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:248]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:262]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:278]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:278]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:296]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:305]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:305]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:319]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:343]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:352]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:388]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_pkg.sv:149]
+INFO: [Synth 8-6155] done synthesizing module 'core_decode' (2#1) [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'core_execute' [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:56]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:88]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:110]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:127]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:138]
+INFO: [Synth 8-6155] done synthesizing module 'core_execute' (3#1) [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'core_mdu' [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:4]
+WARNING: [Synth 8-6014] Unused sequential element width_mask_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:79]
+WARNING: [Synth 8-6014] Unused sequential element width_steps_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:80]
+WARNING: [Synth 8-6014] Unused sequential element sign_bit_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:81]
+WARNING: [Synth 8-6014] Unused sequential element op1_eff_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:82]
+WARNING: [Synth 8-6014] Unused sequential element op2_eff_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:83]
+WARNING: [Synth 8-6014] Unused sequential element mul_acc_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:91]
+WARNING: [Synth 8-6014] Unused sequential element mul_a_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:92]
+WARNING: [Synth 8-6014] Unused sequential element mul_b_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:93]
+WARNING: [Synth 8-6014] Unused sequential element div_rem_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:116]
+WARNING: [Synth 8-6014] Unused sequential element div_quot_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:117]
+WARNING: [Synth 8-6014] Unused sequential element q_unsigned_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:128]
+WARNING: [Synth 8-6014] Unused sequential element r_unsigned_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:129]
+WARNING: [Synth 8-6014] Unused sequential element final_val_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:130]
+WARNING: [Synth 8-6014] Unused sequential element mul_src0_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:147]
+WARNING: [Synth 8-6014] Unused sequential element mul_src1_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:148]
+WARNING: [Synth 8-6014] Unused sequential element div_is_signed_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:181]
+WARNING: [Synth 8-6014] Unused sequential element div_is_rem_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:182]
+WARNING: [Synth 8-6014] Unused sequential element op1_neg_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:185]
+WARNING: [Synth 8-6014] Unused sequential element op2_neg_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:186]
+WARNING: [Synth 8-6014] Unused sequential element dividend_abs_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:187]
+WARNING: [Synth 8-6014] Unused sequential element divisor_abs_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:188]
+WARNING: [Synth 8-6014] Unused sequential element div_is_pow2_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:189]
+WARNING: [Synth 8-6014] Unused sequential element div_pow2_shift_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:190]
+WARNING: [Synth 8-6014] Unused sequential element div_pow2_mask_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:194]
+WARNING: [Synth 8-6014] Unused sequential element div_q_abs_fast_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:219]
+WARNING: [Synth 8-6014] Unused sequential element div_r_abs_fast_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:220]
+INFO: [Synth 8-6155] done synthesizing module 'core_mdu' (4#1) [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'core_commit' [G:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:4]
+	Parameter MEMDETECT_REGION_BASE bound to: 64'b0000000000000000000000000000000010000000000000000110000000000000 
+	Parameter MEMDETECT_REGION_TOP bound to: 64'b0000000000000000000000000000000010000000000000000111000000000000 
+	Parameter MEMDETECT_SCAN_END bound to: 64'b0000000000000000000000000000000010000000000000011011100001100000 
+	Parameter MEMDETECT_FAULT_PC bound to: 64'b0000000000000000000000000000000010000000000000000110000101000000 
+	Parameter MEMDETECT_REGION_WORDS bound to: 64'b0000000000000000000000000000000000000000000000000000001000000000 
+INFO: [Synth 8-6157] synthesizing module 'core_csr' [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:366]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:518]
+INFO: [Synth 8-6155] done synthesizing module 'core_csr' (5#1) [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:4]
+INFO: [Synth 8-6155] done synthesizing module 'core_commit' (6#1) [G:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:4]
+INFO: [Synth 8-6155] done synthesizing module 'core' (7#1) [G:/GitHub/26-Arch/vsrc/src/core.sv:17]
+INFO: [Synth 8-6157] synthesizing module 'mmu' [G:/GitHub/26-Arch/vsrc/util/mmu.sv:8]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:237]
+INFO: [Synth 8-6155] done synthesizing module 'mmu' (8#1) [G:/GitHub/26-Arch/vsrc/util/mmu.sv:8]
+INFO: [Synth 8-6157] synthesizing module 'IBusToCBus' [G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:10]
+INFO: [Synth 8-6157] synthesizing module 'DBusToCBus' [G:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv:13]
+INFO: [Synth 8-6155] done synthesizing module 'DBusToCBus' (9#1) [G:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv:13]
+WARNING: [Synth 8-6014] Unused sequential element req_addr_latched_reg was removed.  [G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:40]
+INFO: [Synth 8-6155] done synthesizing module 'IBusToCBus' (10#1) [G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:10]
+INFO: [Synth 8-6157] synthesizing module 'CBusArbiter' [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:9]
+	Parameter NUM_INPUTS bound to: 32'sb00000000000000000000000000000010 
+	Parameter MAX_INDEX bound to: 32'sb00000000000000000000000000000001 
+WARNING: [Synth 8-589] replacing case/wildcard equality operator === with logical equality operator == [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:38]
+WARNING: [Synth 8-589] replacing case/wildcard equality operator === with logical equality operator == [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:38]
+WARNING: [Synth 8-5858] RAM iresps_reg from Abstract Data Type (record/struct) for this pattern/configuration is not supported. This will most likely be implemented in registers
+INFO: [Synth 8-6155] done synthesizing module 'CBusArbiter' (11#1) [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:9]
+INFO: [Synth 8-6155] done synthesizing module 'VTop' (12#1) [G:/GitHub/26-Arch/vsrc/VTop.sv:12]
+INFO: [Synth 8-6155] done synthesizing module 'mycpu_top' (13#1) [G:/GitHub/26-Arch/vsrc/mycpu_top.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'cbus_crossbar' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/cbus_crossbar.sv:1]
+INFO: [Synth 8-6155] done synthesizing module 'cbus_crossbar' (14#1) [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/cbus_crossbar.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'bram_wrapper' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/bram_wrapper.sv:1]
+	Parameter SIMULATION bound to: 1'b0 
+	Parameter BRAM_DELAY bound to: 2 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'bram_0' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/.Xil/Vivado-63176-Archer/realtime/bram_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'bram_0' (15#1) [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/.Xil/Vivado-63176-Archer/realtime/bram_0_stub.v:6]
+WARNING: [Synth 8-689] width (8) of port connection 'wea' does not match port width (1) of module 'bram_0' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/bram_wrapper.sv:80]
+WARNING: [Synth 8-689] width (18) of port connection 'addra' does not match port width (15) of module 'bram_0' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/bram_wrapper.sv:81]
+INFO: [Synth 8-6155] done synthesizing module 'bram_wrapper' (16#1) [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/bram_wrapper.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'device' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:3]
+	Parameter SIMULATION bound to: 1'b0 
+	Parameter BIT_TMR_MAX bound to: 14'b00000011011000 
+	Parameter BIT_INDEX_MAX bound to: 10 - type: integer 
+	Parameter TX_FIFO_DEPTH bound to: 256 - type: integer 
+	Parameter RDY bound to: 2'b00 
+	Parameter LOAD_BIT bound to: 2'b01 
+	Parameter SEND_BIT bound to: 2'b10 
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:54]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:199]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:210]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:280]
+INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:280]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:379]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:396]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:425]
+WARNING: [Synth 8-6014] Unused sequential element finish_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:117]
+WARNING: [Synth 8-6014] Unused sequential element rxBitSync_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:262]
+WARNING: [Synth 8-6014] Unused sequential element rxBit_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:263]
+WARNING: [Synth 8-6014] Unused sequential element rxState_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:272]
+WARNING: [Synth 8-6014] Unused sequential element rxBitIndex_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:273]
+WARNING: [Synth 8-6014] Unused sequential element rxBitTmr_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:274]
+WARNING: [Synth 8-6014] Unused sequential element rxByteReady_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:275]
+WARNING: [Synth 8-6014] Unused sequential element rxShiftReg_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:276]
+WARNING: [Synth 8-6014] Unused sequential element rxByte_reg was removed.  [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:277]
+INFO: [Synth 8-6155] done synthesizing module 'device' (17#1) [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:3]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/soc_top.sv:151]
+INFO: [Synth 8-6157] synthesizing module 'bram_1' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/.Xil/Vivado-63176-Archer/realtime/bram_1_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'bram_1' (18#1) [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/.Xil/Vivado-63176-Archer/realtime/bram_1_stub.v:6]
+ERROR: [Synth 8-448] named port connection 'ena' does not exist for instance 'disk_bram_inst' of module 'bram_1' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/soc_top.sv:153]
+ERROR: [Synth 8-6156] failed synthesizing module 'soc_top' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/soc_top.sv:1]
+ERROR: [Synth 8-6156] failed synthesizing module 'basys3_top' [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/basys3_top.sv:1]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 519.379 ; gain = 226.742
+---------------------------------------------------------------------------------
+RTL Elaboration failed
+INFO: [Common 17-83] Releasing license: Synthesis
+91 Infos, 45 Warnings, 0 Critical Warnings and 4 Errors encountered.
+synth_design failed
+ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
+INFO: [Common 17-206] Exiting Vivado at Thu Jun 25 05:05:00 2026...
+[Thu Jun 25 05:05:01 2026] synth_1 finished
+wait_on_run: Time (s): cpu = 00:00:00 ; elapsed = 00:01:15 . Memory (MB): peak = 303.160 ; gain = 0.000
+# set synth_status [get_property STATUS [get_runs synth_1]]
+# puts "Synthesis status: $synth_status"
+Synthesis status: synth_design ERROR
+# if {$synth_status != "synth_design Complete!"} {
+#     puts "ERROR: Synthesis failed!"
+#     exit 1
+# }
+ERROR: Synthesis failed!
+INFO: [Common 17-206] Exiting Vivado at Thu Jun 25 05:05:01 2026...

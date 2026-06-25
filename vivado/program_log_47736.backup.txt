@@ -1,0 +1,20 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jun 25 03:17:51 2026
+# Process ID: 47736
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source g:\GitHub\26-Arch\vivado\program_fpga.tcl -log g:\GitHub\26-Arch\vivado\program_log.txt
+# Log file: g:/GitHub/26-Arch/vivado/program_log.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------
+source {g:\GitHub\26-Arch\vivado\program_fpga.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set bitstream [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.bit]
+# open_hw_manager
+invalid command name "open_hw_manager"
+    while executing
+"open_hw_manager"
+    (file "g:\GitHub\26-Arch\vivado\program_fpga.tcl" line 6)
+INFO: [Common 17-206] Exiting Vivado at Thu Jun 25 03:17:52 2026...

@@ -1,0 +1,6 @@
+connect
+targets
+set PROGRAM_FILE {G:/GitHub/26-Arch/vivado/lab5_project/lab5_project.runs/impl_1/basys3_top.bit}
+fpga -file $PROGRAM_FILE
+disconnect
+exit

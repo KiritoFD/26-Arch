@@ -1,0 +1,145 @@
+/*
+
+Xilinx Vivado v2019.2 (64-bit) [Major: 2019, Minor: 2]
+SW Build: 2708876 on Wed Nov  6 21:40:23 MST 2019
+IP Build: 2700528 on Thu Nov  7 00:09:20 MST 2019
+
+Process ID (PID): 39540
+License: Customer
+
+Current time: 	Fri Jun 26 00:39:31 CST 2026
+Time zone: 	China Standard Time (Asia/Shanghai)
+
+OS: Windows 10
+OS Version: 10.0
+OS Architecture: amd64
+Available processors (cores): 32
+
+Screen size: 3840x2160
+Screen resolution (DPI): 200
+Available screens: 1
+Available disk space: 129 GB
+Default font: family=Dialog,name=Dialog,style=plain,size=24
+
+Java version: 	9.0.4 64-bit
+Java home: 	C:/Xilinx/Vivado/2019.2/tps/win64/jre9.0.4
+Java executable location: 	C:/Xilinx/Vivado/2019.2/tps/win64/jre9.0.4/bin/java.exe
+Java initial memory (-Xms): 	128 MB
+Java maximum memory (-Xmx):	 3 GB
+
+
+User name: 	xy
+User home directory: C:/Users/xy
+User working directory: G:/GitHub/26-Arch/vivado
+User country: 	CN
+User language: 	zh
+User locale: 	zh_CN
+
+RDI_BASEROOT: C:/Xilinx/Vivado
+HDI_APPROOT: C:/Xilinx/Vivado/2019.2
+RDI_DATADIR: C:/Xilinx/Vivado/2019.2/data
+RDI_BINDIR: C:/Xilinx/Vivado/2019.2/bin
+
+Vivado preferences file location: C:/Users/xy/AppData/Roaming/Xilinx/Vivado/2019.2/vivado.xml
+Vivado preferences directory: C:/Users/xy/AppData/Roaming/Xilinx/Vivado/2019.2/
+Vivado layouts directory: C:/Users/xy/AppData/Roaming/Xilinx/Vivado/2019.2/layouts
+PlanAhead jar file location: 	C:/Xilinx/Vivado/2019.2/lib/classes/planAhead.jar
+Vivado log file location: 	G:/GitHub/26-Arch/vivado/vivado.log
+Vivado journal file location: 	
+Engine tmp dir: 	G:/GitHub/26-Arch/vivado/.Xil/Vivado-39540-Archer
+
+Xilinx Environment Variables
+----------------------------
+DEVECO_SDK_HOME: C:\Program Files\Huawei\DevEco Studio\sdk
+XILINX: C:/Xilinx/Vivado/2019.2/ids_lite/ISE
+XILINX_DSP: C:/Xilinx/Vivado/2019.2/ids_lite/ISE
+XILINX_PLANAHEAD: C:/Xilinx/Vivado/2019.2
+XILINX_VIVADO: C:/Xilinx/Vivado/2019.2
+XILINX_VIVADO_HLS: C:/Xilinx/Vivado/2019.2
+
+
+GUI allocated memory:	198 MB
+GUI max memory:		3,072 MB
+Engine allocated memory: 773 MB
+
+Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+*/
+
+// TclEventType: START_GUI
+// TclEventType: START_PROGRESS_DIALOG
+// Tcl Message: start_gui 
+// TclEventType: START_PROGRESS_DIALOG
+// TclEventType: LOAD_FEATURE
+// TclEventType: DEBUG_PROBE_SET_CHANGE
+// bB (cr):  Sourcing Tcl script 'g:\GitHub\26-Arch\vivado\program_flash_v3.tcl' : addNotify
+// TclEventType: FILE_SET_NEW
+// TclEventType: RUN_ADD
+// TclEventType: RUN_CURRENT
+// TclEventType: PROJECT_DASHBOARD_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_DASHBOARD_GADGET_NEW
+// TclEventType: PROJECT_DASHBOARD_GADGET_CHANGE
+// TclEventType: PROJECT_NEW
+// Tcl Message: source {g:\GitHub\26-Arch\vivado\program_flash_v3.tcl} 
+// Tcl Message: # set repo_root {G:/GitHub/26-Arch} # set mcs_file_path [file join $repo_root vivado test-cpu project project_3 full_flash.mcs] # set bitstream_path [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.bit] # open_hw 
+// TclEventType: PROJECT_NEW
+// [GUI Memory]: 116 MB (+119626kb) [00:00:04]
+// [Engine Memory]: 712 MB (+595036kb) [00:00:04]
+// TclEventType: HW_SESSION_OPEN
+// Tcl Message: INFO: [IP_Flow 19-234] Refreshing IP repositories INFO: [IP_Flow 19-1704] No user IP repositories specified INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2019.2/data/ip'. 
+// TclEventType: HW_SESSION_OPEN
+// [GUI Memory]: 132 MB (+10618kb) [00:00:06]
+// [Engine Memory]: 764 MB (+17170kb) [00:00:06]
+// TclEventType: HW_SERVER_UPDATE
+// Tcl Message: # connect_hw_server -url localhost:3121 
+// Tcl Message: INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121 INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042 
+// HMemoryUtils.trashcanNow. Engine heap size: 773 MB. GUI used memory: 67 MB. Current time: 6/26/26, 12:39:33 AM CST
+// Tcl Message: INFO: [Labtools 27-3417] Launching cs_server... 
+// TclEventType: HW_SERVER_UPDATE
+// TclEventType: HW_TARGET_CHANGE
+// TclEventType: HW_TARGET_CLOSE
+// TclEventType: HW_DEVICE_CHANGE
+// TclEventType: HW_SYSMON_ADD
+// TclEventType: HW_TARGET_UPDATE
+// WARNING: HEventQueue.dispatchEvent() is taking  2495 ms.
+// TclEventType: HW_DEVICE_CHANGE
+// Tcl Message: INFO: [Labtools 27-2221] Launch Output:   ****** Xilinx cs_server v2019.2.0   **** Build date : Nov 07 2019-13:28:22     ** Copyright 2017-2019 Xilinx, Inc. All Rights Reserved.    
+// Tcl Message: # open_hw_target 
+// Tcl Message: INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A 
+// TclEventType: HW_DEVICE_CHANGE
+// Tcl Message: # set device [get_hw_devices xc7a35t_0] # current_hw_device $device # puts "Step 1: Programming FPGA..." 
+// Tcl Message: Step 1: Programming FPGA... 
+// Tcl Message: # set_property PROGRAM.FILE $bitstream_path $device # program_hw_devices $device 
+// TclEventType: HW_DEVICE_CHANGE
+// TclEventType: HW_CFGMEM_CREATE
+// TclEventType: HW_CFGMEM_PART_CHANGE
+// Tcl Message: INFO: [Labtools 27-3164] End of startup status: HIGH 
+// Tcl Message: # puts "FPGA programmed!" 
+// Tcl Message: FPGA programmed! 
+// Tcl Message: # puts "Step 2: Creating cfgmem..." 
+// Tcl Message: Step 2: Creating cfgmem... 
+// Tcl Message: # set cfgmem [create_hw_cfgmem -hw_device $device "n25q32-3.3v-spi-x1_x2_x4"] # puts "=== cfgmem properties ===" 
+// Tcl Message: === cfgmem properties === 
+// Tcl Message: # foreach p [list_property $cfgmem] { #     catch {set val [get_property $p $cfgmem]} #     if {[info exists val]} { #         puts "  $p = $val" #     } # } 
+// Tcl Message:   CFGMEM_PART = n25q32-3.3v-spi-x1_x2_x4   CLASS = hw_cfgmem   NAME = cfgmem_0   PROGRAM.BIN_OFFSET = 0   PROGRAM.BLANK_CHECK = 0   PROGRAM.BPI_RS_PINS = NONE   PROGRAM.CFG_PROGRAM = 0   PROGRAM.EMMC_CLOCK_FREQUENCY = 50Mhz   PROGRAM.EMMC_DEVICE_INDEX = 10   PROGRAM.EMMC_FILE_DATA_BASE_ADDRESS = 00000000   PROGRAM.EMMC_FILE_DATA_CHUNK_SIZE = 262144   PROGRAM.EMMC_PARTITION_NUMBER = 1   PROGRAM.EMMC_PARTITION_SIZE = small   PROGRAM.EMMC_SD_CONFIG_REG1 = 00000000   PROGRAM.EMMC_SD_ITAP_DLY = 00000000   PROGRAM.EMMC_SD_OTAP_DLY_SEL = 00000000   PROGRAM.EMMC_STATIC_PARTITION_FILE =    PROGRAM.ERASE = 0   PROGRAM.FILES =    PROGRAM.UNUSED_PIN_TERMINATION = pull-none   PROGRAM.VERIFY = 0   PROGRAM.ZYNQ_FSBL =  
+// Tcl Message: # set_property PROGRAM.ADDRESS_RANGE {use_file} $cfgmem # set_property PROGRAM.FILES [list $mcs_file_path] $cfgmem # puts "Step 3: Programming SPI Flash (minimal settings)..." 
+// Tcl Message: Step 3: Programming SPI Flash (minimal settings)... 
+// Tcl Message: # program_hw_cfgmem $cfgmem 
+// TclEventType: HW_DEVICE_CHANGE
+// TclEventType: STOP_PROGRESS_DIALOG
+// HOptionPane Error: 'ERROR: [Labtools 27-3144] Invalid option: Select operation to be performed on flash  (Sourcing Tcl script 'g:\GitHub\26-Arch\vivado\program_flash_v3.tcl')'
+// Tcl Message: ERROR: [Labtools 27-3144] Invalid option: Select operation to be performed on flash 
+// Tcl Message: ERROR: [Common 17-39] 'program_hw_cfgmem' failed due to earlier errors.      while executing "program_hw_cfgmem $cfgmem"     (file "g:\GitHub\26-Arch\vivado\program_flash_v3.tcl" line 38) 
+// TclEventType: STOP_PROGRESS_DIALOG
+// [Engine Memory]: 1,991 MB (+1246594kb) [00:00:41]
+// HMemoryUtils.trashcanNow. Engine heap size: 2,021 MB. GUI used memory: 68 MB. Current time: 6/26/26, 12:40:08 AM CST

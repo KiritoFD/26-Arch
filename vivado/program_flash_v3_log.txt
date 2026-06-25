@@ -1,0 +1,87 @@
+﻿
+****** Vivado v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source {g:\GitHub\26-Arch\vivado\program_flash_v3.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set mcs_file_path [file join $repo_root vivado test-cpu project project_3 full_flash.mcs]
+# set bitstream_path [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.bit]
+# open_hw
+WARNING: 'open_hw' is deprecated, please use 'open_hw_manager' instead.
+# connect_hw_server -url localhost:3121
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042
+INFO: [Labtools 27-3417] Launching cs_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+
+****** Xilinx cs_server v2019.2.0
+  **** Build date : Nov 07 2019-13:28:22
+    ** Copyright 2017-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# set device [get_hw_devices xc7a35t_0]
+# current_hw_device $device
+# puts "Step 1: Programming FPGA..."
+Step 1: Programming FPGA...
+# set_property PROGRAM.FILE $bitstream_path $device
+# program_hw_devices $device
+INFO: [Labtools 27-3164] End of startup status: HIGH
+# puts "FPGA programmed!"
+FPGA programmed!
+# puts "Step 2: Creating cfgmem..."
+Step 2: Creating cfgmem...
+# set cfgmem [create_hw_cfgmem -hw_device $device "n25q32-3.3v-spi-x1_x2_x4"]
+# puts "=== cfgmem properties ==="
+=== cfgmem properties ===
+# foreach p [list_property $cfgmem] {
+#     catch {set val [get_property $p $cfgmem]}
+#     if {[info exists val]} {
+#         puts "  $p = $val"
+#     }
+# }
+  CFGMEM_PART = n25q32-3.3v-spi-x1_x2_x4
+  CLASS = hw_cfgmem
+  NAME = cfgmem_0
+  PROGRAM.BIN_OFFSET = 0
+  PROGRAM.BLANK_CHECK = 0
+  PROGRAM.BPI_RS_PINS = NONE
+  PROGRAM.CFG_PROGRAM = 0
+  PROGRAM.EMMC_CLOCK_FREQUENCY = 50Mhz
+  PROGRAM.EMMC_DEVICE_INDEX = 10
+  PROGRAM.EMMC_FILE_DATA_BASE_ADDRESS = 00000000
+  PROGRAM.EMMC_FILE_DATA_CHUNK_SIZE = 262144
+  PROGRAM.EMMC_PARTITION_NUMBER = 1
+  PROGRAM.EMMC_PARTITION_SIZE = small
+  PROGRAM.EMMC_SD_CONFIG_REG1 = 00000000
+  PROGRAM.EMMC_SD_ITAP_DLY = 00000000
+  PROGRAM.EMMC_SD_OTAP_DLY_SEL = 00000000
+  PROGRAM.EMMC_STATIC_PARTITION_FILE = 
+  PROGRAM.ERASE = 0
+  PROGRAM.FILES = 
+  PROGRAM.UNUSED_PIN_TERMINATION = pull-none
+  PROGRAM.VERIFY = 0
+  PROGRAM.ZYNQ_FSBL = 
+# set_property PROGRAM.ADDRESS_RANGE {use_file} $cfgmem
+# set_property PROGRAM.FILES [list $mcs_file_path] $cfgmem
+# puts "Step 3: Programming SPI Flash (minimal settings)..."
+Step 3: Programming SPI Flash (minimal settings)...
+# program_hw_cfgmem $cfgmem
+vivado.bat : ERROR: [Labtools 27-3144] Invalid option: Select operation to be performed on flash
+At line:15 char:3521
++ ... pgrep\bin'; & "C:\Xilinx\Vivado\2019.2\bin\vivado.bat" -mode batch -n ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: [Labtool...formed on flash:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ERROR: [Common 17-39] 'program_hw_cfgmem' failed due to earlier errors.
+
+    while executing
+"program_hw_cfgmem $cfgmem"
+    (file "g:\GitHub\26-Arch\vivado\program_flash_v3.tcl" line 38)
+INFO: [Common 17-206] Exiting Vivado at Fri Jun 26 00:38:53 2026...

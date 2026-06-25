@@ -1,0 +1,30 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jun 25 03:18:13 2026
+# Process ID: 48076
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source g:\GitHub\26-Arch\vivado\program_fpga.tcl -log g:\GitHub\26-Arch\vivado\program_log.txt
+# Log file: g:/GitHub/26-Arch/vivado/program_log.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------
+source {g:\GitHub\26-Arch\vivado\program_fpga.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set bitstream [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.bit]
+# open_hw
+# connect_hw_server
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8AC3DA
+# set device [lindex [get_hw_devices] 0]
+# current_hw_device $device
+# set_property PROGRAM.FILE $bitstream $device
+# program_hw_devices $device
+INFO: [Labtools 27-3164] End of startup status: HIGH
+# puts "FPGA programmed successfully with: $bitstream"
+FPGA programmed successfully with: G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/impl_1/basys3_top.bit
+# close_hw_target
+INFO: [Labtoolstcl 44-464] Closing hw_target localhost:3121/xilinx_tcf/Digilent/210183A8AC3DA
+# disconnect_hw_server
+INFO: [Common 17-206] Exiting Vivado at Thu Jun 25 03:18:16 2026...

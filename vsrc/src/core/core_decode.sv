@@ -69,7 +69,8 @@ module core_decode
 	output logic          id_dec_is_amo,
 	output logic [4:0]    id_dec_amo_cmd,
 	output logic          id_dec_is_illegal,
-	output logic          id_dec_is_ebreak
+	output logic          id_dec_is_ebreak,
+	output logic          id_dec_is_sfence
 );
 	logic [63:0] id_rs1_val;
 	logic [63:0] id_rs2_val;
@@ -188,6 +189,7 @@ module core_decode
 		id_dec_amo_cmd      = 5'd0;
 		id_dec_is_illegal   = 1'b0;
 		id_dec_is_ebreak    = 1'b0;
+		id_dec_is_sfence    = 1'b0;
 
 		if (id_r.instr == TRAP_INSN) begin
 			id_dec_trap = 1'b1;
@@ -359,20 +361,25 @@ module core_decode
 					if (id_r.instr == 32'h00000073) begin
 						id_dec_is_ecall = 1'b1;
 					end else if (id_r.instr == 32'h30200073) begin
-						id_dec_is_mret = 1'b1;
+						if (privilege_mode < 2'd3)  // MRET requires M-mode
+							id_dec_is_illegal = 1'b1;
+						else
+							id_dec_is_mret = 1'b1;
 					end else if (id_r.instr == 32'h10200073) begin
-						id_dec_is_sret = 1'b1;
+						if (privilege_mode < 2'd1)  // SRET requires S-mode or higher
+							id_dec_is_illegal = 1'b1;
+						else
+							id_dec_is_sret = 1'b1;
 					end else if (id_r.instr == 32'h10500073) begin
 					end else if (id_r.instr == 32'h12000073) begin
+						if (privilege_mode < 2'd1)  // SFENCE.VMA requires S-mode or higher
+							id_dec_is_illegal = 1'b1;
+						else
+							id_dec_is_sfence = 1'b1;
 					end else if (id_r.instr == 32'h00100073) begin
 						id_dec_is_ebreak = 1'b1;
 					end else begin
-						begin
-						logic [1:0] csr_priv;
-						logic csr_priv_ok;
-						csr_priv = id_csr_addr[9:8];
-						csr_priv_ok = (privilege_mode >= csr_priv);
-						if (!csr_priv_ok) begin
+						if ((privilege_mode < id_csr_addr[9:8])) begin
 							id_dec_is_illegal = 1'b1;
 						end else begin
 							id_dec_wen = (id_rd != 0);
@@ -410,7 +417,6 @@ module core_decode
 								end
 							endcase
 								id_dec_csr_wdata = sanitize_csr_write(id_csr_addr, id_dec_csr_wdata);
-						end
 						end
 					end
 				end

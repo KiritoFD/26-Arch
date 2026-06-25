@@ -396,3 +396,49 @@ lab+4 测试结果明细：
 - `labplus-2` 性能优化
 
 理由很直接：现有尝试要么无净收益，要么破坏正确性。为了保证提交版本可运行、可解释、可复现，最终保留的是功能正确的稳定基线。
+
+---
+
+## 6. FPGA 上板（Basys3）
+
+### 6.1 Vivado 2018 兼容性修复
+
+当前代码在 Verilator 仿真环境中稳定运行，但 Vivado 2018 对 SystemVerilog 的支持有限。以下是上板前必须修复的兼容性问题：
+
+| 问题 | 文件 | 修复方法 |
+|------|------|---------|
+| `$error` 系统函数 | `common.sv` | `ASSERTS` 宏用 `ifdef VERILATOR` 隔离，Vivado 看到空 begin...end |
+| `always_comb` 内变量声明 | `core_decode.sv` | 将 `csr_priv`/`csr_priv_ok` 内联为直接比较表达式 |
+| `always_ff` 内变量声明 | `core_mdu.sv` | 26 个局部变量声明移到模块级 |
+| `for (int b = ...)` 循环 | `core_mdu.sv` | `int` 改为 `integer` |
+| `for (int j = ...)` 循环 | `core_commit.sv` | `int` 改为 `integer` |
+| 未隔离的 `include | `core.sv` | 6 个 `include 包裹到 `ifdef VERILATOR` |
+| `localparam type` 枚举 | `device.sv` | 改为 `localparam logic [1:0]` 常量 + `logic [1:0]` 状态变量 |
+| `'x` 赋值 | `device.sv` | `rdata = 'x` 改为 `rdata = 64'd0` |
+| Vivado 工程缺少子模块 | `create_lab5_project.tcl` | 添加 core_pkg/decode/execute/mdu/csr/commit 为独立 source |
+| include 搜索路径 | `create_lab5_project.tcl` | 添加 `vivado/src` 到 include_dirs（for device.svh） |
+
+### 6.2 BRAM 容量与初始化
+
+- Basys3 (xc7a35tcpg236-1) BRAM IP 配置：64-bit 宽，21000 深度（≈164KB）
+- lab5 kernel.bin：13,616 字节（1,702 个 64-bit 字），BRAM 容量充裕
+- COE 文件：从 kernel.bin 重新生成（`ready-to-run/lab5/kernel.coe`，1,702 个 hex 条目）
+
+### 6.3 上板流程
+
+1. 在 Vivado Tcl Console 中运行 `source create_lab5_project.tcl` 重建工程（含更新后的源文件和 include 路径）
+2. 在 Vivado GUI 中打开 `lab5_project`，确认 BRAM IP 的 COE 文件指向 `kernel.coe`
+3. Run Synthesis → Run Implementation → Generate Bitstream
+4. 确认时序收敛（WNS ≥ 0, WHS ≥ 0）
+5. Hardware Manager → Auto Connect → Program Device
+6. 串口调试助手（115200 或由 BIT_TMR_MAX 推算的波特率）观察 UART 输出
+
+### 6.4 串口验证预期
+
+上板运行 lab5 kernel 时，串口应输出内核启动信息。由于 lab5 kernel 包含 MMU 和 S-mode 初始化，预期输出包含：
+
+- 内核启动 banner
+- 内存检测相关输出（若 kernel 包含 mem_detect 测试）
+- 诊断信息或 shell prompt（取决于 kernel 功能范围）
+
+若 BRAM 不足以运行完整 lab5 kernel，降级方案为使用 `lab3-test.coe` 验证基础五级流水功能。

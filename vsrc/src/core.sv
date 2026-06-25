@@ -5,12 +5,14 @@
 `include "include/common.sv"
 `endif
 
+`ifdef VERILATOR
 `include "src/core/core_pkg.sv"
 `include "src/core/core_decode.sv"
 `include "src/core/core_execute.sv"
 `include "src/core/core_mdu.sv"
 `include "src/core/core_csr.sv"
 `include "src/core/core_commit.sv"
+`endif
 
 module core
 	import common::*;
@@ -26,6 +28,7 @@ module core
 	output logic [63:0]  csr_pmpcfg0_o,
 	output logic [63:0]  csr_pmpaddr0_o,
 	output logic [1:0]   privilege_mode_o,
+	output logic         mstatus_sum_o,    // SUM bit for MMU
 	output logic         flush_mmu_o,
 	input  logic         walk_fault,
 	input  logic [63:0]  fault_vaddr,
@@ -95,6 +98,7 @@ module core
 	logic [4:0]  id_dec_amo_cmd;
 	logic        id_dec_is_illegal;
 	logic        id_dec_is_ebreak;
+	logic        id_dec_is_sfence;
 	logic        ex_misalign;
 	logic        ex_instr_misalign;
 	logic        front_trap_pending;
@@ -265,7 +269,8 @@ module core
 		.id_dec_is_amo(id_dec_is_amo),
 		.id_dec_amo_cmd(id_dec_amo_cmd),
 		.id_dec_is_illegal(id_dec_is_illegal),
-		.id_dec_is_ebreak(id_dec_is_ebreak)
+		.id_dec_is_ebreak(id_dec_is_ebreak),
+		.id_dec_is_sfence(id_dec_is_sfence)
 	);
 
 	core_execute u_execute(
@@ -308,6 +313,10 @@ module core
 	);
 
 `ifdef VERILATOR
+`ifdef FPGA_SIM
+	// FPGA simulation: AMO not implemented, same as real FPGA
+	assign amo_helper_result = 64'd0;
+`else
 	AMOHelper u_amo_helper(
 		.clock(clk),
 		.enable(amo_issue),
@@ -317,6 +326,7 @@ module core
 		.mask(amo_mask),
 		.rdata(amo_helper_result)
 	);
+`endif
 `else
 	assign amo_helper_result = 64'd0;
 `endif
@@ -562,6 +572,7 @@ module core
 				wb_r.is_sret <= mem_r.is_sret;
 				wb_r.is_illegal <= mem_r.is_illegal;
 			wb_r.is_ebreak <= mem_r.is_ebreak;
+				wb_r.is_sfence <= mem_r.is_sfence;
 				wb_r.is_misalign <= mem_r.is_misalign;
 				wb_r.is_instr_misalign <= mem_r.is_instr_misalign;
 			end
@@ -610,6 +621,7 @@ module core
 				mem_r.amo_cmd <= ex_r.amo_cmd;
 				mem_r.is_illegal <= ex_r.is_illegal;
 			mem_r.is_ebreak <= ex_r.is_ebreak;
+				mem_r.is_sfence <= ex_r.is_sfence;
 				mem_r.is_misalign <= ex_misalign;
 				mem_r.is_instr_misalign <= ex_instr_misalign;
 
@@ -660,6 +672,7 @@ module core
 				ex_r.amo_cmd <= id_dec_amo_cmd;
 				ex_r.is_illegal <= id_dec_is_illegal;
 				ex_r.is_ebreak <= id_dec_is_ebreak;
+				ex_r.is_sfence <= id_dec_is_sfence;
 				ex_r.is_misalign <= ex_misalign;
 				ex_r.is_instr_misalign <= ex_instr_misalign;
 
@@ -692,6 +705,7 @@ module core
 	assign csr_pmpcfg0_o = csr_pmpcfg0;
 	assign csr_pmpaddr0_o = csr_pmpaddr0;
 	assign privilege_mode_o = privilege_mode;
+	assign mstatus_sum_o = csr_mstatus[18];   // SUM bit for MMU U-page access
 	assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front || ex_instr_misalign || mmu_trap;
 	assign trap_vaddr = fault_vaddr;
 	assign fault_pc = mem_r.valid ? mem_r.pc :
@@ -701,6 +715,45 @@ module core
 	assign mmu_trap = walk_fault && (fetch_redirect_bubble == 2'd0);
 
 `ifdef VERILATOR
+`ifdef FPGA_SIM
+	// Debug: print trap events and instruction trace
+	integer dbg_trap_count;
+	integer dbg_commit_count;
+	always_ff @(posedge clk) begin
+		if (reset) begin
+			dbg_trap_count <= 0;
+			dbg_commit_count <= 0;
+		end else begin
+			// Track committed instructions (first 5000, then only disk-related)
+			if (wb_r.valid && !trap_commit) begin
+				dbg_commit_count <= dbg_commit_count + 1;
+				if (dbg_commit_count < 100) begin
+					$display("[COMMIT] #%0d pc=0x%016h instr=0x%08h wen=%0b rd=%0d",
+					         dbg_commit_count, wb_r.pc, wb_r.instr, wb_r.wen, wb_r.rd);
+				end
+			end
+			if (trap_redirect && dbg_trap_count < 20) begin
+				dbg_trap_count <= dbg_trap_count + 1;
+				$display("[TRAP] #%0d pc=0x%016h redirect_pc=0x%016h mcause=0x%016h mepc=0x%016h mtvec=0x%016h priv=%0d",
+				         dbg_trap_count,
+				         mem_r.valid ? mem_r.pc : (ex_r.valid ? ex_r.pc : 64'h0),
+				         trap_redirect_pc,
+				         csr_mcause,
+				         csr_mepc,
+				         csr_mtvec,
+				         privilege_mode);
+			end
+			if (mret_redirect && dbg_trap_count < 50) begin
+				$display("[MRET] pc=0x%016h redirect_pc=0x%016h mepc=0x%016h priv=%0d",
+				         mem_r.valid ? mem_r.pc : (ex_r.valid ? ex_r.pc : 64'h0),
+				         trap_redirect_pc,
+				         csr_mepc,
+				         privilege_mode);
+			end
+		end
+	end
+`endif // FPGA_SIM
+`ifndef FPGA_SIM
 	DifftestInstrCommit DifftestInstrCommit(
 		.clock              (clk),
 		.coreid             (csr_mhartid[7:0]),
@@ -785,7 +838,9 @@ module core
 		.mideleg            (csr_mideleg_diff),
 		.medeleg            (csr_medeleg_diff)
 	);
+`endif // FPGA_SIM
 `endif
+
 endmodule
 
 `endif

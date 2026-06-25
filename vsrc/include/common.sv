@@ -11,7 +11,7 @@ package common;
 	parameter XLEN = 64;
 	parameter MXLEN = XLEN;
 	parameter LINK_REG_ID = 1;
-	parameter logic[63:0] PCINIT = 64'h00000000_80000000;
+	parameter [63:0] PCINIT = 64'h00000000_80000000;
 
 	// typedefs
 	typedef logic[127:0] u128;
@@ -64,8 +64,13 @@ package common;
 `endif
 
 // simple compile-time assertion
+`ifdef VERILATOR
 `define ASSERTS(expr, message) \
     if (!(expr)) $error(message);
+`else
+`define ASSERTS(expr, message) \
+    if (!(expr)) begin end  // Vivado does not support $error in synthesizable code
+`endif
 `define ASSERT(expr) `ASSERTS(expr, "Assertion failed.");
  
 // to ignore some signals

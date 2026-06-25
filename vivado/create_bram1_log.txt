@@ -1,0 +1,48 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jun 25 04:59:52 2026
+# Process ID: 28832
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source g:\GitHub\26-Arch\vivado\create_bram1.tcl -log g:\GitHub\26-Arch\vivado\create_bram1_log.txt
+# Log file: g:/GitHub/26-Arch/vivado/create_bram1_log.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------
+source {g:\GitHub\26-Arch\vivado\create_bram1.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set project_path [file join $repo_root vivado test-cpu project project_3 project_3.xpr]
+# open_project $project_path
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'G:/Vivado/2018.3/data/ip'.
+# create_ip -name blk_mem_gen -vendor xilinx.com -library ip -module_name bram_1
+INFO: [Device 21-403] Loading part xc7a35tcpg236-1
+# set_property -dict [list \
+#     CONFIG.Memory_Type {Single_Port_RAM} \
+#     CONFIG.Use_Byte_Write_Enable {true} \
+#     CONFIG.Byte_Size {8} \
+#     CONFIG.Write_Width_A {32} \
+#     CONFIG.Read_Width_A {32} \
+#     CONFIG.Write_Depth_A {16384} \
+#     CONFIG.Enable_A {Always_Enabled} \
+#     CONFIG.Register_PortA_Output_of_Memory_Primitives {true} \
+#     CONFIG.Use_RSTA_Pin {false} \
+#     CONFIG.Load_Init_File {true} \
+#     CONFIG.Coe_File [file join $repo_root ready-to-run lab5 fs_mini.coe] \
+#     CONFIG.Fill_Remaining_Memory_Locations {true} \
+#     CONFIG.Remaining_Memory_Locations {00000000} \
+# ] [get_ips bram_1]
+INFO: [IP_Flow 19-3484] Absolute path of file 'g:/GitHub/26-Arch/ready-to-run/lab5/fs_mini.coe' provided. It will be converted relative to IP Instance files '../../../../../../../../ready-to-run/lab5/fs_mini.coe'
+# generate_target all [get_ips bram_1]
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'bram_1'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'bram_1'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'bram_1'...
+INFO: [IP_Flow 19-1686] Generating 'Miscellaneous' target for IP 'bram_1'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'bram_1'...
+# puts "bram_1 IP created and generated successfully!"
+bram_1 IP created and generated successfully!
+# close_project
+INFO: [Common 17-206] Exiting Vivado at Thu Jun 25 04:59:58 2026...

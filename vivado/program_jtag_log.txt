@@ -1,0 +1,55 @@
+#-----------------------------------------------------------
+# Vivado v2018.3 (64-bit)
+# SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+# IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+# Start of session at: Thu Jun 25 14:44:50 2026
+# Process ID: 54380
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source G:\GitHub\26-Arch\vivado\program_jtag.tcl -log G:\GitHub\26-Arch\vivado\program_jtag_log.txt
+# Log file: G:/GitHub/26-Arch/vivado/program_jtag_log.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------
+source {G:\GitHub\26-Arch\vivado\program_jtag.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set bitstream_path [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.bit]
+# open_hw
+# connect_hw_server
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-2222] Launching hw_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+****** Xilinx hw_server v2018.3
+  **** Build date : Dec  7 2018-00:40:27
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+
+connect_hw_server: Time (s): cpu = 00:00:00 ; elapsed = 00:00:06 . Memory (MB): peak = 273.801 ; gain = 0.000
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8AC3DA
+# set device [get_hw_devices xc7a35t_0]
+# current_hw_device $device
+# puts "Programming FPGA..."
+Programming FPGA...
+# set_property PROGRAM.FILE $bitstream_path $device
+# program_hw_devices $device
+INFO: [Labtools 27-3164] End of startup status: HIGH
+# puts "FPGA programmed!"
+FPGA programmed!
+# close_hw_target
+INFO: [Labtoolstcl 44-464] Closing hw_target localhost:3121/xilinx_tcf/Digilent/210183A8AC3DA
+# disconnect_hw_server
+# close_hw
+****** Webtalk v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source G:/GitHub/26-Arch/.Xil/Vivado-54380-Archer/webtalk/labtool_webtalk.tcl -notrace
+INFO: [Common 17-206] Exiting Webtalk at Thu Jun 25 14:45:01 2026...
+# puts "=========================================="
+==========================================
+# puts "FPGA programmed! Check serial output on COM4 (115200 baud)"
+FPGA programmed! Check serial output on COM4 (115200 baud)
+# puts "=========================================="
+==========================================
+INFO: [Common 17-206] Exiting Vivado at Thu Jun 25 14:45:01 2026...

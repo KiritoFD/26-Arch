@@ -35,6 +35,9 @@ module device #(
 	output logic dbg_ever_uart_write,
 	output logic dbg_ever_device_read,
 	output logic dbg_lsr_read,
+	output logic dbg_ever_thr_write,
+	output logic dbg_tx_state_rdy,    // 1=UART TX state machine in RDY (idle)
+	output logic dbg_tx_fifo_nonempty, // 1=TX FIFO has data
 	output logic [63:0] dbg_lsr_rdata
 );
 
@@ -200,16 +203,20 @@ module device #(
 	logic dbg_ever_uart_write_reg;
 	logic dbg_ever_device_read_reg;
 	logic dbg_lsr_read_reg;
+	logic dbg_ever_thr_write_reg;    // TRUE only when THR data byte written
 	logic [63:0] dbg_lsr_rdata_reg;
 	always_ff @(posedge cpu_clk) begin
 		if (reset) begin
 			dbg_ever_uart_write_reg <= 1'b0;
 			dbg_ever_device_read_reg <= 1'b0;
 			dbg_lsr_read_reg <= 1'b0;
+			dbg_ever_thr_write_reg <= 1'b0;
 			dbg_lsr_rdata_reg <= 64'd0;
 		end else begin
 			if (txn_fire && wvalid && addr >= UART_BASE && addr <= UART_LSR)
 				dbg_ever_uart_write_reg <= 1'b1;
+			if (cpu_tx_write)
+				dbg_ever_thr_write_reg <= 1'b1;
 			if (txn_fire && !wvalid) begin
 				dbg_ever_device_read_reg <= 1'b1;
 				if (addr == UART_LSR) begin
@@ -222,6 +229,9 @@ module device #(
 	assign dbg_ever_uart_write = dbg_ever_uart_write_reg;
 	assign dbg_ever_device_read = dbg_ever_device_read_reg;
 	assign dbg_lsr_read = dbg_lsr_read_reg;
+	assign dbg_ever_thr_write = dbg_ever_thr_write_reg;
+	assign dbg_tx_state_rdy = (txState == RDY);
+	assign dbg_tx_fifo_nonempty = ~fifo_empty;
 	assign dbg_lsr_rdata = dbg_lsr_rdata_reg;
 
 	// Push byte into TX FIFO on console write

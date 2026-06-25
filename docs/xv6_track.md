@@ -190,3 +190,54 @@ JTAG 加载新 bitstream 后：
 
 - 若 LED3 亮 → jtag_uart 捕获成功，问题在 JTAG 时钟域或 BSCANE2 协议
 - 若 LED3 灭 → jtag_uart 捕获失败，需检查 device.sv 的 UART TX 波特率与 jtag_uart 的采样逻辑
+
+### 深入诊断结果 (2026-06-26 凌晨)
+
+#### device.sv UART TX 状态机完全正常
+
+通过逐级添加调试信号验证：
+
+1. **`dbg_ever_thr_write`**（真正写 THR 数据字节）：LED3 亮 ✓
+   - 证明 CPU 不仅到了 `uartinit()`，还到了 `printf()` → `uartputc_sync()` → `WriteReg(THR, c)`
+   - 之前 LED2 亮只说明写过 UART 寄存器（含 LCR/IER/FCR 配置），不代表写过 THR 数据
+
+2. **`dbg_tx_fifo_nonempty`**（device.sv 的 TX FIFO 非空）：LED2 灭 ✓
+   - FIFO 为空，所有写入的 THR 数据都已被串行发送
+
+3. **`dbg_tx_state_rdy`**（UART TX 状态机在 RDY 空闲）：LED3 亮 ✓
+   - 状态机正常回到 RDY，没有卡死
+
+**结论**：device.sv 的 UART TX 完全正常，数据已通过 `tx = txBit` 串行发送出去。
+
+#### jtag_uart TX FIFO 短暂捕获到数据
+
+LED2=`jtag_tx_avail` 测试：按下 btnC 后 LED2 闪一下然后灭。
+- 说明 jtag_uart 的 TX FIFO 确实短暂有数据（捕获到了 device.sv 的 UART TX）
+- 但数据很快被消费/丢失
+
+#### BSCANE2 JTAG 读取路径完全失效
+
+在 jtag_uart 中添加自检机制：复位后自动 push 3 个 'U'(0x55) 字节到 TX FIFO，
+并且让 BSCANE2 USER1 的 CAPTURE_DR 始终加载 `{1'b1, 8'h55}`（valid=1, data='U'）。
+
+**结果**：xsdb 仍读到 0 valid bytes / 5000 reads。
+
+**结论**：问题不在 jtag_uart 的 FIFO 或捕获逻辑，而在 **xsdb 的 `jtag sequence` 命令无法正确读取 BSCANE2 USER1 的 TDO 输出**。xsdb 主要用于处理器调试（ARM/RISC-V），可能不支持 FPGA 内部 BSCANE2 原语的 USER1/USER2 指令访问。
+
+#### 替代方案：RsTx 物理引脚输出
+
+将 `assign RsTx = cpu_tx` —— 直接把 device.sv 的 UART TX 串行数据输出到 A18 引脚。
+
+**结果**：LED2,3 亮（CPU 正常运行，写过 THR），但用户没有 USB 转 TTL 串口适配器或示波器，无法直接读取 A18 引脚的 UART 数据。
+
+### 当前阻塞
+
+1. **BSCANE2 读取路径不可用**：xsdb 的 `jtag sequence` 无法读取 BSCANE2 USER1 TDO
+2. **无物理串口读取设备**：没有 USB-TTL 适配器或示波器
+
+### 可能的解决方案
+
+1. **获取 USB-TTL 串口适配器**：连接 Basys3 的 A18 (RsTx) 和 GND，在 PC 上用串口终端（如 PuTTY/Tera Term）读取 115200 baud UART 数据
+2. **研究 OpenOCD**：OpenOCD 可能支持 BSCANE2 的 USER1/USER2 指令访问
+3. **使用 Vivado ILA**：添加 Integrated Logic Analyzer 抓取 cpu_tx 信号波形
+4. **使用 PMOD 接口**：Basys3 的 PMOD 可能有其他可用的通信接口

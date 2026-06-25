@@ -15,6 +15,21 @@ module jtag_uart (
     localparam FIFO_PTR_W    = 4;      // log2(16)
 
     // ================================================================
+    // Self-test: pre-load test bytes into TX FIFO after reset
+    // to verify BSCANE2 read path works independently of UART capture
+    // ================================================================
+    logic [2:0] test_loader;
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            test_loader <= 3'd0;
+        end else begin
+            if (test_loader != 3'd4) begin
+                test_loader <= test_loader + 3'd1;
+            end
+        end
+    end
+
+    // ================================================================
     // UART TX Capture: cpu_tx → TX FIFO
     // ================================================================
     logic [2:0]  tx_state;
@@ -94,8 +109,10 @@ module jtag_uart (
     assign tx_fifo_empty = (tx_fifo_head == tx_fifo_tail);
     assign tx_data_avail = ~tx_fifo_empty;
 
-    // Push when TX capture done (state 3)
-    assign tx_fifo_push = (tx_state == 3'd3) && !tx_fifo_full;
+    // Push when TX capture done (state 3) OR self-test loader active
+    logic [7:0] push_data;
+    assign tx_fifo_push = ((tx_state == 3'd3) || (test_loader != 3'd4 && test_loader != 3'd0)) && !tx_fifo_full;
+    assign push_data = (test_loader != 3'd4 && test_loader != 3'd0) ? 8'h55 : tx_shift;  // 'U' for self-test
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -104,7 +121,7 @@ module jtag_uart (
         end else begin
             // Push
             if (tx_fifo_push) begin
-                tx_fifo_mem[tx_fifo_tail] <= tx_shift;
+                tx_fifo_mem[tx_fifo_tail] <= push_data;
                 tx_fifo_tail <= tx_fifo_tail + 1'b1;
             end
             // Pop (from JTAG UPDATE_DR)
@@ -240,15 +257,12 @@ module jtag_uart (
     );
 
     // CAPTURE_DR latches FIFO output; SHIFT_DR shifts out
-    // Must be in ONE always block to avoid multiple-driver synthesis error
+    // DEBUG: For self-test, always output 0x1FF (valid=1, data=0xFF)
     always_ff @(posedge user1_tck) begin
         if (user1_sel) begin
             if (user1_capture) begin
-                if (tx_fifo_empty) begin
-                    user1_shift_reg <= 9'b0_00000000;  // valid=0, data=0
-                end else begin
-                    user1_shift_reg <= {1'b1, tx_fifo_mem[tx_fifo_head]};  // valid=1, data
-                end
+                // SELF-TEST: always output valid=1, data=0x55 ('U')
+                user1_shift_reg <= 9'b1_01010101;
             end else if (user1_shift) begin
                 user1_shift_reg <= {1'b0, user1_shift_reg[8:1]};
             end

@@ -20,6 +20,9 @@ module basys3_top (
 	logic dbg_ever_uart_write;
 	logic dbg_ever_device_read;
 	logic dbg_lsr_read;
+	logic dbg_ever_thr_write;
+	logic dbg_tx_state_rdy;
+	logic dbg_tx_fifo_nonempty;
 	logic [63:0] dbg_lsr_rdata;
 	logic [63:0] dbg_device_addr;
 	logic cpu_tx;
@@ -53,6 +56,9 @@ module basys3_top (
 		.dbg_ever_uart_write,
 		.dbg_ever_device_read,
 		.dbg_lsr_read,
+		.dbg_ever_thr_write,
+		.dbg_tx_state_rdy,
+		.dbg_tx_fifo_nonempty,
 		.dbg_lsr_rdata,
 		.dbg_device_addr
 	);
@@ -106,8 +112,8 @@ module basys3_top (
 		.tx_data_avail(jtag_tx_avail)
 	);
 
-	// RsTx unused (FTDI Channel B not connected to FPGA UART pins on Basys3)
-	assign RsTx = 1'b1;  // Idle high
+	// RsTx outputs CPU UART TX directly (for USB-serial adapter on PC)
+	assign RsTx = cpu_tx;
 
 	// Debug LEDs
 	logic [24:0] blink_cnt;
@@ -120,8 +126,8 @@ module basys3_top (
 		if (btnC) cpu_clk_cnt <= 24'd0;
 		else cpu_clk_cnt <= cpu_clk_cnt + 24'd1;
 	end
-	assign led[0] = blink_cnt[24];      // ~3Hz blink = FPGA alive (100MHz domain)
-assign led[1] = dbg_clk_locked;     // PLL lock status
-assign led[2] = dbg_ever_uart_write; // 1=CPU ever wrote UART (reached console output)
-assign led[3] = jtag_tx_avail;       // 1=jtag_uart TX FIFO has data (capture worked)
+	assign led[0] = blink_cnt[24];        // ~3Hz blink = FPGA alive (100MHz domain)
+assign led[1] = dbg_clk_locked;       // PLL lock status
+assign led[2] = dbg_ever_uart_write;  // 1=CPU ever wrote UART register
+assign led[3] = dbg_ever_thr_write;   // 1=CPU ever wrote THR DATA byte
 endmodule

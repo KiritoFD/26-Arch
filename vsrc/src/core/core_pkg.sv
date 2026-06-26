@@ -23,9 +23,24 @@ package core_pkg;
 	localparam logic [3:0] ALU_REMU = 4'd14;
 
 	localparam logic [4:0] AMO_CMD_SWAP = 5'd4;
+	localparam logic [4:0] AMO_CMD_XOR  = 5'd5;
 	localparam logic [4:0] AMO_CMD_LR   = 5'd6;
 	localparam logic [4:0] AMO_CMD_SC   = 5'd7;
 	localparam logic [4:0] AMO_CMD_ADD  = 5'd8;
+	localparam logic [4:0] AMO_CMD_AND  = 5'd9;
+	localparam logic [4:0] AMO_CMD_OR   = 5'd10;
+	localparam logic [4:0] AMO_CMD_MIN  = 5'd11;
+	localparam logic [4:0] AMO_CMD_MAX  = 5'd12;
+	localparam logic [4:0] AMO_CMD_MINU = 5'd13;
+	localparam logic [4:0] AMO_CMD_MAXU = 5'd14;
+
+	// AMO hardware execution state machine states
+	localparam logic [2:0] AMO_ST_IDLE    = 3'd0;
+	localparam logic [2:0] AMO_ST_LOAD    = 3'd1;
+	localparam logic [2:0] AMO_ST_LOAD_W  = 3'd2;  // wait for load data
+	localparam logic [2:0] AMO_ST_STORE    = 3'd3;
+	localparam logic [2:0] AMO_ST_STORE_W  = 3'd4;  // wait for store complete
+	localparam logic [2:0] AMO_ST_DONE    = 3'd5;
 
 	localparam logic [11:0] CSR_SATP     = 12'h180;
 	localparam logic [11:0] CSR_SSTATUS  = 12'h100;

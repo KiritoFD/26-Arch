@@ -69,6 +69,7 @@ module core_commit
 	output logic [1:0]   privilege_mode,
 	output logic [1:0]   privilege_mode_diff,
 	input  logic [63:0]  intr_fetch_pc,
+	input  logic         ex_r_is_amo_active,   // T016: AMO/LR/SC in-flight in EX
 	output logic         trap_redirect,
 	output logic         mret_redirect,
 	output logic [63:0]  trap_redirect_pc
@@ -103,7 +104,9 @@ module core_commit
 	assign trap_commit = wb_r.valid && wb_r.trap;
 
 	// Interrupt evaluation: check when pipeline can consume a new instruction
-	assign intr_eval = 1'b1;
+	// T016: suppress interrupts while an AMO/LR/SC is in-flight in EX stage
+	//       (atomicity guarantee). Pipeline still services traps (sync exceptions).
+	assign intr_eval = !(ex_r_is_amo_active);
 
 	core_csr u_csr(
 		.clk(clk),

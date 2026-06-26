@@ -452,14 +452,17 @@ module device #(
 					disk_read_pending <= 1'b0;
 					disk_rdata_valid <= 1'b1;
 					disk_rdata_shifted <= {32'd0, disk_rdata_reg} << (disk_raddr_offset * 8);
-				end else if (valid && !wvalid && addr >= DISK_DATA_BASE && addr < DISK_DATA_BASE + 1024) begin
-					disk_read_pending <= 1'b1;
-					disk_raddr_offset <= addr[2:0];
-				end
+				end else if (valid && !wvalid && !txn_fire &&
+			           addr >= DISK_DATA_BASE && addr < DISK_DATA_BASE + 1024) begin
+				disk_read_pending <= 1'b1;
+				disk_raddr_offset <= addr[2:0];
+			end
 			end
 		end
 		assign disk_read_not_ready = disk_read_pending;
 
+		// Disk control: trigger SPI Flash read on blockno write,
+		// poll data_ready to set disk_rdy for xv6 driver.
 		always_ff @(posedge cpu_clk) begin
 			if (reset) begin
 				disk_blockno <= 32'd0;
@@ -498,12 +501,12 @@ module device #(
 		end
 
 		assign spi_cs_n = 1'b1;
-		assign spi_sck  = 1'b0;
-		assign spi_mosi = 1'b0;
-		assign disk_read_not_ready = 1'b0;
-		assign disk_rdata_reg = 32'd0;
-		assign disk_rdata_valid = 1'b0;
-		assign disk_rdata_shifted = 64'd0;
+	assign spi_sck  = 1'b0;
+	assign spi_mosi = 1'b0;
+	assign disk_read_not_ready = 1'b0;
+	assign disk_rdata_reg = 32'd0;
+	assign disk_rdata_valid = 1'b1;  // sim: data always ready (combinational)
+	assign disk_rdata_shifted = 64'd0;
 	end
 	endgenerate
 
@@ -617,11 +620,17 @@ module device #(
 		else
 			txn_done_pulse <= 1'b0;
 	end
-	// For disk data reads on real hardware, we need 1 extra cycle for BRAM read latency.
-	// When disk_read_not_ready is set, ready is de-asserted until data is available.
+
+	// Disk data reads need 1 extra cycle for BRAM read latency.
+	// is_disk_data_read is combinational — active from cycle 0 of the request.
+	// ready stays 0 until disk_rdata_valid is set (BRAM data available).
+	// This prevents the CPU from latching rdata=0 on the first cycle.
+	logic is_disk_data_read;
+	assign is_disk_data_read = valid && !wvalid &&
+	                           addr >= DISK_DATA_BASE && addr < DISK_DATA_BASE + 1024;
 
 	assign ready = uart_thr_write_req ? (~fifo_full & ~txn_done_pulse) :
-	               (disk_read_not_ready ? 1'b0 : ~txn_done_pulse);
+	               (is_disk_data_read ? (disk_rdata_valid & ~txn_done_pulse) : ~txn_done_pulse);
 
 	// ================================================================
 	// Simulation-only: print UART output

@@ -38,6 +38,18 @@ module spi_flash_disk #(
 	(* ram_style = "block" *)
 	logic [31:0] disk_buf [0:255];
 
+	// DIAG TEST: Initialize ALL BRAM words to 0x12345678 at FPGA power-up.
+	// This bypasses SPI FSM entirely — we only want to verify the CPU read
+	// path (device.sv disk_rdata_shifted / ready handshake) returns the
+	// value stored in BRAM. If CPU reads 0x12345678, the read path is OK
+	// and the bug is in SPI write. If CPU reads a transformed value, the
+	// read path is broken.
+	initial begin
+		for (int i = 0; i < 256; i++) begin
+			disk_buf[i] = 32'h12345678;
+		end
+	end
+
 	logic [7:0]  ram_addr;
 	logic        ram_we;
 	logic [31:0] ram_wdata;
@@ -134,17 +146,24 @@ module spi_flash_disk #(
 	logic       spi_clk_reg;
 	logic       spi_clk_edge;
 
+	// Gate spi_clk_reg by `active`: when inactive, hold SCK low so the
+	// CS falling edge does not see a spurious rising edge (which would
+	// cause the Flash to sample the MOSI bit one cycle early and shift
+	// the command/address bits, returning wrong data).
 	always_ff @(posedge clk) begin
 		if (reset) begin
 			spi_clk_cnt <= 2'd0;
 			spi_clk_reg <= 1'b0;
-		end else begin
+		end else if (active) begin
 			if (spi_clk_cnt == SPI_CLK_DIV - 1) begin
 				spi_clk_cnt <= 2'd0;
 				spi_clk_reg <= ~spi_clk_reg;
 			end else begin
 				spi_clk_cnt <= spi_clk_cnt + 2'd1;
 			end
+		end else begin
+			spi_clk_cnt <= 2'd0;
+			spi_clk_reg <= 1'b0;  // hold SCK low while inactive
 		end
 	end
 
@@ -201,17 +220,14 @@ module spi_flash_disk #(
 
 			case (state)
 				S_IDLE: begin
-					if (req_valid) begin
-						flash_addr <= FLASH_DISK_OFFSET[22:0] + {req_blockno[12:0], 10'd0};
-						shift_reg <= 8'h03;
-						bit_cnt <= 4'd0;
-						byte_cnt <= 10'd0;
-						word_idx <= 8'd0;
-						byte_idx <= 2'd0;
-						active <= 1'b1;
-						state <= S_CMD;
-					end
+				if (req_valid) begin
+					// DIAG TEST: Skip SPI read entirely. BRAM was initialized
+					// to 0x12345678 by initial block. Go straight to DONE so
+					// data_ready pulses and CPU reads the initial pattern.
+					active <= 1'b0;
+					state <= S_DONE;
 				end
+			end
 
 				S_CMD: begin
 					if (spi_clk_edge) begin
@@ -249,23 +265,24 @@ module spi_flash_disk #(
 				end
 
 				S_READ: begin
-					if (spi_clk_edge) begin
-						miso_shift <= {miso_shift[6:0], spi_miso};
-						if (bit_cnt == 4'd7) begin
-							bit_cnt <= 4'd0;
-							// Accumulate byte into word
-							case (byte_idx)
-								2'd0: spi_word_acc[7:0]   <= {miso_shift[6:0], spi_miso};
-								2'd1: spi_word_acc[15:8]  <= {miso_shift[6:0], spi_miso};
-								2'd2: spi_word_acc[23:16] <= {miso_shift[6:0], spi_miso};
-								2'd3: begin
-									// Full word accumulated, write to BRAM
-									spi_ram_we <= 1'b1;
-									spi_ram_addr <= word_idx;
-									spi_ram_wdata <= {miso_shift[6:0], spi_miso, spi_word_acc[23:0]};
-									word_idx <= word_idx + 7'd1;
-								end
-							endcase
+				if (spi_clk_edge) begin
+					miso_shift <= {miso_shift[6:0], spi_miso};
+					if (bit_cnt == 4'd7) begin
+						bit_cnt <= 4'd0;
+						// TEST MODE: fill BRAM with known pattern 0xAAAAAAAA
+						// to verify BRAM read path. If CPU reads 0xAAAAAAAA,
+						// BRAM path is OK and problem is in SPI communication.
+						case (byte_idx)
+							2'd0: spi_word_acc[7:0]   <= 8'hAA;
+							2'd1: spi_word_acc[15:8]  <= 8'hAA;
+							2'd2: spi_word_acc[23:16] <= 8'hAA;
+							2'd3: begin
+								spi_ram_we <= 1'b1;
+								spi_ram_addr <= word_idx;
+								spi_ram_wdata <= 32'hAAAAAAAA;
+								word_idx <= word_idx + 7'd1;
+							end
+						endcase
 							byte_idx <= byte_idx + 2'd1;
 							if (byte_cnt == 10'd1023) begin
 								state <= S_DONE;

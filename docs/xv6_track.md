@@ -240,7 +240,91 @@ LED2=`jtag_tx_avail` 测试：按下 btnC 后 LED2 闪一下然后灭。
 1. **获取 USB-TTL 串口适配器**：连接 Basys3 的 A18 (RsTx) 和 GND，在 PC 上用串口终端（如 PuTTY/Tera Term）读取 115200 baud UART 数据
 2. **研究 OpenOCD**：OpenOCD 可能支持 BSCANE2 的 USER1/USER2 指令访问
 3. **使用 Vivado ILA**：添加 Integrated Logic Analyzer 抓取 cpu_tx 信号波形
-4. **使用 PMOD 接口**：Basys3 的 PMOD 可能有其他可用的通信接口
+
+---
+
+## FT232H UART 读取方案成功 + SPI Flash 磁盘读取 Bug 修复
+
+### 时间：2026-06-26
+
+### FT232H D2XX 直接读取 UART
+
+Basys3 板载 FT2232H 双通道 USB 芯片：
+- Channel A (index 0) = JTAG
+- Channel B (index 1) = UART
+
+使用 Python `ftd2xx` 库直接打开 Channel B，设置 115200 8N1，无需 VCP 驱动分配 COM 端口。
+
+工具 `vivado/tools/prog_and_read.py`：
+1. 先启动 FTDI Channel B UART 读取线程
+2. 通过 Vivado subprocess 编程 FPGA（JTAG SRAM）
+3. 持续捕获从第一个时钟周期开始的 UART 输出
+
+**结果**：成功捕获 xv6 启动输出：
+```
+xv6 kernel is booting
+panic: invalid file system
+```
+
+### SPI Flash 烧录
+
+使用 Vivado GUI 手动烧录 `full_flash.mcs`：
+- Flash 芯片：**S25FL032P** (Spansion)，part 名 `s25fl032p-spi-x1_x2_x4`
+- 批处理 `program_hw_cfgmem` 持续失败（Labtools 27-3347），必须用 GUI
+- MCS 布局：bitstream @ 0x000000 + fs.img @ 0x300000
+- 烧录后需拔插 USB 重新上电（btnC 复位无效，FPGA fabric 被 Flash bridge 占用）
+
+### FSDBG 调试：发现超级块读取全零
+
+在 `kernel/fs.c` 的 `fsinit()` 添加 debug printf：
+```c
+if (sb.magic != FSMAGIC) {
+    printf("FSDBG: magic=%x exp=%x\n", sb.magic, FSMAGIC);
+    printf("FSDBG: first bytes:");
+    char *p = (char*)&sb;
+    for(int i = 0; i < 16; i++) printf(" %x", (unsigned char)p[i]);
+    printf("\n");
+    panic("invalid file system");
+}
+```
+
+**FSDBG 输出**：
+```
+FSDBG: magic=0 exp=10203040
+FSDBG: size=0 nblocks=0 ninodes=0
+FSDBG: first bytes: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+```
+
+所有字节为 0x00（不是 0xFF 擦除态），说明 SPI Flash 数据根本没读到。
+
+### 根因分析：device.sv 磁盘数据读取时序 Bug
+
+**问题**：`device.sv` 的 `ready` 信号在磁盘数据读取的第一个周期就置位，导致 CPU 锁存 `rdata=0`（BRAM 数据尚未就绪）。
+
+**详细分析**：
+- `disk_read_pending` 是寄存器，在读取请求的第一个周期为 0
+- `disk_read_not_ready = disk_read_pending = 0` → `ready = 1`
+- `txn_fire = valid && ready = 1` → CPU 读取 `rdata = disk_rdata_valid ? disk_rdata_shifted : 0 = 0`
+- CPU 读到 0 后就完成了事务，不会再等待正确数据
+
+**修复**：
+```systemverilog
+// 添加组合逻辑检测磁盘数据读取（从第 0 周期就生效）
+logic is_disk_data_read;
+assign is_disk_data_read = valid && !wvalid &&
+                           addr >= DISK_DATA_BASE && addr < DISK_DATA_BASE + 1024;
+
+// 修改 ready：磁盘数据读取时，等待 BRAM 数据有效
+assign ready = uart_thr_write_req ? (~fifo_full & ~txn_done_pulse) :
+               (is_disk_data_read ? (disk_rdata_valid & ~txn_done_pulse) : ~txn_done_pulse);
+```
+
+同时在仿真路径 `gen_sim_disk` 中设置 `disk_rdata_valid = 1'b1`（仿真中数据总是就绪）。
+
+**时序**：
+- Cycle 0: CPU 请求 → `is_disk_data_read=1`, `disk_rdata_valid=0` → `ready=0`（等待）
+- Cycle 1: `disk_read_pending=1` → BRAM 读取完成 → `disk_rdata_valid=1`
+- Cycle 2: `disk_rdata_valid=1` → `ready=1` → `txn_fire=1` → CPU 读到正确数据
 
 ### ILA 实施记录 (2026-06-26)
 

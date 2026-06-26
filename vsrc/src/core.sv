@@ -191,17 +191,79 @@ module core
 	logic        mdu_core_out_valid;
 	logic [63:0] mdu_core_out_result;
 	logic [63:0] amo_result;
-	logic [7:0]  amo_mask;
-	logic        amo_issue;
+	// ===== Hardware AMO state machine (replaces DPI-C AMOHelper, T014) =====
+	logic [2:0]  amo_state;
+	logic [63:0] amo_addr_q;        // latched AMO address
+	logic [63:0] amo_wdata_q;       // latched rs2 (original, unshifted)
+	logic [4:0]  amo_cmd_q;         // latched AMO command
+	logic [63:0] amo_old_data_q;    // loaded old value
+	logic        amo_dreq_valid;    // AMO-driven dreq.valid
+	logic [63:0] amo_dreq_addr;
+	logic [7:0]  amo_dreq_strobe;
+	logic [63:0] amo_dreq_data;
+	logic        amo_busy;
 	logic        amo_issued_q;
 	logic        amo_done_q;
-	logic [63:0] amo_helper_result;
+	// ===== LR/SC Reservation Set (T015) — 2 entries =====
+	logic [63:0] rs_addr  [0:1];
+	logic        rs_valid [0:1];
+	logic        rs_hit;          // SC: address matches a reservation
+	logic        rs_slot;         // which slot LR will use
 	assign mdu_req = is_mdu_cmd(ex_r.alu_cmd);
 	assign ex_is_mdu = mdu_req || ex_r.is_amo;
 	assign ex_to_mem_blocks_front = ex_r.valid && (ex_r.is_load || ex_r.is_store);
-	assign amo_mask = (8'h0f << ex_mem_addr[2:0]);
-	assign amo_issue = ex_r.valid && ex_r.is_amo && !amo_issued_q && !amo_done_q;
-	assign amo_result = amo_helper_result;
+	assign amo_issue = ex_r.valid && ex_r.is_amo && (amo_state == AMO_ST_IDLE) && !amo_done_q &&
+	                   !mem_r.valid;   // ensure MEM stage has no in-flight access
+	assign amo_busy  = ex_r.valid && ex_r.is_amo && ((amo_state != AMO_ST_IDLE) || amo_done_q);
+	// Compute AMO result from loaded old data + rs2 (word-aligned, sign-extended)
+	// amo_wdata_q is the unshifted rs2; old data in amo_old_data_q is already
+	// aligned by dresp.data with size=MSIZE4 (read returns aligned word at [31:0]
+	// by cbus/bram_wrapper since strobe is byte-enable).
+	// Word at byte position: extract word from old 64-bit data
+	wire [31:0] amo_old_word = amo_old_data_q[31 + {amo_addr_q[2:0], 3'b0} -: 32];
+	wire [31:0] amo_rs2_word  = amo_wdata_q[31:0];
+	reg  [31:0] amo_new_word;
+	always_comb begin
+		unique case (amo_cmd_q)
+			AMO_CMD_SWAP: amo_new_word = amo_rs2_word;
+			AMO_CMD_ADD:  amo_new_word = amo_old_word + amo_rs2_word;
+			AMO_CMD_XOR:  amo_new_word = amo_old_word ^ amo_rs2_word;
+			AMO_CMD_AND:  amo_new_word = amo_old_word & amo_rs2_word;
+			AMO_CMD_OR:   amo_new_word = amo_old_word | amo_rs2_word;
+			AMO_CMD_MIN:  amo_new_word = ($signed(amo_old_word) < $signed(amo_rs2_word)) ? amo_old_word : amo_rs2_word;
+			AMO_CMD_MAX:  amo_new_word = ($signed(amo_old_word) > $signed(amo_rs2_word)) ? amo_old_word : amo_rs2_word;
+			AMO_CMD_MINU: amo_new_word = (amo_old_word < amo_rs2_word) ? amo_old_word : amo_rs2_word;
+			AMO_CMD_MAXU: amo_new_word = (amo_old_word > amo_rs2_word) ? amo_old_word : amo_rs2_word;
+			default:      amo_new_word = amo_rs2_word;
+		endcase
+	end
+	// Build full 64-bit store data: keep untouched bytes, replace target word
+	wire [2:0] amo_word_off = amo_addr_q[2:0];
+	reg  [63:0] amo_store_data;
+	always_comb begin
+		amo_store_data = amo_old_data_q;
+		case (amo_word_off)
+			3'd0: amo_store_data[31:0]  = amo_new_word;
+			3'd4: amo_store_data[63:32] = amo_new_word;
+			default: amo_store_data[31:0] = amo_new_word;
+		endcase
+	end
+	wire [7:0] amo_store_strobe = 8'h0f << amo_word_off;
+	// rd value to commit:
+	//   LR.W  -> zero-extended loaded word
+	//   SC.W  -> 0 (success) or 1 (failure)
+	//   AMO.* -> zero-extended old word
+	// SC failure is detected during state machine; latch a flag.
+	logic amo_sc_fail_q;
+	wire [31:0] amo_rd_word = (amo_cmd_q == AMO_CMD_SC) ? (amo_sc_fail_q ? 32'd1 : 32'd0) :
+	                          (amo_cmd_q == AMO_CMD_LR) ? amo_old_word[31:0] :
+	                          amo_old_word[31:0];
+	// Reservation Set: pick an empty slot for LR
+	assign rs_slot = !rs_valid[0] ? 1'b0 : 1'b1;
+	assign rs_hit  = (rs_valid[0] && rs_addr[0] == amo_addr_q) ||
+	                  (rs_valid[1] && rs_addr[1] == amo_addr_q);
+	// Result driven back to pipeline
+	assign amo_result = {32'd0, amo_rd_word};
 
 	core_decode u_decode(
 		.id_r(id_r),
@@ -312,24 +374,10 @@ module core
 		.mdu_out_result(mdu_core_out_result)
 	);
 
-`ifdef VERILATOR
-`ifdef FPGA_SIM
-	// FPGA simulation: AMO not implemented, same as real FPGA
-	assign amo_helper_result = 64'd0;
-`else
-	AMOHelper u_amo_helper(
-		.clock(clk),
-		.enable(amo_issue),
-		.cmd({3'd0, ex_r.amo_cmd}),
-		.addr(ex_mem_addr),
-		.wdata(ex_r.rs2_store),
-		.mask(amo_mask),
-		.rdata(amo_helper_result)
-	);
-`endif
-`else
-	assign amo_helper_result = 64'd0;
-`endif
+	// ===== Hardware AMO state machine (T014): replaces DPI-C AMOHelper =====
+	// Old amo_helper_result no longer needed; amo_result is computed above.
+	// MDU/AMO result mux now also drives ex_is_mdu stall until amo_done_q.
+	// (no DPI-C, no Verilator-specific code — pure RTL works in both sim and FPGA)
 
 	assign mdu_out_valid = ex_r.is_amo ? amo_done_q : mdu_core_out_valid;
 	assign mdu_out_result = ex_r.is_amo ? amo_result : mdu_core_out_result;
@@ -405,6 +453,7 @@ module core
 		.privilege_mode(privilege_mode),
 		.privilege_mode_diff(privilege_mode_diff),
 		.intr_fetch_pc(intr_fetch_pc),
+		.ex_r_is_amo_active(amo_busy),   // T016: AMO in-flight suppresses interrupts
 		.trap_redirect(trap_redirect),
 		.mret_redirect(mret_redirect),
 		.trap_redirect_pc(trap_redirect_pc)
@@ -436,11 +485,18 @@ module core
 	assign ireq.valid = !halted && !trap_commit && (fetch_pending || fetch_issue_fire) && !stall_if_mem;
 	assign ireq.addr  = fetch_req_addr;
 
-	assign dreq.valid  = mem_r.valid && (mem_r.is_load || mem_r.is_store) && !mem_r.is_amo && !trap_commit;
-	assign dreq.addr   = mem_r.mem_addr;
-	assign dreq.size   = msize_t'(mem_r.mem_size);
-	assign dreq.strobe = mem_r.mem_wstrb;
-	assign dreq.data   = mem_r.mem_wdata;
+	// ===== dreq bus mux: AMO state machine vs normal load/store =====
+	// AMO drives dreq during EX-stage state machine (when ex_r.is_amo && amo_busy);
+	// otherwise the normal MEM-stage load/store path drives dreq.
+	// Note: when ex_r.is_amo is active, ex_is_mdu stalls the pipeline, so mem_r
+	// does not advance — no conflict between the two dreq sources.
+	wire amo_owns_dreq = ex_r.valid && ex_r.is_amo && (amo_state != AMO_ST_IDLE);
+	assign dreq.valid  = amo_owns_dreq ? amo_dreq_valid :
+	                     (mem_r.valid && (mem_r.is_load || mem_r.is_store) && !mem_r.is_amo && !trap_commit);
+	assign dreq.addr   = amo_owns_dreq ? amo_dreq_addr   : mem_r.mem_addr;
+	assign dreq.size   = amo_owns_dreq ? MSIZE4          : msize_t'(mem_r.mem_size);
+	assign dreq.strobe = amo_owns_dreq ? amo_dreq_strobe : mem_r.mem_wstrb;
+	assign dreq.data   = amo_owns_dreq ? amo_dreq_data   : mem_r.mem_wdata;
 
 	always_ff @(posedge clk) begin
 		if (reset) begin
@@ -460,19 +516,103 @@ module core
 			wb_r <= '0;
 			amo_issued_q <= 1'b0;
 			amo_done_q <= 1'b0;
+			amo_state <= AMO_ST_IDLE;
+			amo_addr_q <= '0;
+			amo_wdata_q <= '0;
+			amo_cmd_q <= '0;
+			amo_old_data_q <= '0;
+			amo_dreq_valid <= 1'b0;
+			amo_dreq_addr <= '0;
+			amo_dreq_strobe <= '0;
+			amo_dreq_data <= '0;
+			amo_sc_fail_q <= 1'b0;
+			rs_addr[0] <= '0;
+			rs_addr[1] <= '0;
+			rs_valid[0] <= 1'b0;
+			rs_valid[1] <= 1'b0;
 		end else begin
 			if (!ex_r.valid || !ex_r.is_amo) begin
+				// Reset AMO state when no AMO instruction is in EX
 				amo_issued_q <= 1'b0;
-				amo_done_q <= 1'b0;
-			end else if (amo_issue) begin
-				amo_issued_q <= 1'b1;
-				amo_done_q <= 1'b0;
-			end else if (amo_issued_q) begin
-				amo_issued_q <= 1'b0;
-				amo_done_q <= 1'b1;
-			end else if (amo_done_q && !stall_ex_busy) begin
-				amo_done_q <= 1'b0;
-			end
+				amo_done_q   <= 1'b0;
+				amo_state     <= AMO_ST_IDLE;
+				amo_dreq_valid <= 1'b0;
+			end else begin
+				unique case (amo_state)
+					AMO_ST_IDLE: begin
+					// Latch AMO operands and start state machine
+					if (amo_issue) begin
+						amo_addr_q  <= ex_mem_addr;
+						amo_wdata_q <= ex_r.rs2_store;
+						amo_cmd_q   <= ex_r.amo_cmd;
+						amo_issued_q <= 1'b1;
+						amo_done_q  <= 1'b0;
+						amo_sc_fail_q <= 1'b0;   // default: assume success
+						// LR.W: only load, no store. SC.W: store conditional on rs_hit.
+						// Other AMO.*: load -> compute -> store
+						amo_state    <= AMO_ST_LOAD;
+						amo_dreq_valid <= 1'b1;
+						amo_dreq_addr  <= ex_mem_addr;
+						amo_dreq_strobe <= 8'd0;          // read
+						amo_dreq_data  <= 64'd0;
+					end
+				end
+				AMO_ST_LOAD: begin
+					// Wait for load data_ok
+					if (dresp.data_ok) begin
+						amo_old_data_q <= dresp.data;
+						amo_dreq_valid <= 1'b0;
+						// Determine next state based on command
+						if (amo_cmd_q == AMO_CMD_LR) begin
+							// LR.W: register reservation, then DONE
+							rs_addr[rs_slot]  <= amo_addr_q;
+							rs_valid[rs_slot] <= 1'b1;
+							amo_state <= AMO_ST_DONE;
+						end else if (amo_cmd_q == AMO_CMD_SC) begin
+							// SC.W: check reservation, store if hit
+							if (rs_hit) begin
+								amo_dreq_valid <= 1'b1;
+								amo_dreq_addr  <= amo_addr_q;
+								amo_dreq_strobe <= amo_store_strobe;
+								amo_dreq_data  <= amo_store_data;
+								amo_state <= AMO_ST_STORE_W;
+								// On successful SC, clear all reservations
+								rs_valid[0] <= 1'b0;
+								rs_valid[1] <= 1'b0;
+							end else begin
+								// SC failed: rd = 1, no store
+								amo_sc_fail_q <= 1'b1;
+								amo_state <= AMO_ST_DONE;
+							end
+						end else begin
+						// Other AMO.*: store the computed value
+						amo_dreq_valid <= 1'b1;
+						amo_dreq_addr  <= amo_addr_q;
+						amo_dreq_strobe <= amo_store_strobe;
+						amo_dreq_data  <= amo_store_data;
+						amo_state <= AMO_ST_STORE_W;
+						end
+					end
+				end
+					AMO_ST_STORE_W: begin
+						// Wait for store completion
+						if (dresp.data_ok) begin
+							amo_dreq_valid <= 1'b0;
+							amo_state <= AMO_ST_DONE;
+						end
+					end
+					AMO_ST_DONE: begin
+						// Result is ready, wait for stall_ex_busy to clear
+						amo_done_q <= 1'b1;
+						if (!stall_ex_busy) begin
+							amo_done_q   <= 1'b0;
+							amo_issued_q <= 1'b0;
+							amo_state    <= AMO_ST_IDLE;
+						end
+					end
+					default: amo_state <= AMO_ST_IDLE;
+			endcase
+		end
 
 			if (trap_commit) begin
 				fetch_pending <= 1'b0;

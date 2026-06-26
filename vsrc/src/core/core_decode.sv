@@ -260,16 +260,23 @@ module core_decode
 						id_dec_imm = 64'd0;
 						id_dec_mem_size = MSIZE4;
 						unique case (id_funct7[6:2])
-							5'b00001: id_dec_amo_cmd = AMO_CMD_SWAP; // amoswap.w
-							5'b00000: id_dec_amo_cmd = AMO_CMD_ADD;  // amoadd.w
-							5'b00010: id_dec_amo_cmd = AMO_CMD_LR;   // lr.w
-							5'b00011: id_dec_amo_cmd = AMO_CMD_SC;   // sc.w
-							default: begin
-								id_dec_is_amo = 1'b0;
-								id_dec_wen = 1'b0;
-								id_dec_is_illegal = 1'b1;
-							end
-						endcase
+						5'b00001: id_dec_amo_cmd = AMO_CMD_SWAP; // amoswap.w
+						5'b00000: id_dec_amo_cmd = AMO_CMD_ADD;  // amoadd.w
+						5'b00100: id_dec_amo_cmd = AMO_CMD_XOR;  // amoxor.w
+						5'b01100: id_dec_amo_cmd = AMO_CMD_AND;  // amoand.w
+						5'b01000: id_dec_amo_cmd = AMO_CMD_OR;   // amoor.w
+						5'b10000: id_dec_amo_cmd = AMO_CMD_MIN;  // amomin.w
+						5'b10100: id_dec_amo_cmd = AMO_CMD_MAX;  // amomax.w
+						5'b11000: id_dec_amo_cmd = AMO_CMD_MINU; // amominu.w
+						5'b11100: id_dec_amo_cmd = AMO_CMD_MAXU; // amomaxu.w
+						5'b00010: id_dec_amo_cmd = AMO_CMD_LR;   // lr.w
+						5'b00011: id_dec_amo_cmd = AMO_CMD_SC;   // sc.w
+						default: begin
+							id_dec_is_amo = 1'b0;
+							id_dec_wen = 1'b0;
+							id_dec_is_illegal = 1'b1;
+						end
+					endcase
 					end else begin
 						id_dec_is_illegal = 1'b1;
 					end

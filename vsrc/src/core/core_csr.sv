@@ -420,7 +420,10 @@ module core_csr
 		mret_redirect = 1'b0;
 		trap_redirect_pc = 64'd0;
 
+		// Debug: log all traps and redirects
+
 		if (intr_eval && intr_pending && !sync_trap_or_mret) begin
+			$display("TRAP: INTR cause=%0d mode=%0d pc=%x", intr_cause, privilege_mode_i, intr_fetch_pc);
 			if (delegate_to_s(1'b1, intr_cause)) begin
 				next_sepc = intr_fetch_pc;
 				next_scause = intr_cause;
@@ -444,8 +447,9 @@ module core_csr
 				trap_redirect = 1'b1;
 				trap_redirect_pc = csr_mtvec;
 			end
-		end else if (wb_ecall || wb_illegal || wb_ebreak || wb_misalign_instr || wb_misalign_data) begin
-			if (delegate_to_s(1'b0, get_excp_cause())) begin
+	end else if (wb_ecall || wb_illegal || wb_ebreak || wb_misalign_instr || wb_misalign_data) begin
+		$display("TRAP: EXC cause=%0d mode=%0d pc=%x", get_excp_cause(), privilege_mode_i, wb_r.pc);
+		if (delegate_to_s(1'b0, get_excp_cause())) begin
 				next_sepc = wb_r.pc;
 				next_scause = get_excp_cause();
 				next_stval = wb_illegal ? {32'd0, wb_r.instr} :
@@ -494,23 +498,25 @@ module core_csr
 				trap_redirect = 1'b1;
 				trap_redirect_pc = csr_mtvec;
 			end
-		end else if (wb_mret) begin
-			next_mstatus = csr_mstatus;
-			next_mstatus[3] = csr_mstatus[7];
-			next_mstatus[7] = 1'b1;
-			next_mstatus[12:11] = 2'b00;
-			next_privilege_mode = csr_mstatus[12:11];
-			mret_redirect = 1'b1;
-			trap_redirect_pc = csr_mepc;
-		end else if (wb_sret) begin
-			next_mstatus = csr_mstatus;
-			next_mstatus[1] = csr_mstatus[5];
-			next_mstatus[5] = 1'b1;
-			next_mstatus[8] = 1'b0;
-			next_privilege_mode = {1'b0, csr_mstatus[8]};
-			mret_redirect = 1'b1;
-			trap_redirect_pc = csr_sepc_r;
-		end else if (wb_sfence) begin
+	end else if (wb_mret) begin
+		next_mstatus = csr_mstatus;
+		next_mstatus[3] = csr_mstatus[7];
+		next_mstatus[7] = 1'b1;
+		next_mstatus[12:11] = 2'b00;
+		next_privilege_mode = csr_mstatus[12:11];
+		mret_redirect = 1'b1;
+		trap_redirect_pc = csr_mepc;
+		$display("REDIR: MRET pc=%x mode=%0d", csr_mepc, csr_mstatus[12:11]);
+	end else if (wb_sret) begin
+		next_mstatus = csr_mstatus;
+		next_mstatus[1] = csr_mstatus[5];
+		next_mstatus[5] = 1'b1;
+		next_mstatus[8] = 1'b0;
+		next_privilege_mode = {1'b0, csr_mstatus[8]};
+		mret_redirect = 1'b1;
+		trap_redirect_pc = csr_sepc_r;
+		$display("REDIR: SRET pc=%x mode=%0d", csr_sepc_r, {1'b0, csr_mstatus[8]});
+	end else if (wb_sfence) begin
 			// SFENCE.VMA: redirect to PC+4, flush MMU (handled by flush_mmu_o in core.sv)
 			mret_redirect = 1'b1;
 			trap_redirect_pc = wb_r.pc + 64'd4;
@@ -531,7 +537,6 @@ module core_csr
 				CSR_MTVAL:    next_mtval    = wb_r.csr_wdata;
 				CSR_STVAL:    next_stval    = wb_r.csr_wdata;
 				CSR_MEPC:     next_mepc     = wb_r.csr_wdata;
-				CSR_SEPC:     next_sepc     = wb_r.csr_wdata;
 				CSR_SATP:     next_satp     = wb_r.csr_wdata;
 				CSR_MEDELEG:  next_medeleg  = wb_r.csr_wdata;
 				CSR_MIDELEG:  next_mideleg  = wb_r.csr_wdata;

@@ -630,8 +630,8 @@ module core
 				fetch_redirect_bubble <= fetch_redirect_bubble - 2'd1;
 			end
 			// Trap redirect (exception/interrupt) and MRET redirect have highest priority
-			if (trap_redirect || mret_redirect) begin
-				if (fetch_pending) begin
+		if (trap_redirect || mret_redirect) begin
+			if (fetch_pending) begin
 					fetch_drop_resp_pending <= 1'b1;
 				end
 				fetch_buf_valid <= 1'b0;
@@ -850,6 +850,49 @@ module core
 	assign mstatus_sum_o = csr_mstatus[18];   // SUM bit for MMU U-page access
 	assign flush_mmu_o = trap_redirect || mret_redirect || ex_flush_front || ex_instr_misalign || mmu_trap;
 	assign trap_vaddr = fault_vaddr;
+
+`ifdef VERILATOR
+	// Debug: stuck detector - prints when no instruction commits for a long time
+	integer dbg_stall_cnt;
+	integer dbg_commit_total;
+	integer dbg_cycle_cnt;
+	always_ff @(posedge clk) begin
+		if (reset) begin
+			dbg_stall_cnt <= 0;
+			dbg_commit_total <= 0;
+			dbg_cycle_cnt <= 0;
+		end else begin
+			dbg_cycle_cnt <= dbg_cycle_cnt + 1;
+			if (wb_r.valid && !trap_commit) begin
+				dbg_commit_total <= dbg_commit_total + 1;
+				dbg_stall_cnt <= 0;
+				if (dbg_commit_total < 100 || (dbg_commit_total % 10000 == 0)) begin
+					$display("[C#%0d] pc=0x%016h instr=0x%08h wen=%0b rd=%0d isL=%0b isS=%0b",
+					         dbg_commit_total, wb_r.pc, wb_r.instr, wb_r.wen, wb_r.rd, wb_r.is_load, wb_r.is_store);
+				end
+			end else begin
+				dbg_stall_cnt <= dbg_stall_cnt + 1;
+				if (dbg_stall_cnt == 100 || dbg_stall_cnt == 500 || dbg_stall_cnt == 1000 || dbg_stall_cnt == 5000) begin
+					$display("[STUCK %0d] cyc=%0d fetch_pc=0x%016h id_pc=0x%016h ex_pc=0x%016h mem_pc=0x%016h wb_pc=0x%016h",
+					         dbg_stall_cnt, dbg_cycle_cnt, fetch_pc, id_r.pc, ex_r.pc, mem_r.pc, wb_r.pc);
+					$display("[STUCK %0d] stall_front=%0b stall_pipe=%0b stall_ex_busy=%0b stall_mem_busy=%0b stall_if_mem=%0b",
+					         dbg_stall_cnt, stall_front, stall_pipe, stall_ex_busy, stall_mem_busy, stall_if_mem);
+					$display("[STUCK %0d] raw_hazard_ex=%0b raw_hazard_mem=%0b fetch_redirect=%0b trap_redirect=%0b mret_redirect=%0b mmu_trap=%0b",
+					         dbg_stall_cnt, raw_hazard_ex, raw_hazard_mem, fetch_redirect_pending, trap_redirect, mret_redirect, mmu_trap);
+					$display("[STUCK %0d] satp=0x%016h priv=%0d halted=%0b trap_commit=%0b trap_valid=%0b",
+					         dbg_stall_cnt, csr_satp, privilege_mode, halted, trap_commit, trap_valid_latched);
+					$display("[STUCK %0d] id_valid=%0b ex_valid=%0b mem_valid=%0b wb_valid=%0b",
+					         dbg_stall_cnt, id_r.valid, ex_r.valid, mem_r.valid, wb_r.valid);
+					$display("[STUCK %0d] mem_is_load=%0b mem_is_store=%0b dreq_valid=%0b dresp_data_ok=%0b",
+					         dbg_stall_cnt, mem_r.is_load, mem_r.is_store, dreq.valid, dresp.data_ok);
+					$display("[STUCK %0d] ireq_valid=%0b iresp_data_ok=%0b fetch_pending=%0b fetch_buf_valid=%0b fetch_buf_instr=0x%08h",
+					         dbg_stall_cnt, ireq.valid, iresp.data_ok, fetch_pending, fetch_buf_valid, fetch_buf_instr);
+				end
+			end
+		end
+	end
+`endif
+
 	assign fault_pc = mem_r.valid ? mem_r.pc :
 	                  ex_r.valid  ? ex_r.pc  :
 	                  wb_r.valid  ? wb_r.pc  :

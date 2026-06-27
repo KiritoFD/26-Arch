@@ -77,6 +77,24 @@ module mmu
 	logic        u_bit_fault_load;
 	logic        u_bit_fault_store;
 
+	// Simple TLB: 1-entry for instruction, 2-entry for data
+	logic        tlb_i_valid;
+	logic [51:0] tlb_i_va_ppn, tlb_i_pa_ppn;
+	logic        tlb_d_valid0, tlb_d_valid1;
+	logic [51:0] tlb_d_va_ppn0, tlb_d_pa_ppn0;
+	logic [51:0] tlb_d_va_ppn1, tlb_d_pa_ppn1;
+	logic        tlb_d_lru;
+	logic        tlb_i_hit, tlb_d_hit;
+	logic [51:0] tlb_d_pa_hit;
+	logic [63:0] satp_prev;
+
+	assign tlb_i_hit = tlb_i_valid && translate_en && ireq_in.valid &&
+	                   (tlb_i_va_ppn == ireq_in.addr[63:12]);
+	assign tlb_d_hit = translate_en && dreq_in.valid && (
+	                   (tlb_d_valid0 && tlb_d_va_ppn0 == dreq_in.addr[63:12]) ||
+	                   (tlb_d_valid1 && tlb_d_va_ppn1 == dreq_in.addr[63:12]));
+	assign tlb_d_pa_hit = (tlb_d_valid0 && tlb_d_va_ppn0 == dreq_in.addr[63:12]) ? tlb_d_pa_ppn0 : tlb_d_pa_ppn1;
+
 	assign satp_mode = (satp[63:60] == 4'd8);
 	assign satp_ppn  = satp[43:0];
 	assign translate_en = satp_mode && (privilege_mode != 2'd3);
@@ -235,21 +253,23 @@ module mmu
 	always_comb begin
 		phys_addr = 64'd0;
 		unique case (saved_level)
-			2'd2: phys_addr = {10'd0, saved_pte[53:30], vpn1, vpn0, page_offset};        // 10+24+9+9+12 = 64
-			2'd1: phys_addr = {10'd0, saved_pte[53:21], vpn0, page_offset};               // 10+33+9+12 = 64
-			2'd0: phys_addr = {8'd0, saved_pte[53:10], page_offset};                      // 8+44+12 = 64
+			2'd2: phys_addr = {8'd0, saved_pte[53:28], vpn1, vpn0, page_offset};        // 8+26+9+9+12 = 64 (1GB superpage)
+			2'd1: phys_addr = {8'd0, saved_pte[53:19], vpn0, page_offset};               // 8+35+9+12 = 64 (2MB superpage)
+			2'd0: phys_addr = {8'd0, saved_pte[53:10], page_offset};                      // 8+44+12 = 64 (4KB page)
 			default: phys_addr = 64'd0;
 		endcase
 	end
 
-	// Core response: passthrough when no translation needed
-	assign iresp_in.addr_ok = (!translate_en) ? iresp_out.addr_ok : 1'b0;
+	// Core response: passthrough when no translation or TLB hit (but not during walk)
+	assign iresp_in.addr_ok = (!translate_en || (tlb_i_hit && !walk_active)) ? iresp_out.addr_ok : 1'b0;
 	assign iresp_in.data_ok = (!translate_en) ? iresp_out.data_ok :
+	                          (tlb_i_hit && !walk_active) ? iresp_out.data_ok :
 	                          (state == WALK_DONE_INSN && iresp_out.data_ok);
 	assign iresp_in.data    = iresp_out.data;
 
-	assign dresp_in.addr_ok = (!translate_en) ? dresp_out.addr_ok : 1'b0;
+	assign dresp_in.addr_ok = (!translate_en || (tlb_d_hit && !walk_active)) ? dresp_out.addr_ok : 1'b0;
 	assign dresp_in.data_ok = (!translate_en) ? dresp_out.data_ok :
+	                          (tlb_d_hit && !walk_active) ? dresp_out.data_ok :
 	                          (state == WALK_DONE_DATA && dresp_out.data_ok);
 	assign dresp_in.data    = dresp_out.data;
 
@@ -260,6 +280,9 @@ module mmu
 			if (direct_insn_pmp_fault) begin
 				ireq_out.valid = 1'b0;
 			end
+		end else if (tlb_i_hit) begin
+			ireq_out = ireq_in;
+			ireq_out.addr = {tlb_i_pa_ppn, ireq_in.addr[11:0]};
 		end else if (state == WALK_DONE_INSN) begin
 			ireq_out.valid = !done_insn_pmp_fault;
 			ireq_out.addr  = phys_addr;
@@ -285,6 +308,9 @@ module mmu
 			dreq_out.size   = MSIZE8;
 			dreq_out.strobe = 8'd0;
 			dreq_out.data   = 64'd0;
+		end else if (tlb_d_hit) begin
+			dreq_out = dreq_in;
+			dreq_out.addr = {tlb_d_pa_hit, dreq_in.addr[11:0]};
 		end else if (state == WALK_DONE_DATA) begin
 			dreq_out.valid  = !(done_load_pmp_fault || done_store_pmp_fault);
 			dreq_out.addr   = phys_addr;
@@ -313,6 +339,12 @@ module mmu
 			saved_pte     <= 64'd0;
 			saved_level   <= 2'd0;
 			trap_pending  <= 1'b0;
+			tlb_i_valid   <= 1'b0;
+			tlb_d_valid0  <= 1'b0;
+			tlb_d_valid1  <= 1'b0;
+			tlb_d_lru     <= 1'b0;
+			satp_prev     <= 64'd0;
+			tlb_i_valid   <= 1'b0;
 		end else if (flush) begin
 			state         <= WALK_IDLE;
 			saved_is_insn <= 1'b0;
@@ -324,54 +356,56 @@ module mmu
 			saved_pte     <= 64'd0;
 			saved_level   <= 2'd0;
 			trap_pending  <= 1'b0;
+			// TLB entries preserved across traps (same pagetable);
+			// only cleared on reset or when satp changes (detected below)
 		end else begin
 			case (state)
 				WALK_IDLE: begin
-					if (trap_pending) begin
-						trap_pending <= trap_pending;
+				if (trap_pending) begin
+					trap_pending <= trap_pending;
+				end else begin
+					trap_pending <= 1'b0;
+				if (translate_en && privilege_mode != 2'd3) begin
+					if (ireq_in.valid && !tlb_i_hit) begin
+						state         <= WALK_LEVEL2;
+						saved_is_insn <= 1'b1;
+						saved_vaddr   <= ireq_in.addr;
+						pte_addr      <= {8'd0, satp_ppn, ireq_in.addr[38:30], 3'b000};
+				end else if (dreq_in.valid && !tlb_d_hit) begin
+							state         <= WALK_LEVEL2;
+							saved_is_insn <= 1'b0;
+							saved_vaddr   <= dreq_in.addr;
+							saved_wdata   <= dreq_in.data;
+							saved_wstrb   <= dreq_in.strobe;
+							saved_size    <= dreq_in.size;
+							pte_addr      <= {8'd0, satp_ppn, dreq_in.addr[38:30], 3'b000};
+					end
+					end
+				end
+			end
+
+			WALK_LEVEL2: begin
+			if (dresp_out.data_ok) begin
+				if (!dresp_out.data[0]) begin
+						state <= WALK_IDLE;
+					end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
+						saved_pte   <= dresp_out.data;
+						saved_level <= 2'd2;
+						state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
 					end else begin
-						trap_pending <= 1'b0;
-						if (translate_en && privilege_mode != 2'd3) begin
-							if (ireq_in.valid) begin
-								state         <= WALK_LEVEL2;
-								saved_is_insn <= 1'b1;
-								saved_vaddr   <= ireq_in.addr;
-								pte_addr      <= {8'd0, satp_ppn, ireq_in.addr[38:30], 3'b000};
-							end else if (dreq_in.valid) begin
-								state         <= WALK_LEVEL2;
-								saved_is_insn <= 1'b0;
-								saved_vaddr   <= dreq_in.addr;
-								saved_wdata   <= dreq_in.data;
-								saved_wstrb   <= dreq_in.strobe;
-								saved_size    <= dreq_in.size;
-								pte_addr      <= {8'd0, satp_ppn, dreq_in.addr[38:30], 3'b000};
-							end
-						end
+						state    <= WALK_LEVEL1;
+						pte_addr <= {8'd0, dresp_out.data[53:10], vpn1, 3'b000};
 					end
 				end
+			end
 
-				WALK_LEVEL2: begin
-					if (dresp_out.data_ok) begin
-						if (!dresp_out.data[0]) begin
-							state <= WALK_IDLE;
-						end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
-							saved_pte   <= dresp_out.data;
-							saved_level <= 2'd2;
-							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
-						end else begin
-							state    <= WALK_LEVEL1;
-							pte_addr <= {8'd0, dresp_out.data[53:10], vpn1, 3'b000};
-						end
-					end
-				end
-
-				WALK_LEVEL1: begin
-					if (dresp_out.data_ok) begin
-						if (!dresp_out.data[0]) begin
-							state <= WALK_IDLE;
-						end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
-							saved_pte   <= dresp_out.data;
-							saved_level <= 2'd1;
+			WALK_LEVEL1: begin
+			if (dresp_out.data_ok) begin
+				if (!dresp_out.data[0]) begin
+						state <= WALK_IDLE;
+					end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
+						saved_pte   <= dresp_out.data;
+						saved_level <= 2'd1;
 							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
 						end else begin
 							state    <= WALK_LEVEL0;
@@ -381,33 +415,55 @@ module mmu
 				end
 
 				WALK_LEVEL0: begin
-					if (dresp_out.data_ok) begin
-						if (!dresp_out.data[0]) begin
-							state <= WALK_IDLE;
-						end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
-							saved_pte   <= dresp_out.data;
-							saved_level <= 2'd0;
-							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
-						end else begin
-							state <= WALK_IDLE;
-						end
-					end
-				end
-
-				WALK_DONE_INSN: begin
-					if (iresp_out.data_ok) begin
+			if (dresp_out.data_ok) begin
+				if (!dresp_out.data[0]) begin
+						state <= WALK_IDLE;
+					end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
+						saved_pte   <= dresp_out.data;
+						saved_level <= 2'd0;
+						state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
+					end else begin
 						state <= WALK_IDLE;
 					end
 				end
+			end
 
-				WALK_DONE_DATA: begin
-					if (dresp_out.data_ok) begin
-						state <= WALK_IDLE;
+		WALK_DONE_INSN: begin
+		if (iresp_out.data_ok) begin
+			tlb_i_valid  <= 1'b1;
+			tlb_i_va_ppn <= saved_vaddr[63:12];
+			tlb_i_pa_ppn <= phys_addr[63:12];
+			state <= WALK_IDLE;
+		end
+	end
+
+			WALK_DONE_DATA: begin
+				if (dresp_out.data_ok) begin
+					// 2-entry LRU replacement for data TLB
+					if (!tlb_d_valid0 || tlb_d_lru == 1'b0) begin
+						tlb_d_valid0  <= 1'b1;
+						tlb_d_va_ppn0 <= saved_vaddr[63:12];
+						tlb_d_pa_ppn0 <= phys_addr[63:12];
+					end else begin
+						tlb_d_valid1  <= 1'b1;
+						tlb_d_va_ppn1 <= saved_vaddr[63:12];
+						tlb_d_pa_ppn1 <= phys_addr[63:12];
 					end
+					tlb_d_lru <= ~tlb_d_lru;
+					state <= WALK_IDLE;
 				end
+			end
 
 				default: state <= WALK_IDLE;
 			endcase
+		end
+
+		// TLB invalidation when satp changes (pagetable switch)
+		satp_prev <= satp;
+		if (satp != satp_prev) begin
+			tlb_i_valid  <= 1'b0;
+			tlb_d_valid0 <= 1'b0;
+			tlb_d_valid1 <= 1'b0;
 		end
 	end
 

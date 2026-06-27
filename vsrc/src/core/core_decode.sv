@@ -37,6 +37,7 @@ module core_decode
 	input  logic [1:0]    privilege_mode,
 	input  logic          ex_forwardable,
 	input  logic [63:0]   ex_result,
+	input  logic [63:0]   mem_stage_result,
 	output logic [4:0]    id_rs1,
 	output logic [4:0]    id_rs2,
 	output logic          id_use_rs1,
@@ -116,11 +117,11 @@ module core_decode
 		id_rs2_val = (id_rs2 == 0) ? 64'd0 : gpr[id_rs2];
 
 		if (id_use_rs1 && ex_forwardable && (ex_r.rd == id_rs1)) id_rs1_val = ex_result;
-		else if (id_use_rs1 && mem_r.valid && mem_r.wen && (mem_r.rd != 0) && (mem_r.rd == id_rs1)) id_rs1_val = mem_r.result;
+		else if (id_use_rs1 && mem_r.valid && mem_r.wen && (mem_r.rd != 0) && (mem_r.rd == id_rs1)) id_rs1_val = mem_stage_result;
 		else if (id_use_rs1 && wb_r.valid && wb_r.wen && (wb_r.rd != 0) && (wb_r.rd == id_rs1)) id_rs1_val = wb_r.result;
 
 		if (id_use_rs2 && ex_forwardable && (ex_r.rd == id_rs2)) id_rs2_val = ex_result;
-		else if (id_use_rs2 && mem_r.valid && mem_r.wen && (mem_r.rd != 0) && (mem_r.rd == id_rs2)) id_rs2_val = mem_r.result;
+		else if (id_use_rs2 && mem_r.valid && mem_r.wen && (mem_r.rd != 0) && (mem_r.rd == id_rs2)) id_rs2_val = mem_stage_result;
 		else if (id_use_rs2 && wb_r.valid && wb_r.wen && (wb_r.rd != 0) && (wb_r.rd == id_rs2)) id_rs2_val = wb_r.result;
 	end
 

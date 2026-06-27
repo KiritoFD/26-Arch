@@ -202,6 +202,7 @@ module core
 	logic [7:0]  amo_dreq_strobe;
 	logic [63:0] amo_dreq_data;
 	logic        amo_busy;
+	logic        amo_issue;
 	logic        amo_issued_q;
 	logic        amo_done_q;
 	// ===== LR/SC Reservation Set (T015) — 2 entries =====
@@ -299,6 +300,7 @@ module core
 		.privilege_mode(privilege_mode),
 		.ex_forwardable(ex_forwardable),
 		.ex_result(ex_result),
+		.mem_stage_result(mem_stage_result),
 		.id_rs1(id_rs1),
 		.id_rs2(id_rs2),
 		.id_use_rs1(id_use_rs1),

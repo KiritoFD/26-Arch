@@ -1,0 +1,91 @@
+﻿
+****** Vivado v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source {vivado\capture_only.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set ila_csv [file join $repo_root vivado ila_capture_v2.csv]
+# puts "=========================================="
+==========================================
+# puts "Step 1: Opening Hardware Manager..."
+Step 1: Opening Hardware Manager...
+# puts "=========================================="
+==========================================
+# open_hw_manager
+# connect_hw_server -url localhost:3121 -allow_non_jtag
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-2222] Launching hw_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+****** Xilinx hw_server v2019.2
+  **** Build date : Nov  6 2019 at 22:12:23
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+
+INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042
+INFO: [Labtools 27-3417] Launching cs_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+
+****** Xilinx cs_server v2019.2.0
+  **** Build date : Nov 07 2019-13:28:22
+    ** Copyright 2017-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+connect_hw_server: Time (s): cpu = 00:00:00 ; elapsed = 00:00:07 . Memory (MB): peak = 300.711 ; gain = 0.000
+# set targets [get_hw_targets -quiet]
+# if {[llength $targets] == 0} {
+#     puts "ERROR: No hardware targets found!"
+#     close_hw_manager
+#     exit 1
+# }
+# current_hw_target [lindex $targets 0]
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# puts "Connected to: [lindex $targets 0]"
+Connected to: localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# set device [lindex [get_hw_devices] 0]
+# current_hw_device $device
+# refresh_hw_device $device
+INFO: [Labtools 27-2302] Device xc7a35t (JTAG device index = 0) is programmed with a design that has 1 ILA core(s).
+WARNING: [Labtools 27-1347] Unable to find Debug Probes file []. Please update hw_device property [PROBES.FILE]
+ Update of hw_probe objects, will be skipped.
+WARNING: [Labtools 27-1974] Mismatch between the design programmed into the device xc7a35t_0 and the probes file(s) .
+The device design has 1 ILA core(s) and 0 VIO core(s). 0 ILA core(s) and 0 VIO core(s) are matched in the probes file(s).
+Resolution: 
+1. Reprogram device with the correct programming file and associated probes file(s) OR
+2. Goto device properties and associate the correct probes file(s) with the programming file already programmed in the device.
+# puts "Device refreshed."
+Device refreshed.
+# puts "=========================================="
+==========================================
+# puts "Step 2: Triggering ILA..."
+Step 2: Triggering ILA...
+# puts "=========================================="
+==========================================
+# set ila [get_hw_ilas -quiet]
+# if {[llength $ila] == 0} {
+#     puts "ERROR: No ILA core found!"
+#     close_hw_target
+#     disconnect_hw_server
+#     close_hw_manager
+#     exit 1
+# }
+# puts "Found ILA: $ila"
+Found ILA: hw_ila_1
+# current_hw_ila [lindex $ila 0]
+# run_hw_ila -trigger_now [lindex $ila 0]
+vivado.bat : ERROR: [Labtools 27-188] Use refresh_hw_device command, with a valid [debug_nets.ltx] file before running 
+this command.
+At line:15 char:3521
++ ... pgrep\bin'; & "C:\Xilinx\Vivado\2019.2\bin\vivado.bat" -mode batch -s ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: [Labtool...g this command.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 20:21:47 2026...

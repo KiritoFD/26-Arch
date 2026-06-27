@@ -1,0 +1,171 @@
+Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
+| Date         : Sat Jun 27 18:55:52 2026
+| Host         : Archer running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file basys3_top_control_sets_placed.rpt
+| Design       : basys3_top
+| Device       : xc7a35t
+---------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Total control sets                                       |    93 |
+|    Minimum number of control sets                        |    93 |
+|    Addition due to synthesis replication                 |     0 |
+|    Addition due to physical synthesis replication        |     0 |
+| Unused register locations in slices containing registers |   162 |
++----------------------------------------------------------+-------+
+* Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
+** Run report_qor_suggestions for automated merging and remapping suggestions
+
+
+2. Histogram
+------------
+
++--------------------+-------+
+|       Fanout       | Count |
++--------------------+-------+
+| Total control sets |    93 |
+| >= 0 to < 4        |     3 |
+| >= 4 to < 6        |     6 |
+| >= 6 to < 8        |     2 |
+| >= 8 to < 10       |     3 |
+| >= 10 to < 12      |     1 |
+| >= 12 to < 14      |     1 |
+| >= 14 to < 16      |     2 |
+| >= 16              |    75 |
++--------------------+-------+
+* Control sets can be remapped at either synth_design or opt_design
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |              38 |           27 |
+| No           | No                    | Yes                    |               0 |            0 |
+| No           | Yes                   | No                     |             496 |          182 |
+| Yes          | No                    | No                     |             359 |          195 |
+| Yes          | No                    | Yes                    |               0 |            0 |
+| Yes          | Yes                   | No                     |            5649 |         2560 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++--------------------------------------+----------------------------------------------------------------------------------------+------------------------------------------------------------------------------------+------------------+----------------+
+|             Clock Signal             |                                      Enable Signal                                     |                                  Set/Reset Signal                                  | Slice Load Count | Bel Load Count |
++--------------------------------------+----------------------------------------------------------------------------------------+------------------------------------------------------------------------------------+------------------+----------------+
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/dbg_ever_uart_write_reg0                     | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                1 |              1 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/txn_done_pulse_reg_0                         | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                1 |              1 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_scause_r[3]_i_1_n_0      | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_scause_r[59]_i_1_n_0 |                1 |              2 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_div_signed                        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                4 |              4 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mstatus[12]_i_1_n_0      | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                4 |              4 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_cmd                               | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                2 |              5 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[1][54]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                3 |              5 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[16][54]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                4 |              5 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/bram_wrapper_inst/ena0                                                    |                                                                                    |                2 |              5 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/txn_done_pulse_reg[0]                        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                1 |              6 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_steps_left[6]_i_1_n_0             | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                2 |              7 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/fifo_count[7]_i_1_n_0                                         | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                2 |              8 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/disk_rdata_shifted                                            | soc_top_inst/device_inst/gen_real_disk.disk_rdata_shifted[7]_i_1_n_0               |                4 |              8 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_pmpcfg0_r[7]_i_1_n_0     | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                6 |              8 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/console_rx_rptr0                             | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                2 |             10 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/p_0_in1_out                                  |                                                                                    |                3 |             12 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk |                                                                                        | soc_top_inst/device_inst/bitTmr0                                                   |                4 |             14 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/tx_start                                                      | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |                5 |             15 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/bram_wrapper_inst/counter0                                                | soc_top_inst/bram_wrapper_inst/counter[0]_i_1_n_0                                  |                4 |             16 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk |                                                                                        | soc_top_inst/bram_wrapper_inst/burst_counter[0]_i_1_n_0                            |                5 |             18 |
+|  clk_IBUF                            |                                                                                        | btnC_IBUF                                                                          |                7 |             25 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/disk_blockno0                                                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               16 |             32 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/mem_r39_out                        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/ex_r_reg[is_amo][1]            |               15 |             32 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/bitIndex                                                      | soc_top_inst/device_inst/txBit_i_1_n_0                                             |                9 |             33 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[23][54]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               24 |             35 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/ex_r_reg[valid]_1                     | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/halted_reg_0                   |                9 |             38 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[7][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               28 |             42 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[15][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               25 |             43 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/cpu_rmw_pending_reg[0]                       |                                                                                    |               12 |             44 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk |                                                                                        |                                                                                    |               28 |             46 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/u_mmu/saved_pte                                  | soc_top_inst/mycpu_top_inst/VTop_inst/core/SR[0]                                   |               18 |             47 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[24][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               26 |             51 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/lock_select_reg[0]_2[0]                      | soc_top_inst/mycpu_top_inst/VTop_inst/core/SR[0]                                   |               39 |             53 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/disk_rdata_shifted                                            |                                                                                    |               27 |             56 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mstatus[63]_i_1_n_0      | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               30 |             57 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_scause_r[3]_i_1_n_0      |                                                                                    |               32 |             62 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[17][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               37 |             62 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mcounteren_r[63]_i_1_n_0 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               23 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mepc[63]_i_1_n_0         | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               57 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mtval[63]_i_1_n_0        |                                                                                    |               45 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_sepc_r[63]_i_1_n_0       | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               56 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_stval_r[63]_i_1_n_0      |                                                                                    |               52 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[12][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               30 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[14][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               31 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[11][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               31 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[13][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               30 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_pmpaddr0_r[63]_i_1_n_0   | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               33 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[19][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               40 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[18][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               35 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[20][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               34 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[21][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               34 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[26][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               41 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[27][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               35 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[29][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               39 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[25][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               41 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[28][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               51 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[2][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               32 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[30][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               34 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[22][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               30 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[3][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               42 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[4][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               34 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[31][63]_i_1_n_0                | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               43 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[8][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               40 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[9][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               43 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/gpr[6][63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               38 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_div_rem                           | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               29 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/E[0]                               | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/fetch_pending_reg[0]           |               16 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/halted_reg_2[0]                    | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               21 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/i___252_n_0                           | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               56 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/device_inst/mtime                                                         | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               16 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_div_divisor[63]_i_1_n_0           | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               30 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/amo_old_data_q[63]_i_1_n_0                  | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               17 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_div_rem[63]_i_1_n_0               | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/i___251_n_0                       |               38 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/ex_r_reg[valid]_1                     | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/SR[0]                          |               10 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_mul_b[63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/i___85_n_0                        |               36 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_menvcfg_r[63]_i_1_n_0    | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               15 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/rs_addr[1][63]_i_1_n_0                      | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               10 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/rs_addr[0][63]_i_1_n_0                      | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               11 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mcause[3]_i_1_n_0        |                                                                                    |               25 |             64 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/bram_wrapper_inst/rmw_phase0                                              | soc_top_inst/bram_wrapper_inst/rmw_phase_i_1_n_0                                   |               28 |             65 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/u_mmu/saved_vaddr                                | soc_top_inst/mycpu_top_inst/VTop_inst/core/SR[0]                                   |               19 |             65 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/u_mmu/saved_wdata                                | soc_top_inst/mycpu_top_inst/VTop_inst/core/SR[0]                                   |               20 |             72 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/mux/txn_active_reg[0]                            | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               33 |             88 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/E[0]                                  | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               25 |             96 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/amo_cmd_q[3]_i_1_n_0                        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               35 |            100 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_mdu/mdu_mul_b[63]_i_1_n_0                 | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               43 |            128 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/amo_dreq_addr[63]_i_1_n_0                   | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               45 |            136 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/icvt/inst/E[0]                                   | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |               65 |            138 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/fetch_redirect_bubble_reg[0]_0[0]  | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |              126 |            300 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/mem_r39_out                        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/ex_r_reg[is_amo][0]            |              106 |            345 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/ex_r55_out                         | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/ex_r                           |              153 |            417 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk |                                                                                        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |              166 |            439 |
+|  soc_top_inst/clk_wiz_0/inst/cpu_clk | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/csr_mtvec[63]_i_1_n_0        | soc_top_inst/mycpu_top_inst/VTop_inst/core/u_commit/u_csr/btnC                     |              258 |            573 |
++--------------------------------------+----------------------------------------------------------------------------------------+------------------------------------------------------------------------------------+------------------+----------------+
+
+

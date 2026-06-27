@@ -21,8 +21,10 @@ module basys3_top (
 	logic dbg_ever_device_read;
 	logic dbg_lsr_read;
 	(* mark_debug = "true" *) logic dbg_ever_thr_write;
-	logic dbg_tx_state_rdy;
-	logic dbg_tx_fifo_nonempty;
+	(* mark_debug = "true" *) logic dbg_tx_state_rdy;
+	(* mark_debug = "true" *) logic dbg_tx_fifo_nonempty;
+	(* mark_debug = "true" *) logic dbg_ever_tx_sent;
+	(* mark_debug = "true" *) logic [7:0] dbg_tx_byte_cnt;
 	logic [63:0] dbg_lsr_rdata;
 	logic [63:0] dbg_device_addr;
 	(* mark_debug = "true" *) logic cpu_tx;
@@ -59,6 +61,8 @@ module basys3_top (
 		.dbg_ever_thr_write,
 		.dbg_tx_state_rdy,
 		.dbg_tx_fifo_nonempty,
+		.dbg_ever_tx_sent,
+		.dbg_tx_byte_cnt,
 		.dbg_lsr_rdata,
 		.dbg_device_addr
 	);
@@ -121,6 +125,6 @@ module basys3_top (
 	end
 	assign led[0] = blink_cnt[24];        // ~3Hz blink = FPGA alive (100MHz domain)
 assign led[1] = dbg_clk_locked;       // PLL lock status
-assign led[2] = dbg_ever_uart_write;  // 1=CPU ever wrote UART register
-assign led[3] = dbg_ever_thr_write;   // 1=CPU ever wrote THR DATA byte
+assign led[2] = dbg_ever_thr_write;   // 1=CPU ever wrote THR DATA byte
+assign led[3] = dbg_ever_tx_sent;     // 1=TX state machine ever left RDY
 endmodule

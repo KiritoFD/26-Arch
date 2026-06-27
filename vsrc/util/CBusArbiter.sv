@@ -44,9 +44,9 @@ module CBusArbiter
 
     always_ff @(posedge clk) begin
         if (reset) begin
-            lock_valid  <= 1'b0;
-            lock_req    <= '0;
-            lock_select <= 0;
+            lock_valid     <= 1'b0;
+            lock_req       <= '0;
+            lock_select    <= 0;
         end else begin
             if (lock_valid) begin
                 if (oresp.ready && oresp.last) begin

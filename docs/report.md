@@ -442,3 +442,110 @@ lab+4 测试结果明细：
 - 诊断信息或 shell prompt（取决于 kernel 功能范围）
 
 若 BRAM 不足以运行完整 lab5 kernel，降级方案为使用 `lab3-test.coe` 验证基础五级流水功能。
+
+### 6.5 Basys3 FT2232H EEPROM 配置损坏与恢复
+
+**这是上板过程中最耗时的硬件问题**，记录于此以备复现。
+
+#### 6.5.1 故障现象
+
+Basys3 开发板通过 FT2232H 双通道 USB 芯片与主机通信：
+- Channel A → FPGA JTAG（Vivado 编程）
+- Channel B → FPGA UART（串口控制台）
+
+在调试过程中，FT2232H 的 EEPROM 配置被意外擦除/损坏，导致：
+- **Vivado Hardware Manager 无法识别板子**（Auto Connect 找不到设备）
+- 设备管理器中 FTDI 设备显示为 "USB Serial Converter A/B"，而非正常的 "Digilent USB Device"
+- D2XX API 返回的 Description 为 `"Dual RS232-HS A"`（FTDI 默认值），而非 `"Digilent Basys3"`
+- 串口 (COM) 有时可用，有时不可用
+
+#### 6.5.2 根因分析
+
+通过 D2XX API 读取损坏板子的 EEPROM（256 words × 16-bit），并与正常板子备份逐字对比，发现：
+
+1. **字符串描述符区域被擦除**（word 14-33，word 142-161）
+   - 正常板子：包含 `"Basys3"` 和 `"Digilent Basys3"` 的 UTF-16LE 编码
+   - 损坏板子：全为 `0x0000`
+   - 后果：FTDI 芯片无法向 USB 主机报告 Product String，Digilent 插件无法识别
+
+2. **字符串使能标志被清除**（word 13, 41, 141, 169）
+   - 正常板子：`0x0001`（启用字符串描述符）
+   - 损坏板子：`0x0000`
+   - 后果：即使字符串数据存在，FTDI 芯片也不读取
+
+3. **配置字 word 9 的 bit 11 错误**
+   - 正常板子：`0x1ad4`（bit 11 = 1）
+   - 损坏板子：`0x12d4`（bit 11 = 0）
+   - 后果：FTDI 芯片不加载 EEPROM 中的 USB 字符串描述符表，回退到芯片内部默认值 `"Dual RS232-HS"`
+
+4. **EEPROM 校验和错误**（word 127, 255）
+   - FT2232H 使用双镜像结构：word 0-127 为 image 1，word 128-255 为 image 2
+   - 校验和 = word 0..126（或 128..254）的 XOR
+   - 损坏板子校验和与实际数据不匹配
+   - 后果：FTDI 芯片在 USB 枚举时检测到校验和错误，**丢弃整个 EEPROM 配置**，回退到芯片默认 VID/PID 和默认字符串
+
+#### 6.5.3 修复方案
+
+**核心思路**：用正常板子的完整 EEPROM 备份（256 words）覆盖损坏板子的全部 EEPROM，包括字符串区域、配置字和校验和。
+
+**关键脚本**：`sim/force_restore_all.py`
+
+```python
+# 读取正常板子备份（256 words）
+orig = read_backup('sim/eeprom_backups/eeprom_backup_20260627_072124.bin')
+
+# 通过 D2XX API 逐字写入损坏板子
+for i in range(256):
+    if cur[i] != orig[i]:
+        ft.FT_WriteEE(handle, i, orig[i])
+```
+
+**修复过程中的关键技术难点**：
+
+1. **VID 被改为 0x1443 后 D2XX 无法打开设备**
+   - FTDI D2XX 驱动只认 VID=0x0403，自定义 VID 的设备无法通过 `FT_Open` 打开
+   - `FT_SetVIDPID` 函数在该版本 DLL 中不可用
+   - libusb 的 `open()` 也失败（Windows 未绑定 WinUSB 驱动）
+   - **解决**：使用 Zadig 工具给 VID=0x1443 的设备临时安装 WinUSB 驱动，使 libusb 能访问设备并恢复 VID 为 0x0403
+
+2. **校验和必须与实际数据匹配**
+   - 曾尝试只恢复字符串区域但保留旧校验和 → FTDI 仍丢弃配置
+   - 曾尝试用正确数据但计算了错误校验和（`0x17e9`）→ FTDI 仍不读字符串
+   - **最终解决**：直接用正常板子的完整备份覆盖全部 256 words，包括其原始校验和 `0x2947`
+
+3. **D2XX Description 缓存**
+   - 修改 EEPROM 后 D2XX 仍返回旧的 Description
+   - 必须物理拔插 USB 才能触发 FTDI 芯片重新加载 EEPROM
+
+#### 6.5.4 EEPROM 配置参考
+
+正常工作的 Basys3 EEPROM 关键字段：
+
+| Word | 值 | 含义 |
+|------|------|------|
+| 0 | `0x0801` | PID = 0x0801 (FT2232H) |
+| 1 | `0x0403` | VID = 0x0403 (FTDI) |
+| 3 | `0x0700` | Channel A = UART, Channel B = FIFO/D2XX |
+| 5 | `0x0008` | IFAIsFifoTar = 1 |
+| 9 | `0x1ad4` | bit 11 = 1（启用 USB 字符串加载） |
+| 13 | `0x0001` | 字符串区域使能标志 |
+| 14-20 | `"Basys3"` | UTF-16LE 编码 |
+| 26-33 | `"Digilent Basys3"` | UTF-16LE 编码 |
+| 77-105 | `"Digilent"` / `"Digilent USB Device"` | USB 描述符 |
+| 127 | `0x2947` | Image 1 校验和 |
+| 255 | `0x2947` | Image 2 校验和 |
+
+#### 6.5.5 修复结果
+
+完整覆盖 EEPROM 后，物理拔插 USB：
+- Vivado Hardware Manager → Auto Connect 成功识别 Basys3 (`xc7a35t_0`)
+- 串口 COM 口正常出现
+- D2XX Description 从 `"Dual RS232-HS A"` 恢复为 `"Digilent Basys3"`
+
+#### 6.5.6 经验教训
+
+1. **不要随意修改 FT2232H 的 VID/PID**，D2XX 驱动不认自定义 VID，恢复过程极其困难
+2. **EEPROM 校验和是配置生效的关键**——数据正确但校验和错误，FTDI 照样丢弃全部配置
+3. **word 9 的 bit 11** 控制 USB 字符串描述符加载，这个位错了会导致 FTDI 回退到默认字符串
+4. **必须物理拔插 USB** 才能让 FTDI 芯片重新读取 EEPROM，软件 reset 无效
+5. **保留正常板子的完整 EEPROM 备份**是快速恢复的关键

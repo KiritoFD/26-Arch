@@ -69,7 +69,7 @@ package core_pkg;
 	localparam logic [11:0] CSR_MHARTID  = 12'hf14;
 
 	localparam logic [63:0] MSTATUS_MASK = 64'h0000_0000_007e_79bb;
-	localparam logic [63:0] SSTATUS_MASK = 64'h8000_0003_000d_e000;
+	localparam logic [63:0] SSTATUS_MASK = 64'h8000_0003_000d_e122;  // SD+UXL+MXR+SUM+XS+FS+SPP(8)+SPIE(5)+SIE(1)
 	localparam logic [63:0] MIP_MASK     = 64'h0000_0000_0000_0333;
 	localparam logic [63:0] MTVEC_MASK   = ~64'h0000_0000_0000_0002;
 	localparam logic [63:0] STVEC_MASK   = ~64'h0000_0000_0000_0002;

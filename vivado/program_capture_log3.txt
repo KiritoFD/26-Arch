@@ -1,0 +1,127 @@
+﻿
+****** Vivado v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source {vivado\program_and_capture.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set bitstream_path [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.bit]
+# set ltx_path [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.ltx]
+# set ila_csv [file join $repo_root vivado ila_capture_v2.csv]
+# puts "=========================================="
+==========================================
+# puts "Step 1: Opening Hardware Manager..."
+Step 1: Opening Hardware Manager...
+# puts "=========================================="
+==========================================
+# open_hw_manager
+# connect_hw_server -url localhost:3121 -allow_non_jtag
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-2222] Launching hw_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+****** Xilinx hw_server v2019.2
+  **** Build date : Nov  6 2019 at 22:12:23
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+
+INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042
+INFO: [Labtools 27-3417] Launching cs_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+
+****** Xilinx cs_server v2019.2.0
+  **** Build date : Nov 07 2019-13:28:22
+    ** Copyright 2017-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+connect_hw_server: Time (s): cpu = 00:00:01 ; elapsed = 00:00:07 . Memory (MB): peak = 301.047 ; gain = 0.000
+# set targets [get_hw_targets -quiet]
+# if {[llength $targets] == 0} {
+#     puts "ERROR: No hardware targets found!"
+#     close_hw_manager
+#     exit 1
+# }
+# current_hw_target [lindex $targets 0]
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# puts "Connected to: [lindex $targets 0]"
+Connected to: localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# puts "=========================================="
+==========================================
+# puts "Step 2: Programming FPGA..."
+Step 2: Programming FPGA...
+# puts "=========================================="
+==========================================
+# set device [lindex [get_hw_devices] 0]
+# current_hw_device $device
+# set_property PROGRAM.FILE $bitstream_path $device
+# set_property PROBES.FILE $ltx_path $device
+# program_hw_devices $device
+INFO: [Labtools 27-3164] End of startup status: HIGH
+# puts "FPGA programmed successfully!"
+FPGA programmed successfully!
+# refresh_hw_device $device
+INFO: [Labtools 27-2302] Device xc7a35t (JTAG device index = 0) is programmed with a design that has 1 ILA core(s).
+# puts "Device refreshed."
+Device refreshed.
+# puts "=========================================="
+==========================================
+# puts "Step 3: Waiting 3 seconds for CPU boot..."
+Step 3: Waiting 3 seconds for CPU boot...
+# puts "=========================================="
+==========================================
+# after 3000
+# puts "=========================================="
+==========================================
+# puts "Step 4: Triggering ILA (immediate capture)..."
+Step 4: Triggering ILA (immediate capture)...
+# puts "=========================================="
+==========================================
+# set ila [get_hw_ilas -quiet]
+# if {[llength $ila] == 0} {
+#     puts "ERROR: No ILA core found after refresh!"
+#     puts "Available hw_devices: [get_hw_devices]"
+#     # Try refreshing again
+#     refresh_hw_device $device
+#     after 2000
+#     set ila [get_hw_ilas -quiet]
+#     if {[llength $ila] == 0} {
+#         puts "Still no ILA core found. Exiting."
+#         close_hw_target
+#         disconnect_hw_server
+#         close_hw_manager
+#         exit 1
+#     }
+# }
+# puts "Found ILA: $ila"
+Found ILA: hw_ila_1
+# current_hw_ila [lindex $ila 0]
+# run_hw_ila -trigger_now [lindex $ila 0]
+INFO: [Labtools 27-1964] The ILA core 'hw_ila_1' trigger was armed at 2026-Jun-27 20:22:43
+# puts "Waiting for ILA capture..."
+Waiting for ILA capture...
+# set timeout 30
+# set elapsed 0
+# while {$elapsed < $timeout} {
+#     set status [get_property STATUS [lindex $ila 0]]
+#     if {$status eq "IDLE"} {
+#         puts "ILA capture complete!"
+#         break
+#     }
+#     after 1000
+#     incr elapsed
+#     puts "  Status: $status (${elapsed}s / ${timeout}s)"
+# }
+vivado.bat : ERROR: [Labtoolstcl 44-155] hw_ila [hw_ila_1] does not have a [STATUS] property
+At line:15 char:3521
++ ... pgrep\bin'; & "C:\Xilinx\Vivado\2019.2\bin\vivado.bat" -mode batch -s ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: [Labtool...TATUS] property:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 20:22:43 2026...

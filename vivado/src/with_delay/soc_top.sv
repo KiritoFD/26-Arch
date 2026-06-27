@@ -28,6 +28,8 @@ module soc_top #(
 	output logic dbg_ever_thr_write,
 	output logic dbg_tx_state_rdy,
 	output logic dbg_tx_fifo_nonempty,
+	output logic dbg_ever_tx_sent,
+	output logic [7:0] dbg_tx_byte_cnt,
 	output logic [63:0] dbg_lsr_rdata,
 	output logic [63:0] dbg_device_addr
 );
@@ -68,6 +70,8 @@ module soc_top #(
 	logic device_dbg_ever_thr_write;
 	logic device_dbg_tx_state_rdy;
 	logic device_dbg_tx_fifo_nonempty;
+	logic device_dbg_ever_tx_sent;
+	logic [7:0] device_dbg_tx_byte_cnt;
 	logic [63:0] device_dbg_lsr_rdata;
 
 	logic cpu_clk;
@@ -89,6 +93,8 @@ module soc_top #(
 	assign dbg_ever_thr_write = device_dbg_ever_thr_write;
 	assign dbg_tx_state_rdy = device_dbg_tx_state_rdy;
 	assign dbg_tx_fifo_nonempty = device_dbg_tx_fifo_nonempty;
+	assign dbg_ever_tx_sent = device_dbg_ever_tx_sent;
+	assign dbg_tx_byte_cnt = device_dbg_tx_byte_cnt;
 	assign dbg_lsr_rdata = device_dbg_lsr_rdata;
 	assign dbg_device_addr = device_addr;
 
@@ -144,6 +150,8 @@ module soc_top #(
 		.dbg_ever_thr_write(device_dbg_ever_thr_write),
 		.dbg_tx_state_rdy(device_dbg_tx_state_rdy),
 		.dbg_tx_fifo_nonempty(device_dbg_tx_fifo_nonempty),
+		.dbg_ever_tx_sent(device_dbg_ever_tx_sent),
+		.dbg_tx_byte_cnt(device_dbg_tx_byte_cnt),
 		.dbg_lsr_rdata(device_dbg_lsr_rdata),
 		.clk,
 		.reset(sys_reset),

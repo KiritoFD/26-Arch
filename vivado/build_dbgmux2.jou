@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2019.2 (64-bit)
+# SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+# IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+# Start of session at: Fri Jun 26 22:05:28 2026
+# Process ID: 232228
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source vivado\build_full_no_ila.tcl -log vivado\build_dbgmux2.log -journal vivado\build_dbgmux2.jou
+# Log file: G:/GitHub/26-Arch/vivado/build_dbgmux2.log
+# Journal file: G:/GitHub/26-Arch\vivado\build_dbgmux2.jou
+#-----------------------------------------------------------
+source {vivado\build_full_no_ila.tcl}

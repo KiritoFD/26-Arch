@@ -1,0 +1,10 @@
+﻿Current word 3: 0x0000
+  Channel A type: 0
+  Channel B type: 0
+Backup saved to eeprom_backup_before_restore.bin
+
+Wrote word 3 = 0x0700
+  Channel A type: 0 (UART/VCP)
+  Channel B type: 7 (FIFO/D2XX - JTAG)
+
+Please unplug and replug the Basys3 USB cable for the change to take effect.

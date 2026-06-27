@@ -197,7 +197,9 @@ module core_commit
 			if (wb_r.valid && wb_r.csr_wen && (wb_r.csr_addr == CSR_MCYCLE)) cycle_cnt <= wb_r.csr_wdata;
 			else cycle_cnt <= cycle_cnt + 64'd1;
 
-			if (wb_r.valid) instr_cnt <= instr_cnt + 64'd1;
+			if (wb_r.valid) begin
+			instr_cnt <= instr_cnt + 64'd1;
+		end
 
 			if (wb_r.valid && wb_r.wen && (wb_r.rd != 0)) begin
 				gpr[wb_r.rd] <= wb_r.result;

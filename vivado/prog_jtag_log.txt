@@ -1,0 +1,57 @@
+#-----------------------------------------------------------
+# Vivado v2019.2 (64-bit)
+# SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+# IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+# Start of session at: Sat Jun 27 18:58:47 2026
+# Process ID: 34368
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source vivado\program_jtag_xv6.tcl -log vivado\prog_jtag_log.txt
+# Log file: G:/GitHub/26-Arch/vivado/prog_jtag_log.txt
+# Journal file: G:/GitHub/26-Arch\vivado.jou
+#-----------------------------------------------------------
+source {vivado\program_jtag_xv6.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set bitstream_path [file join $repo_root vivado xv6_project xv6_project.runs impl_1 basys3_top.bit]
+# open_hw_manager
+# connect_hw_server -url localhost:3121 -allow_non_jtag
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042
+INFO: [Labtools 27-3414] Connected to existing cs_server.
+# set targets [get_hw_targets -quiet]
+# if {[llength $targets] == 0} {
+#     puts "ERROR: No hardware targets found. Is the Basys3 connected?"
+#     exit 1
+# }
+# puts "Found hardware targets: $targets"
+Found hardware targets: localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# current_hw_target [lindex $targets 0]
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# set devices [get_hw_devices]
+# puts "Found devices: $devices"
+Found devices: xc7a35t_0
+# if {[llength $devices] == 0} {
+#     puts "ERROR: No devices found."
+#     exit 1
+# }
+# set dev [lindex $devices 0]
+# current_hw_device $dev
+# set_property PROGRAM.FILE $bitstream_path $dev
+# puts "Programming $dev with $bitstream_path..."
+Programming xc7a35t_0 with G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/impl_1/basys3_top.bit...
+# program_hw_devices $dev
+INFO: [Labtools 27-3164] End of startup status: HIGH
+# puts "Programming complete!"
+Programming complete!
+# close_hw_target
+INFO: [Labtoolstcl 44-464] Closing hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# disconnect_hw_server
+# close_hw_manager
+****** Webtalk v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source G:/GitHub/26-Arch/.Xil/Vivado-34368-Archer/webtalk/labtool_webtalk.tcl -notrace
+INFO: [Common 17-206] Exiting Webtalk at Sat Jun 27 18:58:52 2026...
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 18:58:52 2026...

@@ -1,0 +1,85 @@
+﻿
+****** Vivado v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source {vivado\capture_v2.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set ltx_path [file join $repo_root vivado test-cpu project project_3 project_3.runs impl_1 basys3_top.ltx]
+# set ila_csv [file join $repo_root vivado ila_capture_v2.csv]
+# open_hw_manager
+# connect_hw_server -url localhost:3121 -allow_non_jtag
+INFO: [Labtools 27-2285] Connecting to hw_server url TCP:localhost:3121
+INFO: [Labtools 27-2222] Launching hw_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+****** Xilinx hw_server v2019.2
+  **** Build date : Nov  6 2019 at 22:12:23
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+
+INFO: [Labtools 27-3415] Connecting to cs_server url TCP:localhost:3042
+INFO: [Labtools 27-3417] Launching cs_server...
+INFO: [Labtools 27-2221] Launch Output:
+
+
+****** Xilinx cs_server v2019.2.0
+  **** Build date : Nov 07 2019-13:28:22
+    ** Copyright 2017-2019 Xilinx, Inc. All Rights Reserved.
+
+
+
+connect_hw_server: Time (s): cpu = 00:00:00 ; elapsed = 00:00:07 . Memory (MB): peak = 302.469 ; gain = 0.000
+# set targets [get_hw_targets -quiet]
+# if {[llength $targets] == 0} { puts "ERROR: No targets"; exit 1 }
+# current_hw_target [lindex $targets 0]
+# open_hw_target
+INFO: [Labtoolstcl 44-466] Opening hw_target localhost:3121/xilinx_tcf/Digilent/210183A8A984A
+# set dev [lindex [get_hw_devices] 0]
+# current_hw_device $dev
+# set_property PROBES.FILE $ltx_path $dev
+# refresh_hw_device $dev
+INFO: [Labtools 27-2302] Device xc7a35t (JTAG device index = 0) is programmed with a design that has 1 ILA core(s).
+# set ilas [get_hw_ilas -quiet]
+# if {[llength $ilas] == 0} {
+#     puts "ERROR: No ILA core found!"
+#     close_hw_target
+#     disconnect_hw_server
+#     close_hw_manager
+#     exit 1
+# }
+# set ila_core [lindex $ilas 0]
+# puts "Found ILA: $ila_core"
+Found ILA: hw_ila_1
+# puts "Probes:"
+Probes:
+# set probes [get_hw_probes -quiet -of_objects $ila_core]
+# foreach probe $probes {
+#     puts "  [get_property NAME $probe]"
+# }
+  cpu_tx
+  dbg_cpu_valid
+  dbg_ever_thr_write
+  dbg_ever_tx_sent
+  dbg_ever_uart_write
+  dbg_tx_byte_cnt
+  dbg_tx_fifo_nonempty
+  dbg_tx_state_rdy
+# run_hw_ila -trigger_now $ila_core
+INFO: [Labtools 27-1964] The ILA core 'hw_ila_1' trigger was armed at 2026-Jun-27 20:27:12
+# puts "ILA triggered, waiting 5 seconds..."
+ILA triggered, waiting 5 seconds...
+# after 5000
+# puts "Uploading ILA data..."
+Uploading ILA data...
+vivado.bat : ERROR: [Labtools 27-3312] Data read from hw_ila [hw_ila_1] is corrupted. Unable to upload waveform.
+At line:15 char:3521
++ ... pgrep\bin'; & "C:\Xilinx\Vivado\2019.2\bin\vivado.bat" -mode batch -s ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: [Labtool...pload waveform.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 20:27:18 2026...

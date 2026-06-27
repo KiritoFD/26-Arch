@@ -38,6 +38,8 @@ module device #(
 	output logic dbg_ever_thr_write,
 	output logic dbg_tx_state_rdy,    // 1=UART TX state machine in RDY (idle)
 	output logic dbg_tx_fifo_nonempty, // 1=TX FIFO has data
+	output logic dbg_ever_tx_sent,     // sticky: 1=TX state machine ever left RDY
+	output logic [7:0] dbg_tx_byte_cnt, // count of bytes fully transmitted
 	output logic [63:0] dbg_lsr_rdata
 );
 
@@ -204,6 +206,8 @@ module device #(
 	logic dbg_ever_device_read_reg;
 	logic dbg_lsr_read_reg;
 	logic dbg_ever_thr_write_reg;    // TRUE only when THR data byte written
+	logic dbg_ever_tx_sent_reg;      // sticky: TX state machine ever left RDY
+	logic [7:0] dbg_tx_byte_cnt_reg; // count of bytes fully transmitted
 	logic [63:0] dbg_lsr_rdata_reg;
 	always_ff @(posedge cpu_clk) begin
 		if (reset) begin
@@ -211,6 +215,8 @@ module device #(
 			dbg_ever_device_read_reg <= 1'b0;
 			dbg_lsr_read_reg <= 1'b0;
 			dbg_ever_thr_write_reg <= 1'b0;
+			dbg_ever_tx_sent_reg <= 1'b0;
+			dbg_tx_byte_cnt_reg <= 8'd0;
 			dbg_lsr_rdata_reg <= 64'd0;
 		end else begin
 			if (txn_fire && wvalid && addr >= UART_BASE && addr <= UART_LSR)
@@ -224,6 +230,12 @@ module device #(
 					dbg_lsr_rdata_reg <= rdata;
 				end
 			end
+			// TX state machine ever left RDY (transmission started)
+			if (txState != RDY)
+				dbg_ever_tx_sent_reg <= 1'b1;
+			// Count fully transmitted bytes (stop bit sent, returning to RDY)
+			if (txState == SEND_BIT && bitDone && bitIndex == BIT_INDEX_MAX)
+				dbg_tx_byte_cnt_reg <= dbg_tx_byte_cnt_reg + 8'd1;
 		end
 	end
 	assign dbg_ever_uart_write = dbg_ever_uart_write_reg;
@@ -232,6 +244,8 @@ module device #(
 	assign dbg_ever_thr_write = dbg_ever_thr_write_reg;
 	assign dbg_tx_state_rdy = (txState == RDY);
 	assign dbg_tx_fifo_nonempty = ~fifo_empty;
+	assign dbg_ever_tx_sent = dbg_ever_tx_sent_reg;
+	assign dbg_tx_byte_cnt = dbg_tx_byte_cnt_reg;
 	assign dbg_lsr_rdata = dbg_lsr_rdata_reg;
 
 	// Push byte into TX FIFO on console write

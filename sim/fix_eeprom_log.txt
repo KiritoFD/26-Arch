@@ -1,0 +1,21 @@
+﻿=== Step 1: Backup EEPROM ===
+Read 128 words
+Backup saved to eeprom_backup.bin
+
+Current word 3: 0x0700
+  Channel A type: 0
+  Channel B type: 7
+
+New word 3: 0x0000
+  Channel A type: 0
+  Channel B type: 0
+
+Auto-confirm enabled (-y).
+
+Writing new EEPROM word 3...
+EEPROM write successful!
+Verification - word 3: 0x0000
+  Channel A type: 0
+  Channel B type: 0
+
+Done! Please unplug and replug the Basys3 USB cable for changes to take effect.

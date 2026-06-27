@@ -28,6 +28,30 @@ puts "Step 1: Opening project..."
 puts "=========================================="
 open_project $project_path
 
+# ------------------------------------------------------------
+# Sync source files from vivado/src to project imports
+# (same step as build_full_no_ila.tcl — ensures latest RTL is used)
+# ------------------------------------------------------------
+set src_dir [file join $repo_root vivado src]
+set imports_dir [file join $repo_root vivado test-cpu project project_3 project_3.srcs sources_1 imports src]
+puts "Syncing source files from $src_dir to $imports_dir..."
+set synced 0
+foreach {orig copy} [list \
+    [file join $src_dir device.sv]          [file join $imports_dir device.sv] \
+    [file join $src_dir spi_flash_disk.sv]  [file join $imports_dir spi_flash_disk.sv] \
+    [file join $src_dir with_delay basys3_top.sv]   [file join $imports_dir with_delay basys3_top.sv] \
+    [file join $src_dir with_delay soc_top.sv]       [file join $imports_dir with_delay soc_top.sv] \
+    [file join $src_dir with_delay bram_wrapper.sv] [file join $imports_dir with_delay bram_wrapper.sv] \
+    [file join $src_dir with_delay cbus_crossbar.sv] [file join $imports_dir with_delay cbus_crossbar.sv] \
+] {
+    if {[file exists $orig] && [file exists $copy]} {
+        file copy -force $orig $copy
+        puts "  Synced: [file tail $orig]"
+        incr synced
+    }
+}
+puts "Synced $synced source files."
+
 set locked_ips [get_ips -filter {IS_LOCKED == true}]
 if {[llength $locked_ips] > 0} {
     puts "Upgrading locked IPs: $locked_ips"
@@ -219,11 +243,57 @@ if {[llength $probe3_list] > 0} {
     connect_debug_port u_ila/probe3 [get_nets [lindex $probe3_list 0]]
 }
 
-# Delete extra probes (probe4+) that ILA core creates by default but are unused
-set extra_probe [get_debug_ports -quiet u_ila/probe4]
-if {[llength $extra_probe] > 0} {
-    delete_debug_port $extra_probe
-    puts "Deleted unused probe4"
+# Create and connect probe 4: dbg_tx_state_rdy (1-bit, TX state machine in RDY)
+set probe4_list [get_nets -hier -filter {NAME =~ "*dbg_tx_state_rdy*"}]
+if {[llength $probe4_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe4]
+    connect_debug_port u_ila/probe4 [get_nets [lindex $probe4_list 0]]
+    puts "  Probe4: dbg_tx_state_rdy"
+} else {
+    puts "  WARNING: dbg_tx_state_rdy net not found"
+}
+
+# Create and connect probe 5: dbg_tx_fifo_nonempty (1-bit, TX FIFO has data)
+set probe5_list [get_nets -hier -filter {NAME =~ "*dbg_tx_fifo_nonempty*"}]
+if {[llength $probe5_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe5]
+    connect_debug_port u_ila/probe5 [get_nets [lindex $probe5_list 0]]
+    puts "  Probe5: dbg_tx_fifo_nonempty"
+} else {
+    puts "  WARNING: dbg_tx_fifo_nonempty net not found"
+}
+
+# Create and connect probe 6: dbg_ever_tx_sent (1-bit, sticky: TX ever left RDY)
+set probe6_list [get_nets -hier -filter {NAME =~ "*dbg_ever_tx_sent*"}]
+if {[llength $probe6_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 1 [get_debug_ports u_ila/probe6]
+    connect_debug_port u_ila/probe6 [get_nets [lindex $probe6_list 0]]
+    puts "  Probe6: dbg_ever_tx_sent"
+} else {
+    puts "  WARNING: dbg_ever_tx_sent net not found"
+}
+
+# Create and connect probe 7: dbg_tx_byte_cnt (8-bit, count of TX'd bytes)
+set probe7_list [get_nets -hier -filter {NAME =~ "*dbg_tx_byte_cnt*"}]
+if {[llength $probe7_list] > 0} {
+    create_debug_port u_ila probe
+    set_property PORT_WIDTH 8 [get_debug_ports u_ila/probe7]
+    connect_debug_port u_ila/probe7 [get_nets [lindex $probe7_list 0]]
+    puts "  Probe7: dbg_tx_byte_cnt[7:0]"
+} else {
+    puts "  WARNING: dbg_tx_byte_cnt net not found"
+}
+
+# Delete any remaining extra probes (probe8+) that ILA creates by default
+for {set i 8} {$i < 16} {incr i} {
+    set extra_probe [get_debug_ports -quiet u_ila/probe$i]
+    if {[llength $extra_probe] > 0} {
+        delete_debug_port $extra_probe
+        puts "Deleted unused probe$i"
+    }
 }
 
 puts "ILA core created:"
@@ -232,6 +302,10 @@ puts "  Probe0: cpu_tx"
 if {[llength $probe1_list] > 0} { puts "  Probe1: dbg_ever_uart_write" }
 if {[llength $probe2_list] > 0} { puts "  Probe2: dbg_ever_thr_write" }
 if {[llength $probe3_list] > 0} { puts "  Probe3: dbg_cpu_valid" }
+if {[llength $probe4_list] > 0} { puts "  Probe4: dbg_tx_state_rdy" }
+if {[llength $probe5_list] > 0} { puts "  Probe5: dbg_tx_fifo_nonempty" }
+if {[llength $probe6_list] > 0} { puts "  Probe6: dbg_ever_tx_sent" }
+if {[llength $probe7_list] > 0} { puts "  Probe7: dbg_tx_byte_cnt[7:0]" }
 puts "  Depth: 4096"
 
 # Save design before implementing debug core (required by Vivado)

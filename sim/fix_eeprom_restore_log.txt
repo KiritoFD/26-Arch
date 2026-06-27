@@ -1,0 +1,9 @@
+﻿=== Step 1: Backup EEPROM ===
+Read 128 words
+Backup saved to eeprom_backup.bin
+
+Current word 3: 0x0000
+  Channel A type: 0
+  Channel B type: 0
+
+Channel B is already UART mode! No change needed.

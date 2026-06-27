@@ -38,18 +38,6 @@ module spi_flash_disk #(
 	(* ram_style = "block" *)
 	logic [31:0] disk_buf [0:255];
 
-	// DIAG TEST: Initialize ALL BRAM words to 0x12345678 at FPGA power-up.
-	// This bypasses SPI FSM entirely — we only want to verify the CPU read
-	// path (device.sv disk_rdata_shifted / ready handshake) returns the
-	// value stored in BRAM. If CPU reads 0x12345678, the read path is OK
-	// and the bug is in SPI write. If CPU reads a transformed value, the
-	// read path is broken.
-	initial begin
-		for (int i = 0; i < 256; i++) begin
-			disk_buf[i] = 32'h12345678;
-		end
-	end
-
 	logic [7:0]  ram_addr;
 	logic        ram_we;
 	logic [31:0] ram_wdata;
@@ -221,11 +209,14 @@ module spi_flash_disk #(
 			case (state)
 				S_IDLE: begin
 				if (req_valid) begin
-					// DIAG TEST: Skip SPI read entirely. BRAM was initialized
-					// to 0x12345678 by initial block. Go straight to DONE so
-					// data_ready pulses and CPU reads the initial pattern.
-					active <= 1'b0;
-					state <= S_DONE;
+					flash_addr <= FLASH_DISK_OFFSET[22:0] + {req_blockno[12:0], 10'd0};
+					shift_reg <= 8'h03;  // SPI Read command
+					bit_cnt <= 4'd0;
+					byte_cnt <= 10'd0;
+					word_idx <= 8'd0;
+					byte_idx <= 2'd0;
+					active <= 1'b1;
+					state <= S_CMD;
 				end
 			end
 
@@ -243,57 +234,61 @@ module spi_flash_disk #(
 				end
 
 				S_ADDR: begin
-					if (spi_clk_edge) begin
-						shift_reg <= {shift_reg[6:0], 1'b0};
-						if (bit_cnt == 4'd7) begin
-							bit_cnt <= 4'd0;
-							if (byte_cnt == 9'd0) begin
-								shift_reg <= flash_addr[15:8];
-								byte_cnt <= byte_cnt + 10'd1;
-							end else if (byte_cnt == 9'd1) begin
-								shift_reg <= flash_addr[7:0];
-								byte_cnt <= byte_cnt + 10'd1;
-							end else begin
-								byte_cnt <= 9'd0;
-								bit_cnt <= 4'd0;
-								state <= S_READ;
-							end
+				if (spi_clk_edge) begin
+					shift_reg <= {shift_reg[6:0], 1'b0};
+					if (bit_cnt == 4'd7) begin
+						bit_cnt <= 4'd0;
+						// S_CMD already loaded flash_addr[22:16] into shift_reg,
+						// so byte_cnt==0 should load the NEXT byte (flash_addr[15:8]).
+						// Previous code reloaded flash_addr[22:16] here, causing the
+						// first address byte to be sent twice and flash_addr[7:0]
+						// to be missing — SPI Flash got a wrong 24-bit address.
+						if (byte_cnt == 9'd0) begin
+							shift_reg <= flash_addr[15:8];
+							byte_cnt <= byte_cnt + 10'd1;
+						end else if (byte_cnt == 9'd1) begin
+							shift_reg <= flash_addr[7:0];
+							byte_cnt <= byte_cnt + 10'd1;
 						end else begin
-							bit_cnt <= bit_cnt + 4'd1;
+							byte_cnt <= 9'd0;
+							bit_cnt <= 4'd0;
+							state <= S_READ;
 						end
+					end else begin
+						bit_cnt <= bit_cnt + 4'd1;
 					end
 				end
+			end
 
 				S_READ: begin
 				if (spi_clk_edge) begin
 					miso_shift <= {miso_shift[6:0], spi_miso};
 					if (bit_cnt == 4'd7) begin
 						bit_cnt <= 4'd0;
-						// TEST MODE: fill BRAM with known pattern 0xAAAAAAAA
-						// to verify BRAM read path. If CPU reads 0xAAAAAAAA,
-						// BRAM path is OK and problem is in SPI communication.
+						// Accumulate byte from MISO into 32-bit word
 						case (byte_idx)
-							2'd0: spi_word_acc[7:0]   <= 8'hAA;
-							2'd1: spi_word_acc[15:8]  <= 8'hAA;
-							2'd2: spi_word_acc[23:16] <= 8'hAA;
+							2'd0: spi_word_acc[7:0]   <= {miso_shift[6:0], spi_miso};
+							2'd1: spi_word_acc[15:8]  <= {miso_shift[6:0], spi_miso};
+							2'd2: spi_word_acc[23:16] <= {miso_shift[6:0], spi_miso};
 							2'd3: begin
+								// Full word accumulated, write to BRAM
 								spi_ram_we <= 1'b1;
 								spi_ram_addr <= word_idx;
-								spi_ram_wdata <= 32'hAAAAAAAA;
+								spi_ram_wdata <= {miso_shift[6:0], spi_miso, spi_word_acc[23:0]};
 								word_idx <= word_idx + 7'd1;
 							end
 						endcase
-							byte_idx <= byte_idx + 2'd1;
-							if (byte_cnt == 10'd1023) begin
-								state <= S_DONE;
-							end else begin
-								byte_cnt <= byte_cnt + 10'd1;
-							end
+						byte_idx <= byte_idx + 2'd1;
+						if (byte_cnt == 10'd1023) begin
+							state <= S_DONE;
 						end else begin
-							bit_cnt <= bit_cnt + 4'd1;
+							byte_cnt <= byte_cnt + 10'd1;
 						end
+					end else begin
+						bit_cnt <= bit_cnt + 4'd1;
 					end
 				end
+			end
 
 				S_DONE: begin
 					active <= 1'b0;

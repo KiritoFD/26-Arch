@@ -866,10 +866,6 @@ module core
 			if (wb_r.valid && !trap_commit) begin
 				dbg_commit_total <= dbg_commit_total + 1;
 				dbg_stall_cnt <= 0;
-				if (dbg_commit_total < 100 || (dbg_commit_total % 10000 == 0)) begin
-					$display("[C#%0d] pc=0x%016h instr=0x%08h wen=%0b rd=%0d isL=%0b isS=%0b",
-					         dbg_commit_total, wb_r.pc, wb_r.instr, wb_r.wen, wb_r.rd, wb_r.is_load, wb_r.is_store);
-				end
 			end else begin
 				dbg_stall_cnt <= dbg_stall_cnt + 1;
 				if (dbg_stall_cnt == 100 || dbg_stall_cnt == 500 || dbg_stall_cnt == 1000 || dbg_stall_cnt == 5000) begin
@@ -909,31 +905,12 @@ module core
 			dbg_trap_count <= 0;
 			dbg_commit_count <= 0;
 		end else begin
-			// Track committed instructions (first 5000, then only disk-related)
+			// Track committed instructions
 			if (wb_r.valid && !trap_commit) begin
 				dbg_commit_count <= dbg_commit_count + 1;
-				if (dbg_commit_count < 100) begin
-					$display("[COMMIT] #%0d pc=0x%016h instr=0x%08h wen=%0b rd=%0d",
-					         dbg_commit_count, wb_r.pc, wb_r.instr, wb_r.wen, wb_r.rd);
-				end
 			end
-			if (trap_redirect && dbg_trap_count < 20) begin
+			if (trap_redirect) begin
 				dbg_trap_count <= dbg_trap_count + 1;
-				$display("[TRAP] #%0d pc=0x%016h redirect_pc=0x%016h mcause=0x%016h mepc=0x%016h mtvec=0x%016h priv=%0d",
-				         dbg_trap_count,
-				         mem_r.valid ? mem_r.pc : (ex_r.valid ? ex_r.pc : 64'h0),
-				         trap_redirect_pc,
-				         csr_mcause,
-				         csr_mepc,
-				         csr_mtvec,
-				         privilege_mode);
-			end
-			if (mret_redirect && dbg_trap_count < 50) begin
-				$display("[MRET] pc=0x%016h redirect_pc=0x%016h mepc=0x%016h priv=%0d",
-				         mem_r.valid ? mem_r.pc : (ex_r.valid ? ex_r.pc : 64'h0),
-				         trap_redirect_pc,
-				         csr_mepc,
-				         privilege_mode);
 			end
 		end
 	end

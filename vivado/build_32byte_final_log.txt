@@ -1,0 +1,94 @@
+﻿
+****** Vivado v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source {g:\GitHub\26-Arch\vivado\build_32byte.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set project_path [file join $repo_root vivado test-cpu project project_3 project_3.xpr]
+# open_project $project_path
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2019.2/data/ip'.
+# update_compile_order -fileset sources_1
+# reset_run synth_1
+# launch_runs synth_1 -jobs 4
+[Sat Jun 27 03:51:29 2026] Launched synth_1...
+Run output will be captured here: G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.runs/synth_1/runme.log
+# wait_on_run synth_1
+[Sat Jun 27 03:51:29 2026] Waiting for synth_1 to finish...
+
+*** Running vivado
+    with args -log basys3_top.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source basys3_top.tcl
+
+
+****** Vivado v2019.2 (64-bit)
+  **** SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+  **** IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+    ** Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+
+source basys3_top.tcl -notrace
+Command: synth_design -top basys3_top -part xc7a35tcpg236-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Device 21-403] Loading part xc7a35tcpg236-1
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 283176 
+WARNING: [Synth 8-6901] identifier 'bram_douta_wire' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/with_delay/bram_wrapper.sv:102]
+WARNING: [Synth 8-6901] identifier 'dbg_ever_uart_write_reg' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:178]
+WARNING: [Synth 8-6901] identifier 'dbg_ever_thr_write_reg' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:178]
+WARNING: [Synth 8-6901] identifier 'dbg_ever_device_read_reg' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:179]
+WARNING: [Synth 8-6901] identifier 'txState' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:179]
+WARNING: [Synth 8-6901] identifier 'RDY' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:179]
+WARNING: [Synth 8-6901] identifier 'uart_thr_write_req' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:180]
+WARNING: [Synth 8-6901] identifier 'is_disk_data_read' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:180]
+WARNING: [Synth 8-6901] identifier 'txState' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:186]
+WARNING: [Synth 8-6901] identifier 'fifo_count' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:186]
+WARNING: [Synth 8-6901] identifier 'fifo_count' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:186]
+WARNING: [Synth 8-6901] identifier 'disk_rdata_valid' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:188]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_data_ready' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:188]
+WARNING: [Synth 8-6901] identifier 'dbg_disk_read_pending' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:188]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_req_valid' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:188]
+WARNING: [Synth 8-6901] identifier 'rxByteReady' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:221]
+WARNING: [Synth 8-6901] identifier 'rxByte' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:222]
+WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:237]
+WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:238]
+WARNING: [Synth 8-6901] identifier 'dbg_inject_active' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:347]
+WARNING: [Synth 8-6901] identifier 'dbg_inject_byte' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:350]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_state' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:488]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_data_ready_cnt' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:488]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_data_ready_cnt' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:489]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_flash_addr' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:490]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_flash_addr' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:491]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_flash_addr' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:492]
+WARNING: [Synth 8-6901] identifier 'disk_blockno' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:493]
+WARNING: [Synth 8-6901] identifier 'disk_blockno' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:494]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_byte_cnt' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:500]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_data_ready' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:502]
+WARNING: [Synth 8-6901] identifier 'dbg_disk_read_pending' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:502]
+WARNING: [Synth 8-6901] identifier 'dbg_spi_req_valid' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:502]
+WARNING: [Synth 8-6901] identifier 'disk_rdy' is used before its declaration [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:502]
+ERROR: [Synth 8-1031] sim_disk_mem is not declared [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:777]
+INFO: [Synth 8-2350] module device ignored due to previous errors [G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv:3]
+Failed to read verilog 'G:/GitHub/26-Arch/vivado/test-cpu/project/project_3/project_3.srcs/sources_1/imports/src/device.sv'
+INFO: [Common 17-83] Releasing license: Synthesis
+4 Infos, 34 Warnings, 0 Critical Warnings and 2 Errors encountered.
+synth_design failed
+ERROR: [Common 17-69] Command failed: Synthesis failed - please see the console or run log file for details
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 03:51:41 2026...
+[Sat Jun 27 03:51:44 2026] synth_1 finished
+WARNING: [Vivado 12-8222] Failed run(s) : 'synth_1'
+wait_on_run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:15 . Memory (MB): peak = 308.113 ; gain = 0.000
+# set synth_status [get_property STATUS [get_runs synth_1]]
+# puts "Synthesis status: $synth_status"
+Synthesis status: synth_design ERROR
+# if {$synth_status != "synth_design Complete!"} {
+#     puts "ERROR: Synthesis failed!"
+#     exit 1
+# }
+ERROR: Synthesis failed!
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 03:51:44 2026...

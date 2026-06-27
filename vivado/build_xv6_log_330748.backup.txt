@@ -1,0 +1,73 @@
+#-----------------------------------------------------------
+# Vivado v2019.2 (64-bit)
+# SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+# IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+# Start of session at: Sat Jun 27 18:47:42 2026
+# Process ID: 330748
+# Current directory: G:/GitHub/26-Arch
+# Command line: vivado.exe -mode batch -source vivado\build_xv6.tcl -log vivado\build_xv6_log.txt -journal vivado\build_xv6.jou
+# Log file: G:/GitHub/26-Arch/vivado/build_xv6_log.txt
+# Journal file: G:/GitHub/26-Arch\vivado\build_xv6.jou
+#-----------------------------------------------------------
+source {vivado\build_xv6.tcl}
+# set repo_root {G:/GitHub/26-Arch}
+# set project_dir [file join $repo_root vivado xv6_project]
+# set project_name xv6_project
+# set ip_root [file join $repo_root vivado test-cpu src ip]
+# file mkdir $project_dir
+# create_project $project_name $project_dir -force -part xc7a35tcpg236-1
+# set_property target_language Verilog [current_project]
+# set_property default_lib xil_defaultlib [current_project]
+# add_files -norecurse [file join $repo_root vsrc include config.sv]
+# add_files -norecurse [file join $repo_root vsrc include common.sv]
+# add_files -norecurse [file join $repo_root vsrc include csr.sv]
+# add_files -norecurse [file join $repo_root vsrc src core core_pkg.sv]
+# add_files -norecurse [file join $repo_root vsrc src core core_decode.sv]
+# add_files -norecurse [file join $repo_root vsrc src core core_execute.sv]
+# add_files -norecurse [file join $repo_root vsrc src core core_mdu.sv]
+# add_files -norecurse [file join $repo_root vsrc src core core_csr.sv]
+# add_files -norecurse [file join $repo_root vsrc src core core_commit.sv]
+# add_files -norecurse [file join $repo_root vsrc util IBusToCBus.sv]
+# add_files -norecurse [file join $repo_root vsrc util DBusToCBus.sv]
+# add_files -norecurse [file join $repo_root vsrc util CBusArbiter.sv]
+# add_files -norecurse [file join $repo_root vsrc util mmu.sv]
+# add_files -norecurse [file join $repo_root vsrc src core.sv]
+# add_files -norecurse [file join $repo_root vsrc VTop.sv]
+# add_files -norecurse [file join $repo_root vsrc mycpu_top.sv]
+# add_files -norecurse [file join $repo_root vivado src with_delay bram_wrapper.sv]
+# add_files -norecurse [file join $repo_root vivado src with_delay cbus_crossbar.sv]
+# add_files -norecurse [file join $repo_root vivado src with_delay soc_top.sv]
+# add_files -norecurse [file join $repo_root vivado src with_delay basys3_top.sv]
+# add_files -norecurse [file join $repo_root vivado src device.sv]
+# add_files -norecurse [file join $repo_root vivado src device.svh]
+# add_files -norecurse [file join $repo_root vivado src spi_flash_disk.sv]
+# add_files -fileset constrs_1 -norecurse [file join $repo_root vivado src Basys-3-Master.xdc]
+# add_files -norecurse [file join $ip_root clk_wiz_0 clk_wiz_0.xci]
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2019.2/data/ip'.
+WARNING: [IP_Flow 19-2162] IP 'clk_wiz_0' is locked:
+* IP definition 'Clocking Wizard (6.0)' for IP 'clk_wiz_0' (customized with software release 2018.3) has a different revision in the IP Catalog.
+# add_files -norecurse [file join $ip_root bram_0 bram_0.xci]
+WARNING: [IP_Flow 19-2162] IP 'bram_0' is locked:
+* IP definition 'Block Memory Generator (8.4)' for IP 'bram_0' (customized with software release 2018.3) has a different revision in the IP Catalog.
+# set_property include_dirs [list \
+#     [file join $repo_root vsrc] \
+#     [file join $repo_root vivado src] \
+# ] [get_filesets sources_1]
+# set_property include_dirs [list \
+#     [file join $repo_root vsrc] \
+#     [file join $repo_root vivado src] \
+# ] [get_filesets sim_1]
+# set_property top basys3_top [get_filesets sources_1]
+# update_compile_order -fileset sources_1
+# set coe_path [file join $repo_root ready-to-run lab5 xv6-kernel.coe]
+# set bram_ip [get_ips bram_0]
+# set_property -dict [list \
+#     CONFIG.Coe_File $coe_path \
+#     CONFIG.Load_Init_File {true} \
+# ] $bram_ip
+INFO: [Common 17-17] undo 'set_property'
+ERROR: [Common 17-107] Cannot change read-only property 'CONFIG.Coe_File'.
+Resolution: Please refer to Vivado Properties Reference Guide (UG912) for more information on setting properties.
+INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 18:47:47 2026...

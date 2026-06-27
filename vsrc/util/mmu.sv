@@ -39,6 +39,7 @@ module mmu
 		WALK_LEVEL2,
 		WALK_LEVEL1,
 		WALK_LEVEL0,
+		WALK_GAP,
 		WALK_DONE_INSN,
 		WALK_DONE_DATA
 	} walk_state_t;
@@ -406,7 +407,7 @@ module mmu
 					end else if (dresp_out.data[3] || dresp_out.data[1] || dresp_out.data[2]) begin
 						saved_pte   <= dresp_out.data;
 						saved_level <= 2'd1;
-							state       <= saved_is_insn ? WALK_DONE_INSN : WALK_DONE_DATA;
+				state       <= saved_is_insn ? WALK_DONE_INSN : WALK_GAP;
 						end else begin
 							state    <= WALK_LEVEL0;
 							pte_addr <= {8'd0, dresp_out.data[53:10], vpn0, 3'b000};
@@ -427,6 +428,10 @@ module mmu
 					end
 				end
 			end
+
+		WALK_GAP: begin
+			state <= WALK_DONE_DATA;
+		end
 
 		WALK_DONE_INSN: begin
 		if (iresp_out.data_ok) begin

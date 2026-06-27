@@ -62,15 +62,15 @@ REF_SO := $(NEMU_HOME)/$(REF_NEMU)
 SIM_JOBS ?= 1
 
 sim:
-	rm -rf build
-	mkdir -p build
-	$(MAKE) EMU_TRACE=1 emu -j$(SIM_JOBS) NOOP_HOME=$(NOOP_HOME) NEMU_HOME=$(NEMU_HOME)
+	@if [ ! -f build/emu ]; then mkdir -p build; $(MAKE) EMU_TRACE=1 emu -j$(SIM_JOBS) NOOP_HOME=$(NOOP_HOME) NEMU_HOME=$(NEMU_HOME); fi
 
 build-xv6:
-	cd $(XV6_DIR) && make clean && make CPUS=1 kernel/kernel fs.img
+	$(MAKE) -C $(XV6_DIR) CPUS=1 kernel/kernel fs.img
 	riscv64-unknown-elf-objcopy -O binary $(XV6_KERNEL_ELF) $(XV6_KERNEL_BIN)
 
-test-xv6: sim build-xv6
+test-xv6:
+	$(MAKE) sim
+	$(MAKE) build-xv6
 	SDCARD_IMAGE=$(XV6_FS_IMG) TEST=sys ./build/emu --no-diff -i $(XV6_KERNEL_BIN) $(VOPT) || true
 
 test-lab1: sim

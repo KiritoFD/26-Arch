@@ -34,8 +34,9 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA VL_NOT_FINAL : public VerilatedMo
     VL_IN8(&io_perfInfo_dump,0,0);
     VL_OUT8(&io_uart_out_valid,0,0);
     VL_OUT8(&io_uart_out_ch,7,0);
-    VL_OUT8(&io_uart_in_valid,0,0);
+    VL_IN8(&io_uart_in_valid,0,0);
     VL_IN8(&io_uart_in_ch,7,0);
+    VL_OUT8(&io_uart_in_ready,0,0);
     VL_IN64(&io_logCtrl_log_begin,63,0);
     VL_IN64(&io_logCtrl_log_end,63,0);
     VL_IN64(&io_logCtrl_log_level,63,0);

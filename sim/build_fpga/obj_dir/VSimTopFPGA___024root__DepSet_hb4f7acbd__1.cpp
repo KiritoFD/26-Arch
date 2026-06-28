@@ -132,5 +132,7 @@ void VSimTopFPGA___024root___eval_debug_assertions(VSimTopFPGA___024root* vlSelf
         Verilated::overWidthError("io_perfInfo_clean");}
     if (VL_UNLIKELY((vlSelfRef.io_perfInfo_dump & 0xfeU))) {
         Verilated::overWidthError("io_perfInfo_dump");}
+    if (VL_UNLIKELY((vlSelfRef.io_uart_in_valid & 0xfeU))) {
+        Verilated::overWidthError("io_uart_in_valid");}
 }
 #endif  // VL_DEBUG

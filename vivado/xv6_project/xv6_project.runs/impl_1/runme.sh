@@ -24,7 +24,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/impl_1'
+HD_PWD='g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/impl_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log

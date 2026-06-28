@@ -37,7 +37,7 @@ VM_PREFIX = VSimTopFPGA
 VM_MODPREFIX = VSimTopFPGA
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
-	-g -std=c++17 -I/mnt/g/GitHub/26-Arch/sim/build_fpga \
+	-g -std=c++17 -I. \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
 VM_USER_LDLIBS = \

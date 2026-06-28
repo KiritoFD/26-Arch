@@ -87,6 +87,15 @@ module core_mdu
 			end
 
 			if (mdu_busy) begin
+`ifdef PERF_OPT
+				// PERF_OPT: combinational MUL completes in 1 cycle, so mdu_busy
+				// is only set for DIV iterations.
+				if (mdu_cmd == ALU_MUL) begin
+					// Should never reach here under PERF_OPT (MUL finishes instantly)
+					mdu_busy <= 1'b0;
+					mdu_out_valid <= 1'b0;
+				end else begin
+`else
 				if (mdu_cmd == ALU_MUL) begin
 					mul_acc_next = mdu_mul_acc;
 					mul_a_next = mdu_mul_a;
@@ -113,6 +122,7 @@ module core_mdu
 						mdu_out_valid <= 1'b1;
 					end
 				end else begin
+`endif
 					div_rem_next = {mdu_div_rem[63:0], mdu_div_quot[63]};
 					div_quot_next = {mdu_div_quot[62:0], 1'b0};
 					if (div_rem_next >= {1'b0, mdu_div_divisor}) begin
@@ -144,6 +154,25 @@ module core_mdu
 				mdu_is_word <= ex_r.is_word;
 
 				if (ex_r.alu_cmd == ALU_MUL) begin
+`ifdef PERF_OPT
+					// 1-cycle combinational multiplier
+					mul_src0 = op1_eff & width_mask;
+					mul_src1 = op2_eff & width_mask;
+					begin
+						logic [63:0] mul_prod;
+						logic [31:0] mul_prod_word;
+						mul_prod = mul_src0 * mul_src1;
+						mul_prod_word = mul_src0[31:0] * mul_src1[31:0];
+						if (ex_r.is_word) begin
+							final_val = {{32{mul_prod_word[31]}}, mul_prod_word[31:0]};
+						end else begin
+							final_val = mul_prod;
+						end
+						mdu_out_result <= final_val;
+					end
+					mdu_out_valid <= 1'b1;
+					mdu_busy <= 1'b0;
+`else
 					mul_src0 = op1_eff & width_mask;
 					mul_src1 = op2_eff & width_mask;
 					if ((mul_src0 == 64'd0) || (mul_src1 == 64'd0)) begin
@@ -177,6 +206,7 @@ module core_mdu
 							mdu_mul_b <= mul_src1;
 						end
 					end
+`endif
 				end else begin
 					div_is_signed = (ex_r.alu_cmd == ALU_DIV) || (ex_r.alu_cmd == ALU_REM);
 					div_is_rem = (ex_r.alu_cmd == ALU_REM) || (ex_r.alu_cmd == ALU_REMU);

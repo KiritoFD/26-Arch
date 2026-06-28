@@ -1,7 +1,7 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-| Date         : Sat Jun 27 18:56:56 2026
+| Date         : Sun Jun 28 10:02:45 2026
 | Host         : Archer running 64-bit major release  (build 9200)
 | Command      : report_drc -file basys3_top_drc_routed.rpt -pb basys3_top_drc_routed.pb -rpx basys3_top_drc_routed.rpx
 | Design       : basys3_top
@@ -24,11 +24,11 @@ Table of Contents
       Design limits: <entire design considered>
            Ruledeck: default
              Max violations: <unlimited>
-             Violations found: 3
+             Violations found: 4
 +--------+----------+---------------------------------+------------+
 | Rule   | Severity | Description                     | Violations |
 +--------+----------+---------------------------------+------------+
-| RPBF-3 | Warning  | IO port buffering is incomplete | 3          |
+| RPBF-3 | Warning  | IO port buffering is incomplete | 4          |
 +--------+----------+---------------------------------+------------+
 
 2. REPORT DETAILS
@@ -40,10 +40,15 @@ Related violations: <none>
 
 RPBF-3#2 Warning
 IO port buffering is incomplete  
-Device port QspiDB[2] expects both input and output buffering but the buffers are incomplete.
+Device port QspiDB[1] expects both input and output buffering but the buffers are incomplete.
 Related violations: <none>
 
 RPBF-3#3 Warning
+IO port buffering is incomplete  
+Device port QspiDB[2] expects both input and output buffering but the buffers are incomplete.
+Related violations: <none>
+
+RPBF-3#4 Warning
 IO port buffering is incomplete  
 Device port QspiDB[3] expects both input and output buffering but the buffers are incomplete.
 Related violations: <none>

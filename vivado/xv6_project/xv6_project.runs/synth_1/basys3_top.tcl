@@ -23,49 +23,49 @@ set_param project.singleFileAddWarning.threshold 0
 set_param project.compositeFile.enableAutoGeneration 0
 set_param synth.vivado.isSynthRun true
 set_msg_config -source 4 -id {IP_Flow 19-2162} -severity warning -new_severity info
-set_property webtalk.parent_dir G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/wt [current_project]
-set_property parent.project_path G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.xpr [current_project]
+set_property webtalk.parent_dir g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/wt [current_project]
+set_property parent.project_path g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.xpr [current_project]
 set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
 set_property default_lib xil_defaultlib [current_project]
 set_property target_language Verilog [current_project]
 set_property ip_output_repo g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/ip [current_project]
 set_property ip_cache_permissions {read write} [current_project]
 set_property include_dirs {
-  G:/GitHub/26-Arch/vsrc
-  G:/GitHub/26-Arch/vivado/src
+  g:/GitHub/26-Arch/vsrc
+  g:/GitHub/26-Arch/vivado/src
 } [current_fileset]
 add_files g:/GitHub/26-Arch/ready-to-run/lab5/xv6-kernel.coe
-read_verilog G:/GitHub/26-Arch/vivado/src/device.svh
-set_property file_type "Verilog Header" [get_files G:/GitHub/26-Arch/vivado/src/device.svh]
+read_verilog g:/GitHub/26-Arch/vivado/src/device.svh
+set_property file_type "Verilog Header" [get_files g:/GitHub/26-Arch/vivado/src/device.svh]
 read_verilog -library xil_defaultlib -sv {
-  G:/GitHub/26-Arch/vsrc/include/config.sv
-  G:/GitHub/26-Arch/vsrc/include/common.sv
-  G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv
-  G:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv
-  G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv
-  G:/GitHub/26-Arch/vsrc/VTop.sv
-  G:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv
-  G:/GitHub/26-Arch/vivado/src/with_delay/cbus_crossbar.sv
-  G:/GitHub/26-Arch/vsrc/src/core/core_pkg.sv
-  G:/GitHub/26-Arch/vsrc/src/core.sv
-  G:/GitHub/26-Arch/vsrc/src/core/core_commit.sv
-  G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv
-  G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv
-  G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv
-  G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv
-  G:/GitHub/26-Arch/vivado/src/device.sv
-  G:/GitHub/26-Arch/vsrc/util/mmu.sv
-  G:/GitHub/26-Arch/vsrc/mycpu_top.sv
-  G:/GitHub/26-Arch/vivado/src/with_delay/soc_top.sv
-  G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv
-  G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv
+  g:/GitHub/26-Arch/vsrc/include/config.sv
+  g:/GitHub/26-Arch/vsrc/include/common.sv
+  g:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv
+  g:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv
+  g:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv
+  g:/GitHub/26-Arch/vsrc/VTop.sv
+  g:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv
+  g:/GitHub/26-Arch/vivado/src/with_delay/cbus_crossbar.sv
+  g:/GitHub/26-Arch/vsrc/src/core/core_pkg.sv
+  g:/GitHub/26-Arch/vsrc/src/core.sv
+  g:/GitHub/26-Arch/vsrc/src/core/core_commit.sv
+  g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv
+  g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv
+  g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv
+  g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv
+  g:/GitHub/26-Arch/vivado/src/device.sv
+  g:/GitHub/26-Arch/vsrc/util/mmu.sv
+  g:/GitHub/26-Arch/vsrc/mycpu_top.sv
+  g:/GitHub/26-Arch/vivado/src/with_delay/soc_top.sv
+  g:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv
+  g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv
 }
-read_ip -quiet G:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0.xci
+read_ip -quiet g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0.xci
 set_property used_in_implementation false [get_files -all g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0_board.xdc]
 set_property used_in_implementation false [get_files -all g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0.xdc]
 set_property used_in_implementation false [get_files -all g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0_ooc.xdc]
 
-read_ip -quiet G:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0.xci
+read_ip -quiet g:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0.xci
 set_property used_in_implementation false [get_files -all g:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0_ooc.xdc]
 
 # Mark all dcp files as not used in implementation to prevent them from being
@@ -76,8 +76,8 @@ set_property used_in_implementation false [get_files -all g:/GitHub/26-Arch/viva
 foreach dcp [get_files -quiet -all -filter file_type=="Design\ Checkpoint"] {
   set_property used_in_implementation false $dcp
 }
-read_xdc G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc
-set_property used_in_implementation false [get_files G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]
+read_xdc g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc
+set_property used_in_implementation false [get_files g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]
 
 set_param ips.enableIPCacheLiteLoad 1
 close [open __synthesis_is_running__ w]

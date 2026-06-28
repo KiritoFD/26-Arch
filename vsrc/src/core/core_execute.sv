@@ -49,7 +49,17 @@ module core_execute
 	assign mem_access_done = (!mem_r.is_load && !mem_r.is_store) || dresp.data_ok;
 	assign mem_result_ready = !mem_r.valid || !mem_r.is_load || mem_access_done;
 	assign stall_mem_busy = mem_r.valid && (mem_r.is_load || mem_r.is_store) && !mem_access_done;
+`ifdef PERF_OPT
+	// Only block IF when D-bus is actually busy (data_ok not yet received).
+	// Once the bus transaction completes, IF can resume immediately even though
+	// the load/store still occupies the MEM stage for one more cycle.
+	// Forwarding from mem_stage_result remains correct because data_ok=1.
+	// Note: creates a false combinational loop through ireq->arbiter->dresp,
+	// resolved deterministically by D-bus priority.  See verilator.mk -Wno-UNOPTFLAT.
+	assign stall_if_mem   = stall_mem_busy;
+`else
 	assign stall_if_mem   = mem_r.valid && (mem_r.is_load || mem_r.is_store);
+`endif
 
 	always_comb begin
 		ex_result = 64'd0;

@@ -1,0 +1,19 @@
+{
+  "backup_time": "20260628_080530",
+  "VendorId": "0x0403",
+  "ProductId": "0x6010",
+  "Manufacturer": "Digilent",
+  "ManufacturerId": "21",
+  "Description": "Digilent USB Device",
+  "SerialNumber": "210183A8A984",
+  "MaxPower": 500,
+  "SerNumEnable": 0,
+  "ADriverType": 0,
+  "BDriverType": 0,
+  "AIsFifo": 0,
+  "AIsFifoTar": 0,
+  "AIsFastSer": 0,
+  "BIsFifo": 0,
+  "BIsFifoTar": 0,
+  "BIsFastSer": 0
+}

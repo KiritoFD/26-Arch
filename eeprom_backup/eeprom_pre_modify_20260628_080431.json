@@ -1,0 +1,13 @@
+{
+  "VendorId": 1027,
+  "ProductId": 24592,
+  "Manufacturer": "Digilent",
+  "ManufacturerId": "21",
+  "Description": "Digilent USB Device",
+  "SerialNumber": "210183A8A984",
+  "MaxPower": 500,
+  "ADriverType": 0,
+  "BDriverType": 0,
+  "AIsFifo": 0,
+  "BIsFifo": 0
+}

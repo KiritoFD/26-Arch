@@ -109,6 +109,11 @@ test-labplus-3: sim
 test-labplus-4: sim
 	TEST=all ./build/emu --no-diff -i ./ready-to-run/lab+/4/all-test-privfull.bin $(VOPT) || true
 
+test-labplus-2-perf:
+	rm -rf build
+	$(MAKE) sim PERF_OPT=1
+	TEST=$(TEST) ./build/emu --diff $(NEMU_HOME)/riscv64-nemu-interpreter-so -i ./ready-to-run/lab+/2/microbench-riscv64-nutshell.bin $(VOPT) || true
+
 clean:
 	rm -rf build
 

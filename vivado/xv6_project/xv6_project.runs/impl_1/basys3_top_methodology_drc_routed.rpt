@@ -1,7 +1,7 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-| Date         : Sat Jun 27 18:57:02 2026
+| Date         : Sun Jun 28 10:02:50 2026
 | Host         : Archer running 64-bit major release  (build 9200)
 | Command      : report_methodology -file basys3_top_methodology_drc_routed.rpt -pb basys3_top_methodology_drc_routed.pb -rpx basys3_top_methodology_drc_routed.rpx
 | Design       : basys3_top
@@ -47,7 +47,7 @@ Related violations: <none>
 
 CKLD-2#1 Warning
 Clock Net has IO Driver, not a Clock Buf, and/or non-Clock loads  
-Clock net clk_IBUF is directly driven by an IO rather than a Clock Buffer or may be an IO driving a mix of Clock Buffer and non-Clock loads. This connectivity should be reviewed and corrected as appropriate. Driver(s): blink_cnt_reg[0]/C, blink_cnt_reg[12]/C, blink_cnt_reg[10]/C, blink_cnt_reg[11]/C, blink_cnt_reg[14]/C, blink_cnt_reg[13]/C, blink_cnt_reg[15]/C, blink_cnt_reg[18]/C, blink_cnt_reg[16]/C, blink_cnt_reg[17]/C, blink_cnt_reg[24]/C, blink_cnt_reg[20]/C, blink_cnt_reg[21]/C, blink_cnt_reg[1]/C, blink_cnt_reg[19]/C (the first 15 of 28 listed)
+Clock net clk_IBUF is directly driven by an IO rather than a Clock Buffer or may be an IO driving a mix of Clock Buffer and non-Clock loads. This connectivity should be reviewed and corrected as appropriate. Driver(s): blink_cnt_reg[0]/C, blink_cnt_reg[12]/C, blink_cnt_reg[11]/C, blink_cnt_reg[10]/C, blink_cnt_reg[16]/C, blink_cnt_reg[19]/C, blink_cnt_reg[14]/C, blink_cnt_reg[15]/C, blink_cnt_reg[13]/C, blink_cnt_reg[18]/C, blink_cnt_reg[17]/C, blink_cnt_reg[22]/C, blink_cnt_reg[23]/C, blink_cnt_reg[24]/C, blink_cnt_reg[20]/C (the first 15 of 28 listed)
 Related violations: <none>
 
 TIMING-18#1 Warning

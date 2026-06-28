@@ -1,7 +1,7 @@
 Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
-| Date             : Sat Jun 27 18:57:08 2026
+| Date             : Sun Jun 28 10:02:55 2026
 | Host             : Archer running 64-bit major release  (build 9200)
 | Command          : report_power -file basys3_top_power_routed.rpt -pb basys3_top_power_summary_routed.pb -rpx basys3_top_power_routed.rpx
 | Design           : basys3_top
@@ -30,10 +30,10 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.202        |
+| Total On-Chip Power (W)  | 0.200        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.128        |
+| Dynamic (W)              | 0.126        |
 | Device Static (W)        | 0.074        |
 | Effective TJA (C/W)      | 5.0          |
 | Max Ambient (C)          | 84.0         |
@@ -52,20 +52,20 @@ Table of Contents
 +--------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                  | Power (W) | Used     | Available | Utilization (%) |
 +--------------------------+-----------+----------+-----------+-----------------+
-| Clocks                   |     0.008 |        6 |       --- |             --- |
-| Slice Logic              |     0.002 |    22607 |       --- |             --- |
-|   LUT as Logic           |     0.001 |    12561 |     20800 |           60.39 |
-|   CARRY4                 |    <0.001 |      735 |      8150 |            9.02 |
-|   Register               |    <0.001 |     6542 |     41600 |           15.73 |
-|   F7/F8 Muxes            |    <0.001 |      488 |     32600 |            1.50 |
+| Clocks                   |     0.006 |        6 |       --- |             --- |
+| Slice Logic              |     0.001 |    22281 |       --- |             --- |
+|   LUT as Logic           |     0.001 |    11834 |     20800 |           56.89 |
+|   CARRY4                 |    <0.001 |      741 |      8150 |            9.09 |
+|   Register               |    <0.001 |     7019 |     41600 |           16.87 |
+|   F7/F8 Muxes            |    <0.001 |      483 |     32600 |            1.48 |
 |   LUT as Distributed RAM |    <0.001 |       16 |      9600 |            0.17 |
-|   Others                 |     0.000 |      120 |       --- |             --- |
-| Signals                  |     0.002 |    17452 |       --- |             --- |
+|   Others                 |     0.000 |      119 |       --- |             --- |
+| Signals                  |     0.001 |    17751 |       --- |             --- |
 | Block RAM                |    <0.001 |     42.5 |        50 |           85.00 |
 | MMCM                     |     0.116 |        1 |         5 |           20.00 |
-| I/O                      |    <0.001 |       15 |       106 |           14.15 |
+| I/O                      |    <0.001 |       16 |       106 |           15.09 |
 | Static Power             |     0.074 |          |           |                 |
-| Total                    |     0.202 |          |           |                 |
+| Total                    |     0.200 |          |           |                 |
 +--------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -75,7 +75,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) |
 +-----------+-------------+-----------+-------------+------------+
-| Vccint    |       1.000 |     0.022 |       0.012 |      0.011 |
+| Vccint    |       1.000 |     0.020 |       0.009 |      0.011 |
 | Vccaux    |       1.800 |     0.077 |       0.064 |      0.013 |
 | Vcco33    |       3.300 |     0.001 |       0.000 |      0.001 |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |
@@ -147,13 +147,13 @@ Table of Contents
 +--------------------+-----------+
 | Name               | Power (W) |
 +--------------------+-----------+
-| basys3_top         |     0.128 |
-|   soc_top_inst     |     0.127 |
+| basys3_top         |     0.126 |
+|   soc_top_inst     |     0.124 |
 |     clk_wiz_0      |     0.116 |
 |       inst         |     0.116 |
 |     device_inst    |     0.001 |
-|     mycpu_top_inst |     0.009 |
-|       VTop_inst    |     0.009 |
+|     mycpu_top_inst |     0.006 |
+|       VTop_inst    |     0.006 |
 +--------------------+-----------+
 
 

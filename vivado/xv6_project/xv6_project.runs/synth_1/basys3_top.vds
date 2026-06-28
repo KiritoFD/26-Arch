@@ -2,160 +2,167 @@
 # Vivado v2019.2 (64-bit)
 # SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
 # IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
-# Start of session at: Sat Jun 27 18:52:01 2026
-# Process ID: 299204
-# Current directory: G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1
+# Start of session at: Sun Jun 28 09:58:01 2026
+# Process ID: 319448
+# Current directory: g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1
 # Command line: vivado.exe -log basys3_top.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source basys3_top.tcl
-# Log file: G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/basys3_top.vds
-# Journal file: G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1\vivado.jou
+# Log file: g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/basys3_top.vds
+# Journal file: g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1\vivado.jou
 #-----------------------------------------------------------
 source basys3_top.tcl -notrace
 Command: synth_design -top basys3_top -part xc7a35tcpg236-1
 Starting synth_design
+WARNING: [Vivado_Tcl 4-393] The 'Synthesis' target of the following IPs are stale, please generate the output products using the generate_target or synth_ip command before running synth_design.
+g:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0.xci
+
 Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
 INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
 INFO: [Device 21-403] Loading part xc7a35tcpg236-1
 INFO: Launching helper process for spawning children vivado processes
-INFO: Helper process launched with PID 297424 
-WARNING: [Synth 8-6901] identifier 'bram_douta_wire' is used before its declaration [G:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:102]
-WARNING: [Synth 8-6901] identifier 'rxByteReady' is used before its declaration [G:/GitHub/26-Arch/vivado/src/device.sv:160]
-WARNING: [Synth 8-6901] identifier 'rxByte' is used before its declaration [G:/GitHub/26-Arch/vivado/src/device.sv:161]
-WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [G:/GitHub/26-Arch/vivado/src/device.sv:176]
-WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [G:/GitHub/26-Arch/vivado/src/device.sv:177]
-WARNING: [Synth 8-6901] identifier 'active' is used before its declaration [G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:157]
+INFO: Helper process launched with PID 23252 
+WARNING: [Synth 8-6901] identifier 'bram_douta_wire' is used before its declaration [g:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:102]
+WARNING: [Synth 8-6901] identifier 'rxByteReady' is used before its declaration [g:/GitHub/26-Arch/vivado/src/device.sv:162]
+WARNING: [Synth 8-6901] identifier 'rxByte' is used before its declaration [g:/GitHub/26-Arch/vivado/src/device.sv:163]
+WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [g:/GitHub/26-Arch/vivado/src/device.sv:178]
+WARNING: [Synth 8-2507] parameter declaration becomes local in device with formal parameter declaration list [g:/GitHub/26-Arch/vivado/src/device.sv:179]
+WARNING: [Synth 8-6901] identifier 'active' is used before its declaration [g:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:145]
 ---------------------------------------------------------------------------------
-Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 814.898 ; gain = 239.957
+Starting RTL Elaboration : Time (s): cpu = 00:00:03 ; elapsed = 00:00:03 . Memory (MB): peak = 814.898 ; gain = 238.852
 ---------------------------------------------------------------------------------
-INFO: [Synth 8-6157] synthesizing module 'basys3_top' [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:1]
-INFO: [Synth 8-5534] Detected attribute (* KEEP = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:14]
-INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:14]
-INFO: [Synth 8-5534] Detected attribute (* KEEP = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:15]
-INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:15]
-INFO: [Synth 8-5534] Detected attribute (* KEEP = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:20]
-INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:20]
-INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:23]
-INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:28]
-INFO: [Synth 8-6157] synthesizing module 'soc_top' [G:/GitHub/26-Arch/vivado/src/with_delay/soc_top.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'basys3_top' [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:1]
+INFO: [Synth 8-5534] Detected attribute (* KEEP = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:14]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:14]
+INFO: [Synth 8-5534] Detected attribute (* KEEP = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:15]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:15]
+INFO: [Synth 8-5534] Detected attribute (* KEEP = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:20]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:20]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:23]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:24]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:25]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:26]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:27]
+INFO: [Synth 8-5534] Detected attribute (* mark_debug = "true" *) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:30]
+INFO: [Synth 8-6157] synthesizing module 'soc_top' [g:/GitHub/26-Arch/vivado/src/with_delay/soc_top.sv:1]
 	Parameter SIMULATION bound to: 1'b0 
-INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-299204-Archer/realtime/clk_wiz_0_stub.v:5]
-INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-299204-Archer/realtime/clk_wiz_0_stub.v:5]
-INFO: [Synth 8-6157] synthesizing module 'mycpu_top' [G:/GitHub/26-Arch/vsrc/mycpu_top.sv:4]
-INFO: [Synth 8-6157] synthesizing module 'VTop' [G:/GitHub/26-Arch/vsrc/VTop.sv:12]
-INFO: [Synth 8-6157] synthesizing module 'core' [G:/GitHub/26-Arch/vsrc/src/core.sv:17]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core.sv:228]
-INFO: [Synth 8-6157] synthesizing module 'core_decode' [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:4]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:128]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:197]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:234]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:248]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:262]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:285]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:285]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:303]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:312]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:312]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:326]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:350]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:359]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:395]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_pkg.sv:164]
-INFO: [Synth 8-6155] done synthesizing module 'core_decode' (2#1) [G:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:4]
-INFO: [Synth 8-6157] synthesizing module 'core_execute' [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:4]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:56]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:88]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:110]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:127]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:138]
-INFO: [Synth 8-6155] done synthesizing module 'core_execute' (3#1) [G:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:4]
-INFO: [Synth 8-6157] synthesizing module 'core_mdu' [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:4]
-WARNING: [Synth 8-6014] Unused sequential element width_mask_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:79]
-WARNING: [Synth 8-6014] Unused sequential element width_steps_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:80]
-WARNING: [Synth 8-6014] Unused sequential element sign_bit_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:81]
-WARNING: [Synth 8-6014] Unused sequential element op1_eff_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:82]
-WARNING: [Synth 8-6014] Unused sequential element op2_eff_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:83]
-WARNING: [Synth 8-6014] Unused sequential element mul_acc_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:91]
-WARNING: [Synth 8-6014] Unused sequential element mul_a_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:92]
-WARNING: [Synth 8-6014] Unused sequential element mul_b_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:93]
-WARNING: [Synth 8-6014] Unused sequential element div_rem_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:116]
-WARNING: [Synth 8-6014] Unused sequential element div_quot_next_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:117]
-WARNING: [Synth 8-6014] Unused sequential element q_unsigned_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:128]
-WARNING: [Synth 8-6014] Unused sequential element r_unsigned_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:129]
-WARNING: [Synth 8-6014] Unused sequential element final_val_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:130]
-WARNING: [Synth 8-6014] Unused sequential element mul_src0_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:147]
-WARNING: [Synth 8-6014] Unused sequential element mul_src1_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:148]
-WARNING: [Synth 8-6014] Unused sequential element div_is_signed_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:181]
-WARNING: [Synth 8-6014] Unused sequential element div_is_rem_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:182]
-WARNING: [Synth 8-6014] Unused sequential element op1_neg_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:185]
-WARNING: [Synth 8-6014] Unused sequential element op2_neg_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:186]
-WARNING: [Synth 8-6014] Unused sequential element dividend_abs_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:187]
-WARNING: [Synth 8-6014] Unused sequential element divisor_abs_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:188]
-WARNING: [Synth 8-6014] Unused sequential element div_is_pow2_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:189]
-WARNING: [Synth 8-6014] Unused sequential element div_pow2_shift_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:190]
-WARNING: [Synth 8-6014] Unused sequential element div_pow2_mask_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:194]
-WARNING: [Synth 8-6014] Unused sequential element div_q_abs_fast_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:219]
-WARNING: [Synth 8-6014] Unused sequential element div_r_abs_fast_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:220]
-INFO: [Synth 8-6155] done synthesizing module 'core_mdu' (4#1) [G:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:4]
-INFO: [Synth 8-6157] synthesizing module 'core_commit' [G:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-319448-Archer/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-319448-Archer/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'mycpu_top' [g:/GitHub/26-Arch/vsrc/mycpu_top.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'VTop' [g:/GitHub/26-Arch/vsrc/VTop.sv:12]
+INFO: [Synth 8-6157] synthesizing module 'core' [g:/GitHub/26-Arch/vsrc/src/core.sv:17]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core.sv:228]
+INFO: [Synth 8-6157] synthesizing module 'core_decode' [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:129]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:198]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:235]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:249]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:263]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:286]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:286]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:304]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:313]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:313]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:327]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:351]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:360]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:396]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_pkg.sv:164]
+INFO: [Synth 8-6155] done synthesizing module 'core_decode' (2#1) [g:/GitHub/26-Arch/vsrc/src/core/core_decode.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'core_execute' [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:56]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:88]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:110]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:127]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:138]
+INFO: [Synth 8-6155] done synthesizing module 'core_execute' (3#1) [g:/GitHub/26-Arch/vsrc/src/core/core_execute.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'core_mdu' [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:4]
+WARNING: [Synth 8-6014] Unused sequential element width_mask_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:79]
+WARNING: [Synth 8-6014] Unused sequential element width_steps_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:80]
+WARNING: [Synth 8-6014] Unused sequential element sign_bit_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:81]
+WARNING: [Synth 8-6014] Unused sequential element op1_eff_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:82]
+WARNING: [Synth 8-6014] Unused sequential element op2_eff_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:83]
+WARNING: [Synth 8-6014] Unused sequential element mul_acc_next_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:91]
+WARNING: [Synth 8-6014] Unused sequential element mul_a_next_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:92]
+WARNING: [Synth 8-6014] Unused sequential element mul_b_next_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:93]
+WARNING: [Synth 8-6014] Unused sequential element div_rem_next_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:116]
+WARNING: [Synth 8-6014] Unused sequential element div_quot_next_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:117]
+WARNING: [Synth 8-6014] Unused sequential element q_unsigned_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:128]
+WARNING: [Synth 8-6014] Unused sequential element r_unsigned_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:129]
+WARNING: [Synth 8-6014] Unused sequential element final_val_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:130]
+WARNING: [Synth 8-6014] Unused sequential element mul_src0_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:147]
+WARNING: [Synth 8-6014] Unused sequential element mul_src1_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:148]
+WARNING: [Synth 8-6014] Unused sequential element div_is_signed_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:181]
+WARNING: [Synth 8-6014] Unused sequential element div_is_rem_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:182]
+WARNING: [Synth 8-6014] Unused sequential element op1_neg_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:185]
+WARNING: [Synth 8-6014] Unused sequential element op2_neg_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:186]
+WARNING: [Synth 8-6014] Unused sequential element dividend_abs_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:187]
+WARNING: [Synth 8-6014] Unused sequential element divisor_abs_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:188]
+WARNING: [Synth 8-6014] Unused sequential element div_is_pow2_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:189]
+WARNING: [Synth 8-6014] Unused sequential element div_pow2_shift_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:190]
+WARNING: [Synth 8-6014] Unused sequential element div_pow2_mask_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:194]
+WARNING: [Synth 8-6014] Unused sequential element div_q_abs_fast_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:219]
+WARNING: [Synth 8-6014] Unused sequential element div_r_abs_fast_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:220]
+INFO: [Synth 8-6155] done synthesizing module 'core_mdu' (4#1) [g:/GitHub/26-Arch/vsrc/src/core/core_mdu.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'core_commit' [g:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:4]
 	Parameter MEMDETECT_REGION_BASE bound to: 64'b0000000000000000000000000000000010000000000000000110000000000000 
 	Parameter MEMDETECT_REGION_TOP bound to: 64'b0000000000000000000000000000000010000000000000000111000000000000 
 	Parameter MEMDETECT_SCAN_END bound to: 64'b0000000000000000000000000000000010000000000000011011100001100000 
 	Parameter MEMDETECT_FAULT_PC bound to: 64'b0000000000000000000000000000000010000000000000000110000101000000 
 	Parameter MEMDETECT_REGION_WORDS bound to: 64'b0000000000000000000000000000000000000000000000000000001000000000 
-INFO: [Synth 8-6157] synthesizing module 'core_csr' [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:4]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:366]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:518]
-INFO: [Synth 8-6155] done synthesizing module 'core_csr' (5#1) [G:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:4]
-INFO: [Synth 8-6155] done synthesizing module 'core_commit' (6#1) [G:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:4]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/src/core.sv:542]
-WARNING: [Synth 8-6014] Unused sequential element amo_issued_q_reg was removed.  [G:/GitHub/26-Arch/vsrc/src/core.sv:518]
-INFO: [Synth 8-6155] done synthesizing module 'core' (7#1) [G:/GitHub/26-Arch/vsrc/src/core.sv:17]
-INFO: [Synth 8-6157] synthesizing module 'mmu' [G:/GitHub/26-Arch/vsrc/util/mmu.sv:8]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vsrc/util/mmu.sv:103]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vsrc/util/mmu.sv:237]
-INFO: [Synth 8-6155] done synthesizing module 'mmu' (8#1) [G:/GitHub/26-Arch/vsrc/util/mmu.sv:8]
-INFO: [Synth 8-6157] synthesizing module 'IBusToCBus' [G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:10]
-INFO: [Synth 8-6157] synthesizing module 'DBusToCBus' [G:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv:10]
-INFO: [Synth 8-6155] done synthesizing module 'DBusToCBus' (9#1) [G:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv:10]
-WARNING: [Synth 8-6014] Unused sequential element req_addr_latched_reg was removed.  [G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:40]
-INFO: [Synth 8-6155] done synthesizing module 'IBusToCBus' (10#1) [G:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:10]
-INFO: [Synth 8-6157] synthesizing module 'CBusArbiter' [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:9]
+INFO: [Synth 8-6157] synthesizing module 'core_csr' [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:366]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:156]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:520]
+INFO: [Synth 8-6155] done synthesizing module 'core_csr' (5#1) [g:/GitHub/26-Arch/vsrc/src/core/core_csr.sv:4]
+INFO: [Synth 8-6155] done synthesizing module 'core_commit' (6#1) [g:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:4]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/src/core.sv:543]
+WARNING: [Synth 8-6014] Unused sequential element amo_issued_q_reg was removed.  [g:/GitHub/26-Arch/vsrc/src/core.sv:519]
+INFO: [Synth 8-6155] done synthesizing module 'core' (7#1) [g:/GitHub/26-Arch/vsrc/src/core.sv:17]
+INFO: [Synth 8-6157] synthesizing module 'mmu' [g:/GitHub/26-Arch/vsrc/util/mmu.sv:8]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vsrc/util/mmu.sv:122]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vsrc/util/mmu.sv:256]
+INFO: [Synth 8-6155] done synthesizing module 'mmu' (8#1) [g:/GitHub/26-Arch/vsrc/util/mmu.sv:8]
+INFO: [Synth 8-6157] synthesizing module 'IBusToCBus' [g:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:10]
+INFO: [Synth 8-6157] synthesizing module 'DBusToCBus' [g:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv:10]
+INFO: [Synth 8-6155] done synthesizing module 'DBusToCBus' (9#1) [g:/GitHub/26-Arch/vsrc/util/DBusToCBus.sv:10]
+WARNING: [Synth 8-6014] Unused sequential element req_addr_latched_reg was removed.  [g:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:40]
+INFO: [Synth 8-6155] done synthesizing module 'IBusToCBus' (10#1) [g:/GitHub/26-Arch/vsrc/util/IBusToCBus.sv:10]
+INFO: [Synth 8-6157] synthesizing module 'CBusArbiter' [g:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:9]
 	Parameter NUM_INPUTS bound to: 32'sb00000000000000000000000000000010 
 	Parameter MAX_INDEX bound to: 32'sb00000000000000000000000000000001 
-WARNING: [Synth 8-589] replacing case/wildcard equality operator === with logical equality operator == [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:38]
-WARNING: [Synth 8-589] replacing case/wildcard equality operator === with logical equality operator == [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:38]
+WARNING: [Synth 8-589] replacing case/wildcard equality operator === with logical equality operator == [g:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:38]
+WARNING: [Synth 8-589] replacing case/wildcard equality operator === with logical equality operator == [g:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:38]
 WARNING: [Synth 8-5858] RAM iresps_reg from Abstract Data Type (record/struct) for this pattern/configuration is not supported. This will most likely be implemented in registers
-INFO: [Synth 8-6155] done synthesizing module 'CBusArbiter' (11#1) [G:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:9]
-INFO: [Synth 8-6155] done synthesizing module 'VTop' (12#1) [G:/GitHub/26-Arch/vsrc/VTop.sv:12]
-INFO: [Synth 8-6155] done synthesizing module 'mycpu_top' (13#1) [G:/GitHub/26-Arch/vsrc/mycpu_top.sv:4]
-INFO: [Synth 8-6157] synthesizing module 'cbus_crossbar' [G:/GitHub/26-Arch/vivado/src/with_delay/cbus_crossbar.sv:1]
-INFO: [Synth 8-6155] done synthesizing module 'cbus_crossbar' (14#1) [G:/GitHub/26-Arch/vivado/src/with_delay/cbus_crossbar.sv:1]
-INFO: [Synth 8-6157] synthesizing module 'bram_wrapper' [G:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:1]
+INFO: [Synth 8-6155] done synthesizing module 'CBusArbiter' (11#1) [g:/GitHub/26-Arch/vsrc/util/CBusArbiter.sv:9]
+INFO: [Synth 8-6155] done synthesizing module 'VTop' (12#1) [g:/GitHub/26-Arch/vsrc/VTop.sv:12]
+INFO: [Synth 8-6155] done synthesizing module 'mycpu_top' (13#1) [g:/GitHub/26-Arch/vsrc/mycpu_top.sv:4]
+INFO: [Synth 8-6157] synthesizing module 'cbus_crossbar' [g:/GitHub/26-Arch/vivado/src/with_delay/cbus_crossbar.sv:1]
+INFO: [Synth 8-6155] done synthesizing module 'cbus_crossbar' (14#1) [g:/GitHub/26-Arch/vivado/src/with_delay/cbus_crossbar.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'bram_wrapper' [g:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:1]
 	Parameter SIMULATION bound to: 1'b0 
 	Parameter BRAM_DELAY bound to: 2 - type: integer 
-INFO: [Synth 8-6157] synthesizing module 'bram_0' [G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-299204-Archer/realtime/bram_0_stub.v:6]
-INFO: [Synth 8-6155] done synthesizing module 'bram_0' (15#1) [G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-299204-Archer/realtime/bram_0_stub.v:6]
-WARNING: [Synth 8-689] width (18) of port connection 'addra' does not match port width (15) of module 'bram_0' [G:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:141]
-INFO: [Synth 8-6155] done synthesizing module 'bram_wrapper' (16#1) [G:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:1]
-INFO: [Synth 8-6157] synthesizing module 'device' [G:/GitHub/26-Arch/vivado/src/device.sv:3]
+INFO: [Synth 8-6157] synthesizing module 'bram_0' [g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-319448-Archer/realtime/bram_0_stub.v:6]
+INFO: [Synth 8-6155] done synthesizing module 'bram_0' (15#1) [g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/.Xil/Vivado-319448-Archer/realtime/bram_0_stub.v:6]
+WARNING: [Synth 8-689] width (18) of port connection 'addra' does not match port width (15) of module 'bram_0' [g:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:141]
+INFO: [Synth 8-6155] done synthesizing module 'bram_wrapper' (16#1) [g:/GitHub/26-Arch/vivado/src/with_delay/bram_wrapper.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'device' [g:/GitHub/26-Arch/vivado/src/device.sv:3]
 	Parameter SIMULATION bound to: 1'b0 
 	Parameter RX_FIFO_DEPTH bound to: 16 - type: integer 
 	Parameter BIT_TMR_MAX bound to: 14'b00000011011000 
@@ -164,7 +171,7 @@ INFO: [Synth 8-6157] synthesizing module 'device' [G:/GitHub/26-Arch/vivado/src/
 	Parameter RDY bound to: 2'b00 
 	Parameter LOAD_BIT bound to: 2'b01 
 	Parameter SEND_BIT bound to: 2'b10 
-INFO: [Synth 8-6157] synthesizing module 'spi_flash_disk' [G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:8]
+INFO: [Synth 8-6157] synthesizing module 'spi_flash_disk' [g:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:8]
 	Parameter FLASH_DISK_OFFSET bound to: 3145728 - type: integer 
 	Parameter SPI_CLK_DIV bound to: 2 - type: integer 
 	Parameter S_IDLE bound to: 4'b0000 
@@ -172,29 +179,27 @@ INFO: [Synth 8-6157] synthesizing module 'spi_flash_disk' [G:/GitHub/26-Arch/viv
 	Parameter S_ADDR bound to: 4'b0010 
 	Parameter S_READ bound to: 4'b0100 
 	Parameter S_DONE bound to: 4'b0101 
-INFO: [Synth 8-5534] Detected attribute (* ram_style = "block" *) [G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:39]
-WARNING: [Synth 8-6014] Unused sequential element miso_shift_reg was removed.  [G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:206]
-WARNING: [Synth 8-6014] Unused sequential element spi_word_acc_reg was removed.  [G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:213]
-INFO: [Synth 8-6155] done synthesizing module 'spi_flash_disk' (17#1) [G:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:8]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:76]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:251]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:264]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:333]
-INFO: [Synth 8-226] default block is never used [G:/GitHub/26-Arch/vivado/src/device.sv:333]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:536]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:549]
-INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [G:/GitHub/26-Arch/vivado/src/device.sv:581]
-WARNING: [Synth 8-6014] Unused sequential element finish_reg was removed.  [G:/GitHub/26-Arch/vivado/src/device.sv:135]
-INFO: [Synth 8-6155] done synthesizing module 'device' (18#1) [G:/GitHub/26-Arch/vivado/src/device.sv:3]
-INFO: [Synth 8-6155] done synthesizing module 'soc_top' (19#1) [G:/GitHub/26-Arch/vivado/src/with_delay/soc_top.sv:1]
-WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:84]
+INFO: [Synth 8-5534] Detected attribute (* ram_style = "block" *) [g:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:39]
+INFO: [Synth 8-6155] done synthesizing module 'spi_flash_disk' (17#1) [g:/GitHub/26-Arch/vivado/src/spi_flash_disk.sv:8]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:78]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:265]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:278]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:347]
+INFO: [Synth 8-226] default block is never used [g:/GitHub/26-Arch/vivado/src/device.sv:347]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:550]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:563]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [g:/GitHub/26-Arch/vivado/src/device.sv:595]
+WARNING: [Synth 8-6014] Unused sequential element finish_reg was removed.  [g:/GitHub/26-Arch/vivado/src/device.sv:137]
+INFO: [Synth 8-6155] done synthesizing module 'device' (18#1) [g:/GitHub/26-Arch/vivado/src/device.sv:3]
+INFO: [Synth 8-6155] done synthesizing module 'soc_top' (19#1) [g:/GitHub/26-Arch/vivado/src/with_delay/soc_top.sv:1]
+WARNING: [Synth 8-4446] all outputs are unconnected for this instance and logic may be removed [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:88]
 INFO: [Synth 8-6157] synthesizing module 'STARTUPE2' [C:/Xilinx/Vivado/2019.2/scripts/rt/data/unisim_comp.v:78135]
 	Parameter PROG_USR bound to: FALSE - type: string 
 	Parameter SIM_CCLK_FREQ bound to: 12.500000 - type: double 
 INFO: [Synth 8-6155] done synthesizing module 'STARTUPE2' (20#1) [C:/Xilinx/Vivado/2019.2/scripts/rt/data/unisim_comp.v:78135]
-INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'soc_top_inst'. This will prevent further optimization [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:37]
-WARNING: [Synth 8-6014] Unused sequential element cpu_clk_cnt_reg was removed.  [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:119]
-INFO: [Synth 8-6155] done synthesizing module 'basys3_top' (21#1) [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:1]
+INFO: [Synth 8-6071] Mark debug on the nets applies keep_hierarchy on instance 'soc_top_inst'. This will prevent further optimization [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:39]
+WARNING: [Synth 8-6014] Unused sequential element cpu_clk_cnt_reg was removed.  [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:123]
+INFO: [Synth 8-6155] done synthesizing module 'basys3_top' (21#1) [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:1]
 WARNING: [Synth 8-3917] design basys3_top has port QspiDB[3] driven by constant 1
 WARNING: [Synth 8-3917] design basys3_top has port QspiDB[2] driven by constant 1
 WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[31]
@@ -216,20 +221,6 @@ WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[1
 WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[15]
 WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[14]
 WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[13]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[12]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[11]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[10]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[9]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[8]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[7]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[6]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[5]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[4]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[3]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[2]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[1]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port req_blockno[0]
-WARNING: [Synth 8-3331] design spi_flash_disk has unconnected port spi_miso
 WARNING: [Synth 8-3331] design device has unconnected port clk
 WARNING: [Synth 8-3331] design device has unconnected port size[7]
 WARNING: [Synth 8-3331] design device has unconnected port size[6]
@@ -241,22 +232,6 @@ WARNING: [Synth 8-3331] design device has unconnected port size[1]
 WARNING: [Synth 8-3331] design device has unconnected port size[0]
 WARNING: [Synth 8-3331] design cbus_crossbar has unconnected port clk
 WARNING: [Synth 8-3331] design cbus_crossbar has unconnected port reset
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[59]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[58]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[57]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[56]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[55]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[54]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[53]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[52]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[51]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[50]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[49]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[48]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[47]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[46]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[45]
-WARNING: [Synth 8-3331] design mmu has unconnected port satp[44]
 WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[63]
 WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[62]
 WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[61]
@@ -297,9 +272,39 @@ WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[27]
 WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[26]
 WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[25]
 WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[24]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[23]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[22]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[21]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[20]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[19]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[18]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[17]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[16]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[15]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[14]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[13]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[12]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[11]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[10]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[9]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[8]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[7]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[6]
+WARNING: [Synth 8-3331] design mmu has unconnected port pmpcfg0[5]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[trap]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[wen]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[rd][4]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[rd][3]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[rd][2]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[rd][1]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[rd][0]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[is_load]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[mem_size][2]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[mem_size][1]
+WARNING: [Synth 8-3331] design core_csr has unconnected port wb_r[mem_size][0]
 INFO: [Common 17-14] Message 'Synth 8-3331' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 ---------------------------------------------------------------------------------
-Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 950.582 ; gain = 375.641
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 953.445 ; gain = 377.398
 ---------------------------------------------------------------------------------
 
 Report Check Netlist: 
@@ -312,14 +317,14 @@ Report Check Netlist:
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 960.781 ; gain = 385.840
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 967.316 ; gain = 391.270
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 960.781 ; gain = 385.840
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 967.316 ; gain = 391.270
 ---------------------------------------------------------------------------------
-CRITICAL WARNING: [Netlist 29-72] Incorrect value '12.500000' specified for property 'SIM_CCLK_FREQ'. Expecting type 'double' with possible values of '0 to 10'. The system will either use the default value or the property value will be dropped. Please verify your source files. [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:84]
+CRITICAL WARNING: [Netlist 29-72] Incorrect value '12.500000' specified for property 'SIM_CCLK_FREQ'. Expecting type 'double' with possible values of '0 to 10'. The system will either use the default value or the property value will be dropped. Please verify your source files. [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:88]
 Resolution: Please check the value of the property and set to a correct value.
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.249 . Memory (MB): peak = 960.781 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.214 . Memory (MB): peak = 967.316 ; gain = 0.000
 INFO: [Netlist 29-17] Analyzing 1 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
@@ -330,29 +335,29 @@ Parsing XDC File [g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0/c
 Finished Parsing XDC File [g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'soc_top_inst/clk_wiz_0'
 Parsing XDC File [g:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0/bram_0_in_context.xdc] for cell 'soc_top_inst/bram_wrapper_inst/bram_0_inst'
 Finished Parsing XDC File [g:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0/bram_0_in_context.xdc] for cell 'soc_top_inst/bram_wrapper_inst/bram_0_inst'
-Parsing XDC File [G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]
-WARNING: [Vivado 12-508] No pins matched 'soc_top_inst/clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0'. [G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc:156]
-WARNING: [Vivado 12-508] No pins matched 'soc_top_inst/clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0'. [G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc:157]
-Finished Parsing XDC File [G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]
-WARNING: [Project 1-498] One or more constraints failed evaluation while reading constraint file [G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc] and the design contains unresolved black boxes. These constraints will be read post-synthesis (as long as their source constraint file is marked as used_in_implementation) and should be applied correctly then. You should review the constraints listed in the file [.Xil/basys3_top_propImpl.xdc] and check the run log file to verify that these constraints were correctly applied.
-INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/basys3_top_propImpl.xdc].
+Parsing XDC File [g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]
+WARNING: [Vivado 12-508] No pins matched 'soc_top_inst/clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0'. [g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc:156]
+WARNING: [Vivado 12-508] No pins matched 'soc_top_inst/clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0'. [g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc:157]
+Finished Parsing XDC File [g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]
+WARNING: [Project 1-498] One or more constraints failed evaluation while reading constraint file [g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc] and the design contains unresolved black boxes. These constraints will be read post-synthesis (as long as their source constraint file is marked as used_in_implementation) and should be applied correctly then. You should review the constraints listed in the file [.Xil/basys3_top_propImpl.xdc] and check the run log file to verify that these constraints were correctly applied.
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/basys3_top_propImpl.xdc].
 Resolution: To avoid this warning, move constraints listed in [.Xil/basys3_top_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
 Completed Processing XDC Constraints
 
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1128.895 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.002 . Memory (MB): peak = 1133.785 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
 No Unisim elements were transformed.
 
-Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.048 . Memory (MB): peak = 1128.895 ; gain = 0.000
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.052 . Memory (MB): peak = 1133.785 ; gain = 0.000
 ---------------------------------------------------------------------------------
-Finished Constraint Validation : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished Constraint Validation : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Loading Part and Timing Information
 ---------------------------------------------------------------------------------
 Loading part: xc7a35tcpg236-1
 ---------------------------------------------------------------------------------
-Finished Loading Part and Timing Information : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Applying 'set_property' XDC Constraints
@@ -362,7 +367,7 @@ Applied set_property CLOCK_BUFFER_TYPE = NONE for clk. (constraint file  g:/GitH
 Applied set_property DONT_TOUCH = true for soc_top_inst/clk_wiz_0. (constraint file  auto generated constraint, line ).
 Applied set_property DONT_TOUCH = true for soc_top_inst/bram_wrapper_inst/bram_0_inst. (constraint file  auto generated constraint, line ).
 ---------------------------------------------------------------------------------
-Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:14 ; elapsed = 00:00:15 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 INFO: [Synth 8-5546] ROM "id_dec_is_load" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "id_dec_is_store" won't be mapped to RAM because it is too sparse
@@ -371,27 +376,56 @@ INFO: [Synth 8-5546] ROM "id_dec_is_jal" won't be mapped to RAM because it is to
 INFO: [Synth 8-5546] ROM "id_dec_is_amo" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5587] ROM size for "id_dec_amo_cmd" is below threshold of ROM address width. It will be mapped to LUTs
 INFO: [Synth 8-5546] ROM "id_dec_is_illegal" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mstatus" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mtvec" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mip_raw" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mie" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mscratch" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mcause" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mtval" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mepc" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_satp" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_stvec_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_sscratch_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_sepc_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_scause_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_stval_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_medeleg_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mideleg_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_mcounteren_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_menvcfg_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_pmpcfg0_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_pmpaddr0_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mstatus" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mtvec" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mip_raw" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mie" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mscratch" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mcause" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mtval" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mepc" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_satp" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_stvec_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_sscratch_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_sepc_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_scause_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_stval_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_medeleg_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mideleg_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_mcounteren_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_menvcfg_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_pmpcfg0_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_pmpaddr0_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5544] ROM "get_ecall_cause" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Synth 8-5544] ROM "get_ecall_cause" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Synth 8-5544] ROM "get_ecall_cause" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Synth 8-5544] ROM "get_ecall_cause" won't be mapped to Block RAM because address size (2) smaller than threshold (5)
-INFO: [Synth 8-4471] merging register 'trap_valid_latched_reg' into 'halted_reg' [G:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:186]
-INFO: [Synth 8-4471] merging register 'fetch_redirect_pc_reg[63:0]' into 'wb_r_reg[mem_wdata][63:0]' [G:/GitHub/26-Arch/vsrc/src/core.sv:508]
-INFO: [Synth 8-4471] merging register 'wb_r_reg[is_amo]' into 'wb_r_reg[mem_unsigned]' [G:/GitHub/26-Arch/vsrc/src/core.sv:273]
+INFO: [Synth 8-4471] merging register 'trap_valid_latched_reg' into 'halted_reg' [g:/GitHub/26-Arch/vsrc/src/core/core_commit.sv:186]
+INFO: [Synth 8-4471] merging register 'fetch_redirect_pc_reg[63:0]' into 'wb_r_reg[mem_wdata][63:0]' [g:/GitHub/26-Arch/vsrc/src/core.sv:509]
+INFO: [Synth 8-4471] merging register 'wb_r_reg[is_amo]' into 'wb_r_reg[mem_unsigned]' [g:/GitHub/26-Arch/vsrc/src/core.sv:273]
 INFO: [Synth 8-802] inferred FSM for state register 'amo_state_reg' in module 'core'
 INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'mmu'
 INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
-INFO: [Synth 8-4471] merging register 'gen_real_disk.spi_req_blockno_reg[31:0]' into 'gen_real_disk.disk_blockno_reg[31:0]' [G:/GitHub/26-Arch/vivado/src/device.sv:426]
-INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [G:/GitHub/26-Arch/vivado/src/device.sv:251]
-INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [G:/GitHub/26-Arch/vivado/src/device.sv:166]
+INFO: [Synth 8-4471] merging register 'gen_real_disk.spi_req_blockno_reg[31:0]' into 'gen_real_disk.disk_blockno_reg[31:0]' [g:/GitHub/26-Arch/vivado/src/device.sv:440]
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [g:/GitHub/26-Arch/vivado/src/device.sv:265]
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [g:/GitHub/26-Arch/vivado/src/device.sv:168]
 INFO: [Synth 8-5544] ROM "rdata" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
 INFO: [Synth 8-802] inferred FSM for state register 'txState_reg' in module 'device'
 ---------------------------------------------------------------------------------------------------
@@ -409,36 +443,37 @@ INFO: [Synth 8-3354] encoded FSM with state register 'amo_state_reg' using encod
                    State |                     New Encoding |                Previous Encoding 
 ---------------------------------------------------------------------------------------------------
                WALK_IDLE |                              000 |                              000
-             WALK_LEVEL2 |                              101 |                              001
-             WALK_LEVEL1 |                              100 |                              010
-             WALK_LEVEL0 |                              011 |                              011
-          WALK_DONE_INSN |                              010 |                              100
-          WALK_DONE_DATA |                              001 |                              101
+             WALK_LEVEL2 |                              110 |                              001
+             WALK_LEVEL1 |                              101 |                              010
+                WALK_GAP |                              011 |                              100
+             WALK_LEVEL0 |                              100 |                              011
+          WALK_DONE_INSN |                              010 |                              101
+          WALK_DONE_DATA |                              001 |                              110
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'mmu'
 ---------------------------------------------------------------------------------------------------
                    State |                     New Encoding |                Previous Encoding 
 ---------------------------------------------------------------------------------------------------
                      RDY |                              001 |                               00
-                LOAD_BIT |                              010 |                               01
-                SEND_BIT |                              100 |                               10
+                LOAD_BIT |                              100 |                               01
+                SEND_BIT |                              010 |                               10
 ---------------------------------------------------------------------------------------------------
 INFO: [Synth 8-3354] encoded FSM with state register 'txState_reg' using encoding 'one-hot' in module 'device'
 ---------------------------------------------------------------------------------
-Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:23 ; elapsed = 00:00:25 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:21 ; elapsed = 00:00:22 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
 +------+-----------------+------------+----------+
 |      |RTL Partition    |Replication |Instances |
 +------+-----------------+------------+----------+
-|1     |core_csr__GB0    |           1|     40385|
-|2     |core_csr__GB1    |           1|     13089|
+|1     |core_csr__GB0    |           1|     25396|
+|2     |core_csr__GB1    |           1|     22454|
 |3     |core_commit__GC0 |           1|     18155|
 |4     |core__GCB0       |           1|     35960|
 |5     |core_mdu         |           1|     13693|
-|6     |VTop__GC0        |           1|     10055|
-|7     |soc_top__GC0     |           1|      7348|
+|6     |VTop__GC0        |           1|     11557|
+|7     |soc_top__GC0     |           1|      7851|
 |8     |basys3_top__GC0  |           1|       101|
 +------+-----------------+------------+----------+
 ---------------------------------------------------------------------------------
@@ -450,11 +485,12 @@ Detailed RTL Component Info :
 	   2 Input     64 Bit       Adders := 13    
 	   3 Input     64 Bit       Adders := 1     
 	   2 Input     32 Bit       Adders := 2     
+	   2 Input     23 Bit       Adders := 1     
 	   2 Input     16 Bit       Adders := 1     
 	   2 Input     15 Bit       Adders := 1     
 	   2 Input     14 Bit       Adders := 1     
 	   2 Input     10 Bit       Adders := 1     
-	   2 Input      8 Bit       Adders := 3     
+	   2 Input      8 Bit       Adders := 4     
 	   2 Input      7 Bit       Adders := 5     
 	   2 Input      6 Bit       Adders := 1     
 	   2 Input      5 Bit       Adders := 3     
@@ -466,38 +502,40 @@ Detailed RTL Component Info :
 	   2 Input      1 Bit         XORs := 1     
 +---Registers : 
 	               65 Bit    Registers := 1     
-	               64 Bit    Registers := 99    
-	               32 Bit    Registers := 9     
+	               64 Bit    Registers := 100   
+	               52 Bit    Registers := 6     
+	               32 Bit    Registers := 10    
 	               23 Bit    Registers := 1     
 	               16 Bit    Registers := 1     
 	               14 Bit    Registers := 1     
 	               12 Bit    Registers := 3     
 	               10 Bit    Registers := 2     
-	                8 Bit    Registers := 14    
+	                8 Bit    Registers := 16    
 	                7 Bit    Registers := 3     
 	                6 Bit    Registers := 1     
 	                5 Bit    Registers := 9     
 	                4 Bit    Registers := 8     
 	                3 Bit    Registers := 7     
 	                2 Bit    Registers := 9     
-	                1 Bit    Registers := 109   
+	                1 Bit    Registers := 114   
 +---RAMs : 
 	               8K Bit         RAMs := 1     
 	              512 Bit         RAMs := 1     
 	              128 Bit         RAMs := 1     
 +---Muxes : 
 	   2 Input     65 Bit        Muxes := 3     
-	   2 Input     64 Bit        Muxes := 279   
-	   3 Input     64 Bit        Muxes := 4     
-	   7 Input     64 Bit        Muxes := 6     
+	   2 Input     64 Bit        Muxes := 277   
 	   8 Input     64 Bit        Muxes := 10    
-	   6 Input     64 Bit        Muxes := 4     
-	   4 Input     64 Bit        Muxes := 6     
+	   4 Input     64 Bit        Muxes := 8     
+	   6 Input     64 Bit        Muxes := 1     
+	   5 Input     64 Bit        Muxes := 4     
 	  33 Input     64 Bit        Muxes := 2     
 	  26 Input     64 Bit        Muxes := 1     
-	   5 Input     64 Bit        Muxes := 3     
+	   7 Input     64 Bit        Muxes := 6     
 	  15 Input     64 Bit        Muxes := 2     
+	   3 Input     64 Bit        Muxes := 1     
 	  10 Input     64 Bit        Muxes := 2     
+	   2 Input     52 Bit        Muxes := 1     
 	   2 Input     32 Bit        Muxes := 40    
 	   2 Input     31 Bit        Muxes := 1     
 	   2 Input     30 Bit        Muxes := 1     
@@ -507,6 +545,7 @@ Detailed RTL Component Info :
 	   2 Input     26 Bit        Muxes := 1     
 	   2 Input     25 Bit        Muxes := 1     
 	   2 Input     24 Bit        Muxes := 1     
+	  11 Input     24 Bit        Muxes := 1     
 	   2 Input     23 Bit        Muxes := 1     
 	   2 Input     22 Bit        Muxes := 1     
 	   2 Input     21 Bit        Muxes := 1     
@@ -527,44 +566,46 @@ Detailed RTL Component Info :
 	   4 Input     10 Bit        Muxes := 1     
 	   2 Input      9 Bit        Muxes := 1     
 	   4 Input      8 Bit        Muxes := 1     
-	   2 Input      8 Bit        Muxes := 31    
+	   2 Input      8 Bit        Muxes := 33    
 	   5 Input      8 Bit        Muxes := 1     
-	   6 Input      8 Bit        Muxes := 1     
+	   6 Input      8 Bit        Muxes := 2     
 	   9 Input      8 Bit        Muxes := 1     
 	   2 Input      7 Bit        Muxes := 3     
 	   2 Input      6 Bit        Muxes := 3     
 	  26 Input      5 Bit        Muxes := 1     
 	   2 Input      5 Bit        Muxes := 1     
 	   7 Input      5 Bit        Muxes := 1     
-	   4 Input      4 Bit        Muxes := 4     
-	   8 Input      4 Bit        Muxes := 3     
-	   6 Input      4 Bit        Muxes := 1     
-	   2 Input      4 Bit        Muxes := 5     
+	   5 Input      4 Bit        Muxes := 1     
+	   4 Input      4 Bit        Muxes := 2     
+	   8 Input      4 Bit        Muxes := 2     
+	   6 Input      4 Bit        Muxes := 2     
+	   2 Input      4 Bit        Muxes := 6     
 	  15 Input      4 Bit        Muxes := 2     
 	  13 Input      4 Bit        Muxes := 1     
 	   3 Input      4 Bit        Muxes := 1     
 	  11 Input      4 Bit        Muxes := 1     
-	   2 Input      3 Bit        Muxes := 22    
+	   2 Input      3 Bit        Muxes := 23    
 	   4 Input      3 Bit        Muxes := 2     
 	  15 Input      3 Bit        Muxes := 2     
 	  10 Input      3 Bit        Muxes := 1     
 	   5 Input      3 Bit        Muxes := 1     
 	   3 Input      3 Bit        Muxes := 2     
-	   6 Input      3 Bit        Muxes := 2     
-	  24 Input      2 Bit        Muxes := 3     
-	   2 Input      2 Bit        Muxes := 21    
+	   7 Input      3 Bit        Muxes := 1     
+	   6 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 22    
 	  15 Input      2 Bit        Muxes := 3     
 	   4 Input      2 Bit        Muxes := 2     
+	   7 Input      2 Bit        Muxes := 1     
 	   6 Input      2 Bit        Muxes := 1     
 	   3 Input      2 Bit        Muxes := 1     
 	   5 Input      2 Bit        Muxes := 1     
-	   2 Input      1 Bit        Muxes := 288   
+	   2 Input      1 Bit        Muxes := 305   
 	   3 Input      1 Bit        Muxes := 7     
 	   8 Input      1 Bit        Muxes := 3     
 	   4 Input      1 Bit        Muxes := 13    
-	   7 Input      1 Bit        Muxes := 7     
+	   7 Input      1 Bit        Muxes := 20    
 	  12 Input      1 Bit        Muxes := 1     
-	   6 Input      1 Bit        Muxes := 15    
+	   6 Input      1 Bit        Muxes := 13    
 	  15 Input      1 Bit        Muxes := 16    
 	  13 Input      1 Bit        Muxes := 2     
 	   5 Input      1 Bit        Muxes := 19    
@@ -604,19 +645,18 @@ Detailed RTL Component Info :
 	               64 Bit    Registers := 20    
 	                2 Bit    Registers := 1     
 +---Muxes : 
-	   2 Input     64 Bit        Muxes := 66    
-	   3 Input     64 Bit        Muxes := 3     
-	   7 Input     64 Bit        Muxes := 1     
+	   2 Input     64 Bit        Muxes := 61    
 	   8 Input     64 Bit        Muxes := 9     
-	   6 Input     64 Bit        Muxes := 3     
+	   4 Input     64 Bit        Muxes := 2     
+	   6 Input     64 Bit        Muxes := 1     
+	   5 Input     64 Bit        Muxes := 1     
 	   2 Input     13 Bit        Muxes := 6     
 	   2 Input     12 Bit        Muxes := 2     
 	   2 Input      6 Bit        Muxes := 2     
-	   4 Input      4 Bit        Muxes := 3     
-	   8 Input      4 Bit        Muxes := 1     
-	  24 Input      2 Bit        Muxes := 3     
+	   5 Input      4 Bit        Muxes := 1     
+	   4 Input      4 Bit        Muxes := 1     
 	   2 Input      2 Bit        Muxes := 11    
-	   2 Input      1 Bit        Muxes := 26    
+	   2 Input      1 Bit        Muxes := 33    
 Module core_commit 
 Detailed RTL Component Info : 
 +---Adders : 
@@ -713,16 +753,18 @@ Detailed RTL Component Info :
 	   2 Input     64 Bit       Adders := 2     
 	   2 Input     32 Bit       Adders := 1     
 +---Registers : 
-	               64 Bit    Registers := 4     
+	               64 Bit    Registers := 5     
+	               52 Bit    Registers := 6     
 	                8 Bit    Registers := 1     
 	                3 Bit    Registers := 1     
 	                2 Bit    Registers := 1     
-	                1 Bit    Registers := 2     
+	                1 Bit    Registers := 6     
 +---Muxes : 
-	   2 Input     64 Bit        Muxes := 10    
+	   2 Input     64 Bit        Muxes := 13    
 	   4 Input     64 Bit        Muxes := 1     
-	   6 Input     64 Bit        Muxes := 1     
+	   7 Input     64 Bit        Muxes := 1     
 	  10 Input     64 Bit        Muxes := 1     
+	   2 Input     52 Bit        Muxes := 1     
 	   2 Input     32 Bit        Muxes := 29    
 	   2 Input     31 Bit        Muxes := 1     
 	   2 Input     30 Bit        Muxes := 1     
@@ -747,15 +789,15 @@ Detailed RTL Component Info :
 	   2 Input     11 Bit        Muxes := 1     
 	   2 Input     10 Bit        Muxes := 1     
 	   2 Input      9 Bit        Muxes := 1     
-	   2 Input      8 Bit        Muxes := 4     
+	   2 Input      8 Bit        Muxes := 5     
 	   2 Input      7 Bit        Muxes := 1     
 	   3 Input      4 Bit        Muxes := 1     
-	   2 Input      3 Bit        Muxes := 12    
-	   6 Input      3 Bit        Muxes := 1     
-	   6 Input      2 Bit        Muxes := 1     
-	   2 Input      1 Bit        Muxes := 25    
+	   2 Input      3 Bit        Muxes := 13    
+	   7 Input      3 Bit        Muxes := 1     
+	   7 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 30    
 	   4 Input      1 Bit        Muxes := 3     
-	   6 Input      1 Bit        Muxes := 6     
+	   7 Input      1 Bit        Muxes := 13    
 Module DBusToCBus__1 
 Detailed RTL Component Info : 
 +---Registers : 
@@ -811,15 +853,16 @@ Detailed RTL Component Info :
 Module spi_flash_disk 
 Detailed RTL Component Info : 
 +---Adders : 
+	   2 Input     23 Bit       Adders := 1     
 	   2 Input     10 Bit       Adders := 1     
 	   2 Input      8 Bit       Adders := 1     
 	   2 Input      4 Bit       Adders := 1     
 	   2 Input      2 Bit       Adders := 2     
 +---Registers : 
-	               32 Bit    Registers := 3     
+	               32 Bit    Registers := 4     
 	               23 Bit    Registers := 1     
 	               10 Bit    Registers := 1     
-	                8 Bit    Registers := 4     
+	                8 Bit    Registers := 5     
 	                4 Bit    Registers := 3     
 	                2 Bit    Registers := 2     
 	                1 Bit    Registers := 6     
@@ -827,16 +870,19 @@ Detailed RTL Component Info :
 	               8K Bit         RAMs := 1     
 +---Muxes : 
 	   2 Input     32 Bit        Muxes := 2     
+	  11 Input     24 Bit        Muxes := 1     
 	   2 Input     10 Bit        Muxes := 1     
 	   6 Input     10 Bit        Muxes := 1     
-	   2 Input      8 Bit        Muxes := 11    
-	   6 Input      8 Bit        Muxes := 1     
-	   2 Input      4 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 12    
+	   6 Input      8 Bit        Muxes := 2     
+	   2 Input      4 Bit        Muxes := 2     
+	   6 Input      4 Bit        Muxes := 1     
 	   2 Input      3 Bit        Muxes := 1     
 	   6 Input      3 Bit        Muxes := 1     
-	   2 Input      2 Bit        Muxes := 3     
-	   2 Input      1 Bit        Muxes := 18    
-	   6 Input      1 Bit        Muxes := 8     
+	   2 Input      2 Bit        Muxes := 4     
+	   6 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 22    
+	   6 Input      1 Bit        Muxes := 12    
 	   3 Input      1 Bit        Muxes := 2     
 	   4 Input      1 Bit        Muxes := 2     
 Module device 
@@ -844,7 +890,7 @@ Detailed RTL Component Info :
 +---Adders : 
 	   2 Input     16 Bit       Adders := 1     
 	   2 Input     14 Bit       Adders := 1     
-	   2 Input      8 Bit       Adders := 2     
+	   2 Input      8 Bit       Adders := 3     
 	   2 Input      7 Bit       Adders := 3     
 	   2 Input      6 Bit       Adders := 1     
 	   2 Input      5 Bit       Adders := 3     
@@ -855,13 +901,13 @@ Detailed RTL Component Info :
 	               16 Bit    Registers := 1     
 	               14 Bit    Registers := 1     
 	               10 Bit    Registers := 1     
-	                8 Bit    Registers := 2     
+	                8 Bit    Registers := 3     
 	                7 Bit    Registers := 2     
 	                6 Bit    Registers := 1     
 	                5 Bit    Registers := 2     
 	                4 Bit    Registers := 3     
 	                2 Bit    Registers := 1     
-	                1 Bit    Registers := 15    
+	                1 Bit    Registers := 16    
 +---RAMs : 
 	              512 Bit         RAMs := 1     
 	              128 Bit         RAMs := 1     
@@ -882,7 +928,7 @@ Detailed RTL Component Info :
 	   2 Input      3 Bit        Muxes := 1     
 	   3 Input      2 Bit        Muxes := 1     
 	   5 Input      2 Bit        Muxes := 1     
-	   2 Input      1 Bit        Muxes := 9     
+	   2 Input      1 Bit        Muxes := 10    
 	   3 Input      1 Bit        Muxes := 4     
 	   4 Input      1 Bit        Muxes := 4     
 	   5 Input      1 Bit        Muxes := 1     
@@ -904,159 +950,95 @@ Start Cross Boundary and Area Optimization
 ---------------------------------------------------------------------------------
 WARNING: [Synth 8-3917] design basys3_top has port QspiDB[3] driven by constant 1
 WARNING: [Synth 8-3917] design basys3_top has port QspiDB[2] driven by constant 1
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[16]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[0]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[8]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[17]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[1]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[9]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[18]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[2]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[10]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[19]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[3]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[11]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[20]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[4]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[12]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[21]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[5]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[13]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[22]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[6]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[14]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[16]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[17]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[18]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[19]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[20]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[21]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[22]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[23]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[24]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[25]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[26]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[27]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[28]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[29]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[30]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[31]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[0]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[1]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[2]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[3]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[4]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[5]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[6]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[7]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[8]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[9]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[10]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[11]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[12]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[13]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[14] )
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[7]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[15]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[15] )
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[0]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[1]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[8]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[1]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[1]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[2]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[9]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[2]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[2]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[3]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[3]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[4]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[4]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[5]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[5]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[6]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[6]' (FDRE) to 'soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[7]'
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/flash_addr_reg[7] )
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/state_reg[3] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/active_reg )
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/led_reg[0]' (FDRE) to 'soc_top_inst/i_0/device_inst/led_reg[3]'
-INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/led_reg[1]' (FDRE) to 'soc_top_inst/i_0/device_inst/led_reg[3]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/led_reg[0]' (FDRE) to 'soc_top_inst/i_0/device_inst/led_reg[1]'
+INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/led_reg[1]' (FDRE) to 'soc_top_inst/i_0/device_inst/led_reg[2]'
 INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/led_reg[2]' (FDRE) to 'soc_top_inst/i_0/device_inst/led_reg[3]'
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[8] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[9] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[7] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[6] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[5] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[4] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[3] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[2] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_cnt_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[2] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[3] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[4] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[5] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[6] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/word_idx0_inferred /\device_inst/gen_real_disk.u_spi_flash/word_idx_reg[7] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_clk_reg_d_reg )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_idx_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/byte_idx_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/bit_cnt_reg[3] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/bit_cnt_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/bit_cnt_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/bit_cnt_reg[2] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_wdata_reg[15] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[2] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[3] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[4] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[5] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[6] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_addr_reg[7] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/\device_inst/gen_real_disk.u_spi_flash/spi_ram_we_reg )
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[7]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[6]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[5]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[4]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[3]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[2]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[1]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[0]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:97]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[7]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[6]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[5]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[4]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[3]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[2]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[1]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[0]__0/Q' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [G:/GitHub/26-Arch/vivado/src/device.sv:98]
-CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [G:/GitHub/26-Arch/vivado/src/device.sv:98]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[7]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[6]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[5]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[4]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[3]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[2]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[1]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_lcr_reg[0]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:99]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[7]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[6]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[5]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[4]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[3]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[2]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[1]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 1st driver pin 'soc_top_inst/i_0/device_inst/uart_ier_reg[0]__0/Q' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6859] multi-driven net on pin Q with 2nd driver pin 'GND' [g:/GitHub/26-Arch/vivado/src/device.sv:100]
+CRITICAL WARNING: [Synth 8-6858] multi-driven net Q is connected to at least one constant driver which has been preserved, other driver is ignored [g:/GitHub/26-Arch/vivado/src/device.sv:100]
 INFO: [Synth 8-3333] propagating constant 1 across sequential element (soc_top_inst/i_0/\device_inst/rxBitSync_reg )
 INFO: [Synth 8-3886] merging instance 'soc_top_inst/i_0/device_inst/rxBit_reg' (FDS) to 'soc_top_inst/i_0/device_inst/rxBitSync_reg'
 INFO: [Synth 8-3333] propagating constant 1 across sequential element (soc_top_inst/i_0/\device_inst/rxBitSync_reg )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_15/\device_inst/console_rx_wptr_reg[0] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_15/\device_inst/console_rx_wptr_reg[1] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_15/\device_inst/console_rx_wptr_reg[2] )
-INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_15/\device_inst/console_rx_wptr_reg[3] )
-INFO: [Synth 8-5546] ROM "csr_pmpaddr0_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_16/\device_inst/console_rx_wptr_reg[0] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_16/\device_inst/console_rx_wptr_reg[1] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_16/\device_inst/console_rx_wptr_reg[2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (soc_top_inst/i_0/i_16/\device_inst/console_rx_wptr_reg[3] )
+INFO: [Synth 8-5546] ROM "csr_mstatus" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_sscratch_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mscratch" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_stvec_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mcause" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_scause_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mtval" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mtvec" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_stval_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mepc" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_sepc_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_satp" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_mcounteren_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_menvcfg_r" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "csr_pmpcfg0_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_pmpaddr0_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_medeleg_r" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mie" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mip_raw" won't be mapped to RAM because it is too sparse
+INFO: [Synth 8-5546] ROM "csr_mideleg_r" won't be mapped to RAM because it is too sparse
 WARNING: [Synth 8-3917] design core_csr__GB1 has port csr_pmpcfg0[63] driven by constant 0
 WARNING: [Synth 8-3917] design core_csr__GB1 has port csr_pmpcfg0[62] driven by constant 0
 WARNING: [Synth 8-3917] design core_csr__GB1 has port csr_pmpcfg0[61] driven by constant 0
@@ -1168,12 +1150,49 @@ INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][52] )
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][53] )
 INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][54] )
-INFO: [Common 17-14] Message 'Synth 8-3333' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][55] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][56] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][57] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][58] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][59] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][60] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][61] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][62] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\gpr_reg[0][63] )
 INFO: [Synth 8-5546] ROM "id_dec_is_load" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "id_dec_is_store" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "id_dec_is_branch" won't be mapped to RAM because it is too sparse
 INFO: [Synth 8-5546] ROM "id_dec_is_jal" won't be mapped to RAM because it is too sparse
 INFO: [Common 17-14] Message 'Synth 8-3331' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (fetch_redirect_pending_reg)
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[amo_cmd][0] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[amo_cmd][1] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[amo_cmd][2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[amo_cmd][3] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[amo_cmd][4] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][0] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][1] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][3] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][4] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][5] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][6] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wstrb][7] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][0] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][1] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][3] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][4] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][5] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][6] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][7] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][8] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][9] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][10] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][11] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][12] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\wb_r_reg[mem_wdata][13] )
+INFO: [Common 17-14] Message 'Synth 8-3333' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 INFO: [Synth 8-3886] merging instance 'ex_r_reg[amo_cmd][4]' (FDRE) to 'ex_r_reg[mem_size][2]'
 INFO: [Synth 8-3886] merging instance 'ex_r_reg[csr_addr][0]' (FDRE) to 'ex_r_reg[instr][20]'
 INFO: [Synth 8-3886] merging instance 'ex_r_reg[csr_addr][1]' (FDRE) to 'ex_r_reg[instr][21]'
@@ -1218,10 +1237,54 @@ INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][47]' (FDRE) to 'ex_r_reg[im
 INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][48]' (FDRE) to 'ex_r_reg[imm][49]'
 INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][49]' (FDRE) to 'ex_r_reg[imm][50]'
 INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][50]' (FDRE) to 'ex_r_reg[imm][51]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][51]' (FDRE) to 'ex_r_reg[imm][52]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][52]' (FDRE) to 'ex_r_reg[imm][53]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][53]' (FDRE) to 'ex_r_reg[imm][54]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][54]' (FDRE) to 'ex_r_reg[imm][55]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][55]' (FDRE) to 'ex_r_reg[imm][56]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][56]' (FDRE) to 'ex_r_reg[imm][57]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][57]' (FDRE) to 'ex_r_reg[imm][58]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][58]' (FDRE) to 'ex_r_reg[imm][59]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][59]' (FDRE) to 'ex_r_reg[imm][60]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][60]' (FDRE) to 'ex_r_reg[imm][61]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][61]' (FDRE) to 'ex_r_reg[imm][62]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[imm][62]' (FDRE) to 'ex_r_reg[imm][63]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[instr][7]' (FDRE) to 'ex_r_reg[rd][0]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[instr][8]' (FDRE) to 'ex_r_reg[rd][1]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[instr][9]' (FDRE) to 'ex_r_reg[rd][2]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[instr][10]' (FDRE) to 'ex_r_reg[rd][3]'
+INFO: [Synth 8-3886] merging instance 'ex_r_reg[instr][11]' (FDRE) to 'ex_r_reg[rd][4]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[csr_addr][0]' (FDRE) to 'mem_r_reg[instr][20]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[csr_addr][1]' (FDRE) to 'mem_r_reg[instr][21]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[csr_addr][2]' (FDRE) to 'mem_r_reg[instr][22]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][7]' (FDRE) to 'mem_r_reg[rd][0]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][8]' (FDRE) to 'mem_r_reg[rd][1]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][9]' (FDRE) to 'mem_r_reg[rd][2]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][10]' (FDRE) to 'mem_r_reg[rd][3]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][11]' (FDRE) to 'mem_r_reg[rd][4]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][23]' (FDRE) to 'mem_r_reg[csr_addr][3]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][24]' (FDRE) to 'mem_r_reg[csr_addr][4]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][25]' (FDRE) to 'mem_r_reg[csr_addr][5]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][26]' (FDRE) to 'mem_r_reg[csr_addr][6]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][27]' (FDRE) to 'mem_r_reg[csr_addr][7]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][28]' (FDRE) to 'mem_r_reg[csr_addr][8]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][29]' (FDRE) to 'mem_r_reg[csr_addr][9]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][30]' (FDRE) to 'mem_r_reg[csr_addr][10]'
+INFO: [Synth 8-3886] merging instance 'mem_r_reg[instr][31]' (FDRE) to 'mem_r_reg[csr_addr][11]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][0]' (FDRE) to 'wb_r_reg[instr][20]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][1]' (FDRE) to 'wb_r_reg[instr][21]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][2]' (FDRE) to 'wb_r_reg[instr][22]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][3]' (FDRE) to 'wb_r_reg[instr][23]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][4]' (FDRE) to 'wb_r_reg[instr][24]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][5]' (FDRE) to 'wb_r_reg[instr][25]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][6]' (FDRE) to 'wb_r_reg[instr][26]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][7]' (FDRE) to 'wb_r_reg[instr][27]'
+INFO: [Synth 8-3886] merging instance 'wb_r_reg[csr_addr][8]' (FDRE) to 'wb_r_reg[instr][28]'
 INFO: [Common 17-14] Message 'Synth 8-3886' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 INFO: [Common 17-14] Message 'Synth 8-3331' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+INFO: [Common 17-14] Message 'Synth 8-3886' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
 ---------------------------------------------------------------------------------
-Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:04 ; elapsed = 00:01:31 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:00 ; elapsed = 00:01:18 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP and Shift Register Reporting
@@ -1253,26 +1316,26 @@ Report RTL Partitions:
 +------+-----------------+------------+----------+
 |      |RTL Partition    |Replication |Instances |
 +------+-----------------+------------+----------+
-|1     |core_csr__GB0    |           1|     11641|
-|2     |core_csr__GB1    |           1|      2594|
+|1     |core_csr__GB0    |           1|      6682|
+|2     |core_csr__GB1    |           1|      6122|
 |3     |core_commit__GC0 |           1|      5642|
 |4     |core__GCB0       |           1|     20899|
 |5     |core_mdu         |           1|      7936|
-|6     |VTop__GC0        |           1|      6786|
-|7     |soc_top__GC0     |           1|      2673|
+|6     |VTop__GC0        |           1|      7854|
+|7     |soc_top__GC0     |           1|      3201|
 |8     |basys3_top__GC0  |           1|        34|
 +------+-----------------+------------+----------+
 ---------------------------------------------------------------------------------
 Start Applying XDC Timing Constraints
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:09 ; elapsed = 00:01:37 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:04 ; elapsed = 00:01:23 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Timing Optimization
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Timing Optimization : Time (s): cpu = 00:01:16 ; elapsed = 00:01:44 . Memory (MB): peak = 1128.895 ; gain = 553.953
+Finished Timing Optimization : Time (s): cpu = 00:01:10 ; elapsed = 00:01:29 . Memory (MB): peak = 1133.785 ; gain = 557.738
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start ROM, RAM, DSP and Shift Register Reporting
@@ -1302,13 +1365,13 @@ Report RTL Partitions:
 +------+-----------------+------------+----------+
 |      |RTL Partition    |Replication |Instances |
 +------+-----------------+------------+----------+
-|1     |core_csr__GB0    |           1|      6076|
-|2     |core_csr__GB1    |           1|      1624|
+|1     |core_csr__GB0    |           1|      2335|
+|2     |core_csr__GB1    |           1|      2894|
 |3     |core_commit__GC0 |           1|      5243|
 |4     |core__GCB0       |           1|     20418|
 |5     |core_mdu         |           1|      7936|
-|6     |VTop__GC0        |           1|      6748|
-|7     |soc_top__GC0     |           1|      2662|
+|6     |VTop__GC0        |           1|      7807|
+|7     |soc_top__GC0     |           1|      3190|
 |8     |basys3_top__GC0  |           1|        34|
 +------+-----------------+------------+----------+
 ---------------------------------------------------------------------------------
@@ -1317,20 +1380,20 @@ Start Technology Mapping
 INFO: [Synth 8-7053] The timing for the instance soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/disk_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 INFO: [Synth 8-7053] The timing for the instance soc_top_inst/i_0/device_inst/gen_real_disk.u_spi_flash/disk_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
 ---------------------------------------------------------------------------------
-Finished Technology Mapping : Time (s): cpu = 00:01:22 ; elapsed = 00:01:56 . Memory (MB): peak = 1139.828 ; gain = 564.887
+Finished Technology Mapping : Time (s): cpu = 00:01:14 ; elapsed = 00:01:39 . Memory (MB): peak = 1139.949 ; gain = 563.902
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
 +------+-----------------+------------+----------+
 |      |RTL Partition    |Replication |Instances |
 +------+-----------------+------------+----------+
-|1     |core_csr__GB0    |           1|      2412|
-|2     |core_csr__GB1    |           1|       767|
+|1     |core_csr__GB0    |           1|       937|
+|2     |core_csr__GB1    |           1|      1395|
 |3     |core_commit__GC0 |           1|      2661|
-|4     |core__GCB0       |           1|      8574|
+|4     |core__GCB0       |           1|      8575|
 |5     |core_mdu         |           1|      3826|
-|6     |VTop__GC0        |           1|      2464|
-|7     |soc_top__GC0     |           1|      1577|
+|6     |VTop__GC0        |           1|      2985|
+|7     |soc_top__GC0     |           1|      1800|
 |8     |basys3_top__GC0  |           1|        34|
 +------+-----------------+------------+----------+
 ---------------------------------------------------------------------------------
@@ -1351,13 +1414,13 @@ INFO: [Synth 8-7053] The timing for the instance soc_top_inst/device_inst/gen_re
 Finished Final Netlist Cleanup
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished IO Insertion : Time (s): cpu = 00:01:26 ; elapsed = 00:02:01 . Memory (MB): peak = 1145.164 ; gain = 570.223
+Finished IO Insertion : Time (s): cpu = 00:01:18 ; elapsed = 00:01:43 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Instances
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Instances : Time (s): cpu = 00:01:26 ; elapsed = 00:02:01 . Memory (MB): peak = 1145.164 ; gain = 570.223
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:18 ; elapsed = 00:01:43 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 
 Report RTL Partitions: 
@@ -1376,25 +1439,25 @@ Report Check Netlist:
 Start Rebuilding User Hierarchy
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:29 ; elapsed = 00:02:04 . Memory (MB): peak = 1145.164 ; gain = 570.223
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:20 ; elapsed = 00:01:46 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Ports
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Ports : Time (s): cpu = 00:01:29 ; elapsed = 00:02:04 . Memory (MB): peak = 1145.164 ; gain = 570.223
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:20 ; elapsed = 00:01:46 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Handling Custom Attributes
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Handling Custom Attributes : Time (s): cpu = 00:01:30 ; elapsed = 00:02:05 . Memory (MB): peak = 1146.117 ; gain = 571.176
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:21 ; elapsed = 00:01:47 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Renaming Generated Nets
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-Finished Renaming Generated Nets : Time (s): cpu = 00:01:30 ; elapsed = 00:02:05 . Memory (MB): peak = 1146.117 ; gain = 571.176
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:21 ; elapsed = 00:01:47 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 Start Writing Synthesis Report
@@ -1414,22 +1477,22 @@ Report Cell Usage:
 +------+----------+------+
 |1     |bram_0    |     1|
 |2     |clk_wiz_0 |     1|
-|3     |CARRY4    |   735|
-|4     |LUT1      |   143|
-|5     |LUT2      |  1450|
-|6     |LUT3      |  1779|
-|7     |LUT4      |  2572|
-|8     |LUT5      |  2239|
-|9     |LUT6      |  6416|
-|10    |MUXF7     |   372|
-|11    |MUXF8     |    52|
+|3     |CARRY4    |   757|
+|4     |LUT1      |   148|
+|5     |LUT2      |  1463|
+|6     |LUT3      |  1714|
+|7     |LUT4      |  2089|
+|8     |LUT5      |  2119|
+|9     |LUT6      |  6383|
+|10    |MUXF7     |   368|
+|11    |MUXF8     |    51|
 |12    |RAM32M    |     1|
 |13    |RAM64M    |     3|
 |14    |RAMB18E1  |     1|
 |15    |STARTUPE2 |     1|
-|16    |FDRE      |  6525|
+|16    |FDRE      |  7011|
 |17    |FDSE      |    12|
-|18    |IBUF      |     5|
+|18    |IBUF      |     6|
 |19    |OBUF      |     9|
 +------+----------+------+
 
@@ -1437,51 +1500,51 @@ Report Instance Areas:
 +------+----------------------------------+---------------+------+
 |      |Instance                          |Module         |Cells |
 +------+----------------------------------+---------------+------+
-|1     |top                               |               | 22381|
-|2     |  soc_top_inst                    |soc_top        | 22333|
+|1     |top                               |               | 22202|
+|2     |  soc_top_inst                    |soc_top        | 22153|
 |3     |    bram_wrapper_inst             |bram_wrapper   |   417|
-|4     |    device_inst                   |device         |   634|
-|5     |      \gen_real_disk.u_spi_flash  |spi_flash_disk |   194|
-|6     |    mycpu_top_inst                |mycpu_top      | 21280|
-|7     |      VTop_inst                   |VTop           | 21280|
-|8     |        core                      |core           | 19189|
-|9     |          u_commit                |core_commit    |  9778|
-|10    |            u_csr                 |core_csr       |  5281|
+|4     |    device_inst                   |device         |   857|
+|5     |      \gen_real_disk.u_spi_flash  |spi_flash_disk |   391|
+|6     |    mycpu_top_inst                |mycpu_top      | 20877|
+|7     |      VTop_inst                   |VTop           | 20877|
+|8     |        core                      |core           | 18399|
+|9     |          u_commit                |core_commit    |  8986|
+|10    |            u_csr                 |core_csr       |  4562|
 |11    |          u_mdu                   |core_mdu       |  4347|
 |12    |        dcvt                      |DBusToCBus     |     5|
-|13    |        icvt                      |IBusToCBus     |    79|
-|14    |          inst                    |DBusToCBus_0   |    75|
-|15    |        mux                       |CBusArbiter    |   994|
-|16    |        u_mmu                     |mmu            |  1013|
+|13    |        icvt                      |IBusToCBus     |    10|
+|14    |          inst                    |DBusToCBus_0   |     6|
+|15    |        mux                       |CBusArbiter    |   952|
+|16    |        u_mmu                     |mmu            |  1511|
 +------+----------------------------------+---------------+------+
 ---------------------------------------------------------------------------------
-Finished Writing Synthesis Report : Time (s): cpu = 00:01:30 ; elapsed = 00:02:05 . Memory (MB): peak = 1146.117 ; gain = 571.176
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:21 ; elapsed = 00:01:47 . Memory (MB): peak = 1145.691 ; gain = 569.645
 ---------------------------------------------------------------------------------
 Synthesis finished with 0 errors, 48 critical warnings and 259 warnings.
-Synthesis Optimization Runtime : Time (s): cpu = 00:01:20 ; elapsed = 00:02:01 . Memory (MB): peak = 1146.117 ; gain = 403.062
-Synthesis Optimization Complete : Time (s): cpu = 00:01:30 ; elapsed = 00:02:06 . Memory (MB): peak = 1146.117 ; gain = 571.176
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:11 ; elapsed = 00:01:43 . Memory (MB): peak = 1145.691 ; gain = 403.176
+Synthesis Optimization Complete : Time (s): cpu = 00:01:21 ; elapsed = 00:01:48 . Memory (MB): peak = 1145.691 ; gain = 569.645
 INFO: [Project 1-571] Translating synthesized netlist
-CRITICAL WARNING: [Netlist 29-72] Incorrect value '12.500000' specified for property 'SIM_CCLK_FREQ'. Expecting type 'double' with possible values of '0 to 10'. The system will either use the default value or the property value will be dropped. Please verify your source files. [G:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:84]
+CRITICAL WARNING: [Netlist 29-72] Incorrect value '12.500000' specified for property 'SIM_CCLK_FREQ'. Expecting type 'double' with possible values of '0 to 10'. The system will either use the default value or the property value will be dropped. Please verify your source files. [g:/GitHub/26-Arch/vivado/src/with_delay/basys3_top.sv:88]
 Resolution: Please check the value of the property and set to a correct value.
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.164 . Memory (MB): peak = 1154.191 ; gain = 0.000
-INFO: [Netlist 29-17] Analyzing 1165 Unisim elements for replacement
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.159 . Memory (MB): peak = 1153.672 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 1182 Unisim elements for replacement
 INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
 INFO: [Project 1-570] Preparing netlist for logic optimization
 INFO: [Opt 31-140] Inserted 1 IBUFs to IO ports without IO buffers.
 INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.003 . Memory (MB): peak = 1163.156 ; gain = 0.000
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.004 . Memory (MB): peak = 1158.676 ; gain = 0.000
 INFO: [Project 1-111] Unisim Transformation Summary:
   A total of 4 instances were transformed.
   RAM32M => RAM32M (RAMD32(x6), RAMS32(x2)): 1 instance 
   RAM64M => RAM64M (RAMD64E(x4)): 3 instances
 
 INFO: [Common 17-83] Releasing license: Synthesis
-371 Infos, 206 Warnings, 50 Critical Warnings and 0 Errors encountered.
+421 Infos, 205 Warnings, 50 Critical Warnings and 0 Errors encountered.
 synth_design completed successfully
-synth_design: Time (s): cpu = 00:01:36 ; elapsed = 00:02:12 . Memory (MB): peak = 1163.156 ; gain = 861.758
-Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.006 . Memory (MB): peak = 1163.156 ; gain = 0.000
+synth_design: Time (s): cpu = 00:01:26 ; elapsed = 00:01:54 . Memory (MB): peak = 1158.676 ; gain = 857.523
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.008 . Memory (MB): peak = 1158.676 ; gain = 0.000
 WARNING: [Constraints 18-5210] No constraints selected for write.
 Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
-INFO: [Common 17-1381] The checkpoint 'G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/basys3_top.dcp' has been generated.
+INFO: [Common 17-1381] The checkpoint 'g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/basys3_top.dcp' has been generated.
 INFO: [runtcl-4] Executing : report_utilization -file basys3_top_utilization_synth.rpt -pb basys3_top_utilization_synth.pb
-INFO: [Common 17-206] Exiting Vivado at Sat Jun 27 18:54:18 2026...
+INFO: [Common 17-206] Exiting Vivado at Sun Jun 28 09:59:59 2026...

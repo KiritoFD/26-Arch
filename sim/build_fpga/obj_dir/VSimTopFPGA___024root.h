@@ -22,14 +22,17 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         VL_IN8(io_perfInfo_dump,0,0);
         VL_OUT8(io_uart_out_valid,0,0);
         VL_OUT8(io_uart_out_ch,7,0);
-        VL_OUT8(io_uart_in_valid,0,0);
+        VL_IN8(io_uart_in_valid,0,0);
         VL_IN8(io_uart_in_ch,7,0);
+        VL_OUT8(io_uart_in_ready,0,0);
         CData/*0:0*/ SimTopFPGA__DOT__ram_valid;
         CData/*0:0*/ SimTopFPGA__DOT__ram_ready;
         CData/*0:0*/ SimTopFPGA__DOT__ram_last;
         CData/*0:0*/ SimTopFPGA__DOT__device_valid;
         CData/*0:0*/ SimTopFPGA__DOT__device_ready;
         CData/*0:0*/ SimTopFPGA__DOT__dbg_cpu_tx_write;
+        CData/*4:0*/ SimTopFPGA__DOT__sim_rx_bit_idx;
+        CData/*0:0*/ SimTopFPGA__DOT__sim_rx_idle;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__flush_mmu;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__fault_is_insn;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT____Vcellinp__dcvt__reset;
@@ -71,24 +74,34 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*1:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__privilege_mode;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__halted;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__trap_commit;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__trap_valid_latched;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mmu_trap;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__trap_redirect;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mret_redirect;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mdu_req;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__ex_to_mem_blocks_front;
-        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_ex_busy;
-        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_mem_busy;
-        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__raw_hazard_ex;
-        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__raw_hazard_mem;
     };
     struct {
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_ex_busy;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_mem_busy;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_if_mem;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__raw_hazard_ex;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__raw_hazard_mem;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_pipe;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__stall_front;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__ex_flush_front;
         CData/*7:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mem_store_strobe;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mdu_core_out_valid;
+        CData/*2:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_state;
+        CData/*4:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_cmd_q;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_dreq_valid;
+        CData/*7:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_dreq_strobe;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_issue;
-        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_issued_q;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_done_q;
-        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT____VdfgRegularize_h47660625_0_12;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__rs_hit;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__rs_slot;
+        CData/*7:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_store_strobe;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_sc_fail_q;
         CData/*4:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_decode__DOT__id_rd;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mdu_busy;
         CData/*3:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mdu_cmd;
@@ -120,6 +133,12 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*2:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__saved_size;
         CData/*1:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__saved_level;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__trap_pending;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_i_valid;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_valid0;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_valid1;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_lru;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_i_hit;
+        CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_hit;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__req_addr_bit2;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__req_inflight;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__issue_now;
@@ -127,6 +146,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__inst__DOT__req_inflight;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__inst__DOT__resp_seen;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__inst__DOT__issue_now;
+    };
+    struct {
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__icvt__DOT__inst__DOT__resp_fire;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__dcvt__DOT__okay;
         CData/*0:0*/ SimTopFPGA__DOT__u_vtop__DOT__dcvt__DOT__req_inflight;
@@ -146,8 +167,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*7:0*/ SimTopFPGA__DOT__u_device__DOT__uart_lcr;
         CData/*7:0*/ SimTopFPGA__DOT__u_device__DOT__uart_ier;
         CData/*3:0*/ SimTopFPGA__DOT__u_device__DOT__switch;
-    };
-    struct {
         CData/*4:0*/ SimTopFPGA__DOT__u_device__DOT__console_rx_wptr;
         CData/*4:0*/ SimTopFPGA__DOT__u_device__DOT__console_rx_rptr;
         CData/*5:0*/ SimTopFPGA__DOT__u_device__DOT__console_rx_count;
@@ -168,7 +187,7 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*0:0*/ SimTopFPGA__DOT__u_device__DOT__disk_rdy;
         CData/*0:0*/ SimTopFPGA__DOT__u_device__DOT__txn_done_pulse;
         CData/*0:0*/ SimTopFPGA__DOT__u_device__DOT____Vlvbound_h99cc83ff__0;
-        CData/*7:0*/ SimTopFPGA__DOT__u_device__DOT____Vlvbound_h24e30222__0;
+        CData/*7:0*/ SimTopFPGA__DOT__u_device__DOT____Vlvbound_hba873ae5__0;
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_commit__DOT__u_csr__DOT__delegate_to_s__14__Vfuncout;
         CData/*1:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_commit__DOT__u_csr__DOT__get_ecall_cause__16__mode;
         CData/*1:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_commit__DOT__u_csr__DOT__get_ecall_cause__18__mode;
@@ -193,6 +212,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*1:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__33__a_mode;
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__34__Vfuncout;
         CData/*1:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__34__mode;
+    };
+    struct {
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__34__active;
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__34__hit;
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__34__allow;
@@ -212,8 +233,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__38__allow;
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__39__Vfuncout;
         CData/*1:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__39__a_mode;
-    };
-    struct {
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__40__Vfuncout;
         CData/*1:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__40__mode;
         CData/*0:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__40__active;
@@ -225,6 +244,7 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         CData/*0:0*/ __VicoFirstIteration;
         CData/*0:0*/ __Vtrigprevexpr___TOP__clock__0;
         CData/*0:0*/ __VactContinue;
+        SData/*9:0*/ SimTopFPGA__DOT__sim_rx_shift;
         SData/*11:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_decode__DOT__id_csr_addr;
         SData/*8:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__vpn1;
         SData/*8:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__vpn0;
@@ -234,12 +254,14 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         SData/*9:0*/ SimTopFPGA__DOT__u_device__DOT__rxShiftReg;
         SData/*13:0*/ SimTopFPGA__DOT__u_device__DOT__rxBitTmr;
         SData/*11:0*/ __Vfunc_sanitize_csr_write__1__addr;
+        IData/*31:0*/ SimTopFPGA__DOT__sim_rx_cnt;
         IData/*31:0*/ SimTopFPGA__DOT__dbg_cycle_count;
         IData/*31:0*/ SimTopFPGA__DOT__dbg_device_access_count;
         IData/*31:0*/ SimTopFPGA__DOT__dbg_ram_access_count;
         IData/*31:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__fetch_buf_instr;
-        IData/*31:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__dbg_trap_count;
-        IData/*31:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__dbg_commit_count;
+        IData/*31:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__dbg_stall_cnt;
+        IData/*31:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__dbg_commit_total;
+        IData/*31:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__dbg_cycle_cnt;
         VlWide<3>/*64:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mdu_div_rem;
         VlWide<3>/*64:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__div_rem_next;
         VlWide<5>/*150:0*/ SimTopFPGA__DOT__u_vtop__DOT__mux__DOT____Vxrand_hee1f0c2a__0;
@@ -256,6 +278,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         IData/*31:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__37__ones;
         IData/*31:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__39__ones;
         IData/*31:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__41__ones;
+    };
+    struct {
         IData/*31:0*/ __VactIterCount;
         VL_IN64(io_logCtrl_log_begin,63,0);
         VL_IN64(io_logCtrl_log_end,63,0);
@@ -266,6 +290,7 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         VlWide<3>/*64:0*/ SimTopFPGA__DOT__u_vtop__DOT__ireq_core;
         QData/*33:0*/ SimTopFPGA__DOT__u_vtop__DOT__iresp_core;
         VlWide<5>/*139:0*/ SimTopFPGA__DOT__u_vtop__DOT__dreq_core;
+        VlWide<3>/*65:0*/ SimTopFPGA__DOT__u_vtop__DOT__dresp_core;
         VlWide<3>/*64:0*/ SimTopFPGA__DOT__u_vtop__DOT__ireq_bus;
         VlWide<5>/*139:0*/ SimTopFPGA__DOT__u_vtop__DOT__dreq_bus;
         VlWide<3>/*65:0*/ SimTopFPGA__DOT__u_vtop__DOT__dresp_bus;
@@ -278,8 +303,6 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__fetch_pc;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__fetch_req_pc;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__fetch_buf_pc;
-    };
-    struct {
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__fetch_redirect_pc;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__id_dec_op1;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__id_dec_op2;
@@ -302,6 +325,13 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__ex_redirect_pc;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mem_store_data_shifted;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__mdu_core_out_result;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_result;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_addr_q;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_wdata_q;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_old_data_q;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_dreq_addr;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_dreq_data;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__amo_store_data;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_decode__DOT__id_rs2_val;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mdu_mul_acc;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mdu_mul_a;
@@ -314,6 +344,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__dividend_abs;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__divisor_abs;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mul_acc_next;
+    };
+    struct {
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mul_a_next;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__mul_b_next;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__core__DOT__u_mdu__DOT__div_quot_next;
@@ -341,11 +373,17 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__saved_wdata;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pte_addr;
         QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__saved_pte;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__phys_addr;
+        QData/*51:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_i_va_ppn;
+        QData/*51:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_i_pa_ppn;
+        QData/*51:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_va_ppn0;
+        QData/*51:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_pa_ppn0;
+        QData/*51:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_va_ppn1;
+        QData/*51:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__tlb_d_pa_ppn1;
+        QData/*63:0*/ SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__satp_prev;
         VlWide<5>/*150:0*/ SimTopFPGA__DOT__u_vtop__DOT__mux__DOT__selected_req;
         VlWide<5>/*150:0*/ SimTopFPGA__DOT__u_vtop__DOT__mux__DOT__lock_req;
         VlWide<3>/*65:0*/ SimTopFPGA__DOT__u_vtop__DOT__mux__DOT____Vlvbound_hfd226540__0;
-    };
-    struct {
         VlWide<3>/*65:0*/ SimTopFPGA__DOT__u_vtop__DOT__mux__DOT____Vlvbound_h10130eb1__0;
         QData/*63:0*/ SimTopFPGA__DOT__u_bram__DOT__latched_addr;
         QData/*63:0*/ SimTopFPGA__DOT__u_bram__DOT__latched_wdata;
@@ -372,6 +410,8 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__32__cfg;
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_req_fault__32__paddr;
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__33__addr;
+    };
+    struct {
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__33__cfg;
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__33__paddr;
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__33__base;
@@ -409,9 +449,9 @@ class alignas(VL_CACHE_LINE_BYTES) VSimTopFPGA___024root final : public Verilate
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__41__base;
         QData/*63:0*/ __Vfunc_SimTopFPGA__DOT__u_vtop__DOT__u_mmu__DOT__pmp_entry_match__41__top;
         VlUnpacked<QData/*63:0*/, 32> SimTopFPGA__DOT__u_vtop__DOT__core__DOT__gpr;
+        VlUnpacked<QData/*63:0*/, 2> SimTopFPGA__DOT__u_vtop__DOT__core__DOT__rs_addr;
+        VlUnpacked<CData/*0:0*/, 2> SimTopFPGA__DOT__u_vtop__DOT__core__DOT__rs_valid;
         VlUnpacked<QData/*63:0*/, 262144> SimTopFPGA__DOT__u_bram__DOT__mem;
-    };
-    struct {
         VlUnpacked<CData/*7:0*/, 16> SimTopFPGA__DOT__u_device__DOT__console_rx_fifo;
         VlUnpacked<IData/*31:0*/, 256000> SimTopFPGA__DOT__u_device__DOT__sim_disk_mem;
     };

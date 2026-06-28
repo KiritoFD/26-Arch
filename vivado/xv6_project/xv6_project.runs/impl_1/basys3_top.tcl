@@ -65,19 +65,19 @@ start_step init_design
 set ACTIVE_STEP init_design
 set rc [catch {
   create_msg_db init_design.pb
-  set_param chipscope.maxJobs 8
+  set_param chipscope.maxJobs 3
   create_project -in_memory -part xc7a35tcpg236-1
   set_property design_mode GateLvl [current_fileset]
   set_param project.singleFileAddWarning.threshold 0
-  set_property webtalk.parent_dir G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/wt [current_project]
-  set_property parent.project_path G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.xpr [current_project]
-  set_property ip_output_repo G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/ip [current_project]
+  set_property webtalk.parent_dir g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/wt [current_project]
+  set_property parent.project_path g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.xpr [current_project]
+  set_property ip_output_repo g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.cache/ip [current_project]
   set_property ip_cache_permissions {read write} [current_project]
   set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
-  add_files -quiet G:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/basys3_top.dcp
-  read_ip -quiet G:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0.xci
-  read_ip -quiet G:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0.xci
-  read_xdc G:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc
+  add_files -quiet g:/GitHub/26-Arch/vivado/xv6_project/xv6_project.runs/synth_1/basys3_top.dcp
+  read_ip -quiet g:/GitHub/26-Arch/vivado/test-cpu/src/ip/clk_wiz_0/clk_wiz_0.xci
+  read_ip -quiet g:/GitHub/26-Arch/vivado/test-cpu/src/ip/bram_0/bram_0.xci
+  read_xdc g:/GitHub/26-Arch/vivado/src/Basys-3-Master.xdc
   link_design -top basys3_top -part xc7a35tcpg236-1
   close_msg_db -file init_design.pb
 } RESULT]
@@ -166,6 +166,25 @@ if {$rc} {
   return -code error $RESULT
 } else {
   end_step route_design
+  unset ACTIVE_STEP 
+}
+
+start_step write_bitstream
+set ACTIVE_STEP write_bitstream
+set rc [catch {
+  create_msg_db write_bitstream.pb
+  set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
+  catch { write_mem_info -force basys3_top.mmi }
+  write_bitstream -force basys3_top.bit 
+  catch {write_debug_probes -quiet -force basys3_top}
+  catch {file copy -force basys3_top.ltx debug_nets.ltx}
+  close_msg_db -file write_bitstream.pb
+} RESULT]
+if {$rc} {
+  step_failed write_bitstream
+  return -code error $RESULT
+} else {
+  end_step write_bitstream
   unset ACTIVE_STEP 
 }
 

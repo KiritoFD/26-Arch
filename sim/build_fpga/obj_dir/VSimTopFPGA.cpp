@@ -17,6 +17,7 @@ VSimTopFPGA::VSimTopFPGA(VerilatedContext* _vcontextp__, const char* _vcname__)
     , io_uart_out_ch{vlSymsp->TOP.io_uart_out_ch}
     , io_uart_in_valid{vlSymsp->TOP.io_uart_in_valid}
     , io_uart_in_ch{vlSymsp->TOP.io_uart_in_ch}
+    , io_uart_in_ready{vlSymsp->TOP.io_uart_in_ready}
     , io_logCtrl_log_begin{vlSymsp->TOP.io_logCtrl_log_begin}
     , io_logCtrl_log_end{vlSymsp->TOP.io_logCtrl_log_end}
     , io_logCtrl_log_level{vlSymsp->TOP.io_logCtrl_log_level}

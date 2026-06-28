@@ -535,12 +535,34 @@ for i in range(256):
 | 127 | `0x2947` | Image 1 校验和 |
 | 255 | `0x2947` | Image 2 校验和 |
 
-#### 6.5.5 修复结果
+#### 6.5.5 Vivado 与 COM 口同时可用的最终方案
 
-完整覆盖 EEPROM 后，物理拔插 USB：
+**关键发现**：Basys3 的 Vivado 识别和 COM 口功能**不能通过 EEPROM word 5 的 VCP 位同时实现**。
+
+| word 5 配置 | Vivado | COM 口 | 原因 |
+|-------------|--------|--------|------|
+| `0x0008`（原厂） | ✓ | ✗ | 两通道都是 D2XX，无 VCP |
+| `0x0009`（ChA VCP） | ✗ | ✓ | ChA 绑 VCP 驱动后 Digilent 驱动被踢掉 |
+| `0x000a`（ChB VCP） | ✗ | ✓ | ChB 绑 VCP 驱动后 Digilent 驱动被踢掉 |
+
+**根因**：EEPROM 启用 VCP 会让 Windows 给对应通道绑定 FTDI VCP 驱动（ftdibus.sys），这会**替换掉 Digilent D2XX 驱动**。而 Vivado 通过 Digilent Adept SDK 访问设备，需要 D2XX 驱动。两者互斥。
+
+**最终方案**：EEPROM 保持原厂配置（word 5 = `0x0008`，两通道都不启用 VCP），通过 **Windows 设备管理器的驱动属性**手动加载 VCP：
+
+1. 保持 EEPROM word 5 = `0x0008`（不动 EEPROM）
+2. 打开设备管理器 → "通用串行总线控制器"
+3. 找到 **USB Serial Converter A**（Channel A，连 FPGA UART）
+4. 右键 → 属性 → **Advanced**（或"VCP"）选项卡
+5. 勾选 **Load VCP**（加载 VCP 驱动）
+6. 对 **USB Serial Converter B**（Channel B，连 FPGA JTAG）做同样操作
+7. 拔插 USB
+
+**结果**：FTDI 驱动在 D2XX 模式下同时加载 VCP 子驱动，两个通道都同时出现 D2XX 设备和 COM 口：
+- `USB Serial Converter A` + `USB Serial Port (COM27)`
+- `USB Serial Converter B` + `USB Serial Port (COM28)`
 - Vivado Hardware Manager → Auto Connect 成功识别 Basys3 (`xc7a35t_0`)
-- 串口 COM 口正常出现
-- D2XX Description 从 `"Dual RS232-HS A"` 恢复为 `"Digilent Basys3"`
+
+这种方式不修改 EEPROM，不影响 Digilent 驱动绑定，Vivado 和串口同时可用。
 
 #### 6.5.6 经验教训
 
@@ -549,3 +571,5 @@ for i in range(256):
 3. **word 9 的 bit 11** 控制 USB 字符串描述符加载，这个位错了会导致 FTDI 回退到默认字符串
 4. **必须物理拔插 USB** 才能让 FTDI 芯片重新读取 EEPROM，软件 reset 无效
 5. **保留正常板子的完整 EEPROM 备份**是快速恢复的关键
+6. **EEPROM 的 VCP 位（word 5 bit 0/1）会替换掉 Digilent D2XX 驱动**，导致 Vivado 不认板子。Basys3 的 Vivado 识别和 COM 口共存**必须通过设备管理器属性启用 VCP**，不能通过 EEPROM 启用
+7. **Basys3 的 COM 口不是 FTDI VCP 直接提供**，而是 Digilent Adept 驱动在 D2XX 模式下通过驱动属性加载 VCP 子驱动实现

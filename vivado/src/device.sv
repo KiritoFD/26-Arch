@@ -552,7 +552,7 @@ module device #(
 			UART_IER:     rdata = {48'b0, uart_ier, 8'b0};
 			UART_FCR_ISR: rdata = {40'b0, 8'h01, 16'b0}; // ISR=1 (no pending interrupt)
 			UART_LCR:     rdata = {32'b0, uart_lcr, 24'b0};
-			UART_LSR:     rdata = {16'b0, 8'h60, 40'b0}; // THRE+TEMT
+			UART_LSR:     rdata = {16'b0, 8'h60 | (console_rx_empty ? 8'h00 : 8'h01), 40'b0}; // THRE+TEMT+DR(DR=1 when RX FIFO has data)
 
 			DISK_BLOCKNO: rdata = {32'd0, disk_blockno};
 			DISK_STATUS:  rdata = {63'd0, disk_rdy};
